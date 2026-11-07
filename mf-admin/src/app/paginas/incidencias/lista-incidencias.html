@@ -1,0 +1,111 @@
+<h1>Incidencias</h1>
+<form class="agro-herramientas" [formGroup]="filtros" (ngSubmit)="filtrar()">
+  <mat-form-field
+    ><mat-label>Parcela</mat-label
+    ><mat-select formControlName="idParcela" (selectionChange)="filtrar()"
+      ><mat-option value="">Todas</mat-option>
+      @for (p of parcelas(); track p.id) {
+        <mat-option [value]="p.id">{{ p.nombre }}</mat-option>
+      }
+    </mat-select></mat-form-field
+  >
+  <mat-form-field
+    ><mat-label>Campaña</mat-label
+    ><mat-select formControlName="idCampania" (selectionChange)="filtrar()"
+      ><mat-option value="">Todas</mat-option>
+      @for (c of campanias(); track c.id) {
+        <mat-option [value]="c.id">{{ c.nombre }}</mat-option>
+      }
+    </mat-select></mat-form-field
+  >
+  <mat-form-field
+    ><mat-label>Tipo</mat-label
+    ><mat-select formControlName="tipo" (selectionChange)="filtrar()"
+      ><mat-option value="">Todos</mat-option>
+      @for (t of tipos; track t) {
+        <mat-option [value]="t">{{ etiqueta(t) }}</mat-option>
+      }
+    </mat-select></mat-form-field
+  >
+  <mat-form-field
+    ><mat-label>Desde</mat-label
+    ><input
+      matInput
+      type="date"
+      formControlName="fechaDesde"
+      (change)="filtrar()" /></mat-form-field
+  ><mat-form-field
+    ><mat-label>Hasta</mat-label
+    ><input
+      matInput
+      type="date"
+      formControlName="fechaHasta"
+      (change)="filtrar()" /></mat-form-field
+  ><button mat-button type="submit" [disabled]="!valida()">Buscar</button>
+</form>
+@if (!filtros.controls.idParcela.value && !filtros.controls.idCampania.value) {
+  <p role="status">Elija una parcela o una campaña.</p>
+} @else if (!valida()) {
+  <p class="agro-error" role="alert">Desde debe ser anterior o igual a Hasta.</p>
+}
+<agro-mensaje-error [error]="error()" [reintentable]="true" (reintentar)="cargar()" />
+@if (cargando()) {
+  <p role="status">Cargando incidencias…</p>
+}
+<div class="agro-tabla">
+  <table mat-table [dataSource]="items()">
+    <ng-container matColumnDef="fecha"
+      ><th mat-header-cell *matHeaderCellDef>Observación</th>
+      <td mat-cell *matCellDef="let i">{{ i.fechaObservacion | date: 'medium' }}</td></ng-container
+    >
+    <ng-container matColumnDef="tipo"
+      ><th mat-header-cell *matHeaderCellDef>Tipo</th>
+      <td mat-cell *matCellDef="let i">{{ etiqueta(i.tipo) }}</td></ng-container
+    >
+    <ng-container matColumnDef="parcela"
+      ><th mat-header-cell *matHeaderCellDef>Parcela</th>
+      <td mat-cell *matCellDef="let i">{{ nombre(parcelas(), i.idParcela) }}</td></ng-container
+    >
+    <ng-container matColumnDef="campania"
+      ><th mat-header-cell *matHeaderCellDef>Campaña</th>
+      <td mat-cell *matCellDef="let i">{{ nombre(campanias(), i.idCampania) }}</td></ng-container
+    >
+    <ng-container matColumnDef="descripcion"
+      ><th mat-header-cell *matHeaderCellDef>Descripción</th>
+      <td mat-cell *matCellDef="let i">
+        {{ i.descripcion.slice(0, 100) }}{{ i.descripcion.length > 100 ? '…' : '' }}
+      </td></ng-container
+    >
+    <ng-container matColumnDef="registradaPor"
+      ><th mat-header-cell *matHeaderCellDef>Registrada por</th>
+      <td mat-cell *matCellDef="let i">{{ i.registradaPor.nombre }}</td></ng-container
+    >
+    <ng-container matColumnDef="clasificacion"
+      ><th mat-header-cell *matHeaderCellDef>Clasificación</th>
+      <td mat-cell *matCellDef="let i">
+        {{
+          i.clasificacion
+            ? i.clasificacion.categoria + ' · ' + porcentaje(i.clasificacion.confianza)
+            : 'Sin clasificación'
+        }}
+      </td></ng-container
+    >
+    <ng-container matColumnDef="acciones"
+      ><th mat-header-cell *matHeaderCellDef>Detalle</th>
+      <td mat-cell *matCellDef="let i">
+        <button mat-button (click)="$event.stopPropagation(); abrir(i)">Ver incidencia</button>
+      </td></ng-container
+    >
+    <tr mat-header-row *matHeaderRowDef="columnas"></tr>
+    <tr mat-row *matRowDef="let i; columns: columnas" (click)="abrir(i)"></tr>
+  </table>
+</div>
+@if (valida() && !cargando() && !items().length) {
+  <p>No hay incidencias para estos filtros.</p>
+}
+<agro-mensaje-error [error]="errorMas()" />
+@if (cursor()) {
+  <button mat-button [disabled]="cargandoMas() || cargando()" (click)="mas()">
+    {{ cargandoMas() ? 'Cargando…' : 'Cargar más' }}
+  </button>
+}

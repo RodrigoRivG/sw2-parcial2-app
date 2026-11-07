@@ -1,0 +1,103 @@
+<a mat-button routerLink="/labores">Volver a labores</a
+><button mat-button [disabled]="cargando() || guardando()" (click)="cargar()">Actualizar</button
+><agro-mensaje-error [error]="error()" [reintentable]="true" (reintentar)="cargar()" />
+@if (cargando()) {
+  <p role="status">Cargando labor…</p>
+}
+@if (labor(); as l) {
+  <mat-card
+    ><mat-card-content
+      ><h1>{{ etiqueta(l.tipoLabor) }}</h1>
+      <p>
+        Estado: <strong>{{ etiqueta(l.estado) }}</strong>
+      </p>
+      <p>
+        Campaña: {{ nombre(campanias(), l.idCampania) }} · Parcela:
+        {{ nombre(parcelas(), l.idParcela) }}
+      </p>
+      <p>
+        Fecha programada: {{ l.fechaProgramada ?? 'Sin programar' }} · Ejecución:
+        {{ (l.fechaEjecucion | date: 'medium') ?? 'Sin ejecutar' }}
+      </p>
+      <p>
+        Creación: {{ l.fechaCreacion | date: 'medium' }} · Recepción:
+        {{ l.fechaRecepcion | date: 'medium' }}
+      </p>
+      @if (l.fechaRecepcionEjecucion) {
+        <p>Recepción de ejecución: {{ l.fechaRecepcionEjecucion | date: 'medium' }}</p>
+      }
+      <p>
+        Responsable: {{ l.responsable.nombre }} · Programada por:
+        {{ l.programadaPor?.nombre ?? 'No corresponde' }}
+      </p>
+      <p>{{ l.observaciones ?? 'Sin observaciones' }}</p>
+      <p>
+        {{
+          l.validacionCampania === 'PENDIENTE'
+            ? 'Validación de campaña pendiente'
+            : 'Campaña validada'
+        }}
+      </p>
+      @if (l.motivo; as m) {
+        <p class="agro-error">{{ etiqueta(m.codigo) }}: {{ m.mensaje }}</p>
+      }
+      <h2>Insumos consumidos</h2>
+      @for (i of l.insumos; track i.idInsumo) {
+        <p>
+          {{ insumo(i.idInsumo)?.nombre ?? i.idInsumo.slice(0, 8) }}: {{ i.cantidad }}
+          {{ unidades[insumo(i.idInsumo)?.unidad ?? ''] }}
+        </p>
+      } @empty {
+        <p>Sin insumos.</p>
+      }
+      @if (l.resolucion; as r) {
+        <h2>Resolución</h2>
+        <p>{{ etiqueta(r.decision) }} · {{ r.observacion }}</p>
+        <p>{{ r.administrador.nombre }} · {{ r.fecha | date: 'medium' }}</p>
+        @if (r.motivoAnterior; as m) {
+          <p>Motivo anterior: {{ etiqueta(m.codigo) }} · {{ m.mensaje }}</p>
+        }
+      }
+    </mat-card-content></mat-card
+  >
+  @if (saga(); as s) {
+    <agro-vista-saga [saga]="s" />
+    @if (l.estado === 'PENDIENTE_REVISION') {
+      @if (sagaActiva(s.estado)) {
+        <p role="status">La Saga todavía está compensando; actualice en unos segundos.</p>
+      } @else if (decisiones().length) {
+        <h2>Resolver</h2>
+        <form [formGroup]="formulario" (ngSubmit)="resolver()">
+          <div class="agro-herramientas">
+            <mat-form-field
+              ><mat-label>Decisión</mat-label
+              ><mat-select formControlName="decision">
+                @for (d of decisiones(); track d) {
+                  <mat-option [value]="d">{{ etiqueta(d) }}</mat-option>
+                }
+              </mat-select></mat-form-field
+            ><mat-form-field
+              ><mat-label>Observación</mat-label
+              ><textarea matInput formControlName="observacion" maxlength="500"></textarea
+              ><mat-error>Observación obligatoria, máximo 500 caracteres</mat-error></mat-form-field
+            ><button
+              mat-flat-button
+              type="submit"
+              [disabled]="formulario.invalid || guardando() || cargando()"
+            >
+              Resolver
+            </button>
+          </div>
+        </form>
+      }
+    }
+  }
+  @if (l.idsSagaAnteriores.length) {
+    <h2>Sagas anteriores</h2>
+    @for (id of l.idsSagaAnteriores; track id) {
+      <p>
+        <a [routerLink]="['/sagas', id]">{{ id }}</a>
+      </p>
+    }
+  }
+}

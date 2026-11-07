@@ -1,0 +1,43 @@
+<h2 mat-dialog-title>Detalle de incidencia</h2>
+<mat-dialog-content>
+  <agro-mensaje-error [error]="error()" [reintentable]="true" (reintentar)="cargar()" />
+  @if (cargando()) {
+    <p role="status">Cargando incidencia…</p>
+  }
+  @if (incidencia(); as i) {
+    <h3>{{ etiqueta(i.tipo) }}</h3>
+    <p>Parcela: {{ datos.parcela }} · Campaña: {{ datos.campania }}</p>
+    <p>Observación: {{ i.fechaObservacion | date: 'medium' }}</p>
+    <p>{{ i.descripcion }}</p>
+    <p>Registrada por: {{ i.registradaPor.nombre }}</p>
+    <p>
+      Creación: {{ i.fechaCreacion | date: 'medium' }} · Recepción:
+      {{ i.fechaRecepcion | date: 'medium' }}
+    </p>
+    @if (i.clasificacion; as c) {
+      <h3>Clasificación</h3>
+      <p>{{ c.categoria }} · Confianza: {{ porcentaje(c.confianza) }}</p>
+      <p>Modelo: {{ c.versionModelo }} · Origen: {{ etiqueta(c.origen) }}</p>
+      <p>Orientativa: no reemplaza el criterio técnico.</p>
+    } @else {
+      <p>Sin clasificación.</p>
+    }
+    @if (fotoError()) {
+      <p role="alert">No se pudo cargar la foto.</p>
+      <button mat-button (click)="cargar()">Volver a cargar la incidencia</button>
+    } @else {
+      <img
+        [src]="i.foto.url"
+        alt="Fotografía de la incidencia"
+        style="max-width: 100%; max-height: 60vh; object-fit: contain"
+        (error)="fotoError.set(true)"
+      />
+    }
+    <p>
+      Foto: {{ i.foto.tipoContenido }} · {{ i.foto.tamanio }} bytes · URL vigente hasta
+      {{ i.foto.expiraEn | date: 'medium' }}
+    </p>
+  }</mat-dialog-content
+><mat-dialog-actions
+  ><button mat-button (click)="dialogo.close()">Cerrar</button></mat-dialog-actions
+>

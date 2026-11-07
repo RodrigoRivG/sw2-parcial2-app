@@ -1,0 +1,58 @@
+<h2 mat-dialog-title>Programar labor</h2>
+<mat-dialog-content>
+  <agro-mensaje-error [error]="error()" [reintentable]="!pendiente()" (reintentar)="cargar()" />
+  @if (cargando()) {
+    <p role="status">Consultando campañas…</p>
+  }
+  @if (pendiente() && !guardando()) {
+    <p role="status">Reintente el envío para consultar el resultado de esta misma operación.</p>
+  }
+  <form id="formulario-labor" [formGroup]="formulario" (ngSubmit)="guardar()">
+    <mat-form-field
+      ><mat-label>Campaña</mat-label
+      ><mat-select formControlName="idCampania">
+        @for (c of campanias(); track c.id) {
+          <mat-option [value]="c.id">{{ c.nombre }}</mat-option>
+        }</mat-select
+      ><mat-error>Seleccione una campaña</mat-error></mat-form-field
+    >
+    <p>Parcela: {{ nombreParcela() }}</p>
+    <mat-form-field
+      ><mat-label>Tipo de labor</mat-label
+      ><mat-select formControlName="tipoLabor">
+        @for (t of tipos; track t) {
+          <mat-option [value]="t">{{ etiqueta(t) }}</mat-option>
+        }
+      </mat-select></mat-form-field
+    >
+    <mat-form-field
+      ><mat-label>Fecha programada</mat-label
+      ><input matInput type="date" formControlName="fechaProgramada" [min]="hoy" /><mat-error
+        >Elija una fecha desde hoy (UTC)</mat-error
+      ></mat-form-field
+    >
+    @if (formulario.controls.fechaProgramada.value < hoy) {
+      <p class="agro-error">La fecha no puede ser anterior a hoy (UTC).</p>
+    }
+    <mat-form-field
+      ><mat-label>Observaciones</mat-label
+      ><textarea matInput formControlName="observaciones" maxlength="500"></textarea
+      ><mat-error>Máximo 500 caracteres</mat-error></mat-form-field
+    >
+  </form></mat-dialog-content
+><mat-dialog-actions
+  ><button mat-button [disabled]="guardando()" (click)="dialogo.close()">Cancelar</button
+  ><button
+    mat-flat-button
+    type="submit"
+    form="formulario-labor"
+    [disabled]="
+      guardando() ||
+      cargando() ||
+      (!pendiente() &&
+        (formulario.invalid || !campania() || formulario.controls.fechaProgramada.value < hoy))
+    "
+  >
+    {{ pendiente() ? 'Reintentar envío' : 'Guardar' }}
+  </button></mat-dialog-actions
+>

@@ -5,6 +5,10 @@ export class PaginaConsulta {
   readonly cargando = signal(false);
   protected destruida = false;
   private controlador?: AbortController;
+  protected cancelarConsulta() {
+    this.controlador?.abort();
+    this.cargando.set(false);
+  }
   constructor() {
     inject(DestroyRef).onDestroy(() => {
       this.destruida = true;

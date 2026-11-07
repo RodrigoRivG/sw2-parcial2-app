@@ -16,6 +16,17 @@ import { consulta } from './consulta';
 const ruta = '/api/gestion/v1/campanias';
 @Injectable({ providedIn: 'root' })
 export class ServicioCampanias {
+  catalogo(signal?: AbortSignal) {
+    return http<Pagina<Campania>>(ruta + '?tamanio=100', { signal });
+  }
+  async elegiblesParaLabor(signal?: AbortSignal) {
+    const paginas = await Promise.all(
+      ['PLANIFICADA', 'EN_CURSO'].map((estado) =>
+        http<Pagina<Campania>>(ruta + consulta({ estado, tamanio: 100 }), { signal }),
+      ),
+    );
+    return paginas.flatMap((p) => p.items).sort((a, b) => a.nombre.localeCompare(b.nombre));
+  }
   listar(
     filtros: { estado?: string; idParcela?: string; idCultivo?: string } = {},
     pagina = 0,

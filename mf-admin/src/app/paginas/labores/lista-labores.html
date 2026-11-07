@@ -1,0 +1,92 @@
+<h1>Labores</h1>
+<form class="agro-herramientas" [formGroup]="filtros" (ngSubmit)="filtrar()">
+  <mat-form-field
+    ><mat-label>Estado</mat-label
+    ><mat-select formControlName="estado" (selectionChange)="filtrar()"
+      ><mat-option value="">Todos</mat-option>
+      @for (e of estados; track e) {
+        <mat-option [value]="e">{{ etiqueta(e) }}</mat-option>
+      }
+    </mat-select></mat-form-field
+  >
+  <mat-form-field
+    ><mat-label>Campaña</mat-label
+    ><mat-select formControlName="idCampania" (selectionChange)="filtrar()"
+      ><mat-option value="">Todas</mat-option>
+      @for (c of campanias(); track c.id) {
+        <mat-option [value]="c.id">{{ c.nombre }}</mat-option>
+      }
+    </mat-select></mat-form-field
+  >
+  <mat-form-field
+    ><mat-label>Desde</mat-label
+    ><input
+      matInput
+      type="date"
+      formControlName="fechaDesde"
+      (change)="filtrar()" /></mat-form-field
+  ><mat-form-field
+    ><mat-label>Hasta</mat-label
+    ><input matInput type="date" formControlName="fechaHasta" (change)="filtrar()"
+  /></mat-form-field>
+  <mat-form-field
+    ><mat-label>Orden</mat-label
+    ><mat-select formControlName="orden" (selectionChange)="filtrar()"
+      ><mat-option value="DESC">Más recientes primero</mat-option
+      ><mat-option value="ASC">Más antiguas primero</mat-option></mat-select
+    ></mat-form-field
+  ><button mat-button type="submit" [disabled]="!valida()">Buscar</button
+  ><button mat-flat-button type="button" (click)="programar()">Programar labor</button>
+</form>
+@if (!filtros.controls.estado.value && !filtros.controls.idCampania.value) {
+  <p role="status">Elija un estado o una campaña.</p>
+} @else if (!valida()) {
+  <p class="agro-error" role="alert">Desde debe ser anterior o igual a Hasta.</p>
+}
+<agro-mensaje-error [error]="error()" [reintentable]="true" (reintentar)="cargar()" />
+@if (cargando()) {
+  <p role="status">Cargando labores…</p>
+}
+<div class="agro-tabla">
+  <table mat-table [dataSource]="items()">
+    <ng-container matColumnDef="fecha"
+      ><th mat-header-cell *matHeaderCellDef>Fecha de referencia</th>
+      <td mat-cell *matCellDef="let l">
+        {{ l.fechaProgramada ?? (l.fechaReferencia | date: 'medium') }}
+      </td></ng-container
+    >
+    <ng-container matColumnDef="tipo"
+      ><th mat-header-cell *matHeaderCellDef>Tipo</th>
+      <td mat-cell *matCellDef="let l">
+        <a [routerLink]="['/labores', l.id]">{{ etiqueta(l.tipoLabor) }}</a>
+      </td></ng-container
+    >
+    <ng-container matColumnDef="campania"
+      ><th mat-header-cell *matHeaderCellDef>Campaña</th>
+      <td mat-cell *matCellDef="let l">{{ nombre(campanias(), l.idCampania) }}</td></ng-container
+    >
+    <ng-container matColumnDef="parcela"
+      ><th mat-header-cell *matHeaderCellDef>Parcela</th>
+      <td mat-cell *matCellDef="let l">{{ nombre(parcelas(), l.idParcela) }}</td></ng-container
+    >
+    <ng-container matColumnDef="responsable"
+      ><th mat-header-cell *matHeaderCellDef>Responsable</th>
+      <td mat-cell *matCellDef="let l">{{ l.responsable.nombre }}</td></ng-container
+    >
+    <ng-container matColumnDef="estado"
+      ><th mat-header-cell *matHeaderCellDef>Estado</th>
+      <td mat-cell *matCellDef="let l">{{ etiqueta(l.estado) }}</td></ng-container
+    >
+    <tr mat-header-row *matHeaderRowDef="columnas"></tr>
+    <tr mat-row *matRowDef="let l; columns: columnas" (click)="abrir(l.id)"></tr>
+  </table>
+</div>
+@if (valida() && !cargando() && !items().length) {
+  <p>No hay labores para estos filtros.</p>
+}
+<agro-mensaje-error [error]="errorMas()" />
+@if (cursor()) {
+  <button mat-button [disabled]="cargandoMas() || cargando()" (click)="mas()">
+    {{ cargandoMas() ? 'Cargando…' : 'Cargar más' }}
+  </button>
+}

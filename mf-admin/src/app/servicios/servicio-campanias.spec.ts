@@ -1,5 +1,21 @@
 import { http } from '@agro/compartido';
 import { ServicioCampanias } from './servicio-campanias';
+it('obtiene el catálogo completo y une las campañas elegibles por nombre sin incluir finalizadas', async () => {
+  const servicio = new ServicioCampanias(),
+    signal = new AbortController().signal;
+  vi.mocked(http)
+    .mockResolvedValueOnce({ items: [{ id: 'b', nombre: 'Zafra', estado: 'PLANIFICADA' }] })
+    .mockResolvedValueOnce({ items: [{ id: 'a', nombre: 'Arroz', estado: 'EN_CURSO' }] });
+  expect((await servicio.elegiblesParaLabor(signal)).map((c) => c.id)).toEqual(['a', 'b']);
+  expect(http).toHaveBeenCalledWith('/api/gestion/v1/campanias?estado=PLANIFICADA&tamanio=100', {
+    signal,
+  });
+  expect(http).toHaveBeenCalledWith('/api/gestion/v1/campanias?estado=EN_CURSO&tamanio=100', {
+    signal,
+  });
+  await servicio.catalogo(signal);
+  expect(http).toHaveBeenLastCalledWith('/api/gestion/v1/campanias?tamanio=100', { signal });
+});
 beforeEach(() => vi.mocked(http).mockReset());
 it('respeta las rutas, filtros, versiones y cuerpos del contrato de campañas', async () => {
   const servicio = new ServicioCampanias(),

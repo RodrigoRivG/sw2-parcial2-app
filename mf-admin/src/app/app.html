@@ -47,5 +47,21 @@
     [active]="inventario.isActive"
     >Inventario</a
   >
+  <a
+    mat-tab-link
+    routerLink="/labores"
+    routerLinkActive
+    #labores="routerLinkActive"
+    [active]="labores.isActive"
+    >Labores</a
+  >
+  <a
+    mat-tab-link
+    routerLink="/incidencias"
+    routerLinkActive
+    #incidencias="routerLinkActive"
+    [active]="incidencias.isActive"
+    >Incidencias</a
+  >
 </nav>
 <mat-tab-nav-panel #panel><router-outlet /></mat-tab-nav-panel>

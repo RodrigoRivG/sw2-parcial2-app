@@ -1,6 +1,8 @@
 ﻿import { Component, inject, OnInit, signal } from '@angular/core';
 import { DatePipe } from '@angular/common';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { DialogoLabor } from '../labores/dialogo-labor';
+import { Labor } from '../../modelos/operaciones';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ErrorApi } from '@agro/compartido';
@@ -52,7 +54,14 @@ import { IndicadoresCampania } from './indicadores-campania';
             }
           </p>
           <div class="agro-herramientas">
+            <a mat-button routerLink="/labores" [queryParams]="{ idCampania: c.id }">Ver labores</a>
+            <a mat-button routerLink="/incidencias" [queryParams]="{ idCampania: c.id }"
+              >Ver incidencias</a
+            >
             @if (admiteCambios(c.estado)) {
+              <button mat-button [disabled]="ocupada() || cargando()" (click)="programarLabor()">
+                Programar labor
+              </button>
               <button mat-button [disabled]="ocupada() || cargando()" (click)="editar()">
                 Editar</button
               ><button
@@ -92,10 +101,22 @@ export class DetalleCampania extends PaginaConsulta implements OnInit {
   private readonly servicioParcelas = inject(ServicioParcelas);
   private readonly servicioCultivos = inject(ServicioCultivos);
   private readonly dialogos = inject(MatDialog);
+  private readonly router = inject(Router);
   private readonly avisos = inject(MatSnackBar);
   private catalogosListos = false;
   ngOnInit() {
     void this.cargar();
+  }
+  programarLabor() {
+    this.dialogos
+      .open(DialogoLabor, { width: '620px', data: { campania: this.campania() } })
+      .afterClosed()
+      .subscribe((labor: Labor | undefined) => {
+        if (labor && !this.destruida) {
+          this.avisos.open('Labor programada', 'Cerrar', { duration: 2500 });
+          void this.router.navigate(['/labores', labor.id]);
+        }
+      });
   }
   nombre(items: { id: string; nombre: string }[], id: string) {
     return items.find((i) => i.id === id)?.nombre ?? id.slice(0, 8);
