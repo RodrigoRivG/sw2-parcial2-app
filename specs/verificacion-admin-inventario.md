@@ -70,6 +70,6 @@ Verificación de la corrección final: 16 pruebas en 10 archivos aprobadas y 100
 
 El workflow existente de `mf-admin` ya instala dependencias de Angular y `compartido`, ejecuta las pruebas con cobertura y construye el bundle. No necesitó cambios. Sus comandos de pruebas y build se verificaron localmente.
 
-**Pendiente T09 / CE-INV-04:** ejecutar el pipeline de GitHub con estos cambios. El pipeline aprobado de FE-002 no corresponde a FE-003. No se realizó commit, push ni despliegue.
+**T09 / CE-INV-04 completados:** el usuario confirmó el 2026-11-07 que el pipeline de FE-003 está en verde tras corregir la identidad de `ErrorApi` en las pruebas. Esta confirmación cierra la verificación remota pendiente. No se adjuntó enlace ni identificador de ejecución.
 
-Para repetir: mantener el backend levantado, ejecutar `npm.cmd run construir` y `npm.cmd run servir`, entrar con `admin.prueba` en Chrome y Edge y recorrer el ciclo de la tabla con nombres nuevos. Verificar después los errores, filtros y edición por unidad indicados arriba. Tras publicar los cambios, comprobar la ejecución nueva del workflow antes de cerrar T09.
+Para repetir: mantener el backend levantado, ejecutar `npm.cmd run construir` y `npm.cmd run servir`, entrar con `admin.prueba` en Chrome y Edge y recorrer el ciclo de la tabla con nombres nuevos. Verificar después los errores, filtros y edición por unidad indicados arriba. Tras cambios posteriores, comprobar una nueva ejecución del workflow de `mf-admin` en GitHub.

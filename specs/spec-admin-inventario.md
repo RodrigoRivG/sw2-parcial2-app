@@ -4,7 +4,7 @@
 |---|---|
 | ID | FE-003 |
 | Archivo | `specs/spec-admin-inventario.md` |
-| Estado | Implementada y verificada localmente (2026-11-07); CI remota pendiente |
+| Estado | Implementada y verificada (2026-11-07) |
 | Constitución | Microfrontends v1.1.0 |
 | Trazabilidad | CU-06, CU-07, CU-24 · RF-07, RF-08, RF-33 · RN-04, RN-05, RN-15, RN-16 · RNF-05, RNF-15 |
 | Depende de | FE-002 (implementada): navegación, `consulta.ts` y componentes de `componentes/`; `servicio-inventario` (implementado) |
@@ -212,6 +212,6 @@ La prueba de reglas también cubre el rechazo local de cantidades cero y la adap
 - [x] **T06** — Movimientos: lista, filtros en la URL y botón de registro. *Hecho cuando:* historia 3.
 - [x] **T07** [P] — Estado del inventario. *Hecho cuando:* historia 4.
 - [x] **T08** — Verificación manual: CE-INV-01 y CE-INV-02 en Chrome y Edge, y los casos borde de errores (`UNIDAD_NO_MODIFICABLE`, `STOCK_INSUFICIENTE`, duplicado, conflicto de versión). Se anota en `specs/verificacion-admin-inventario.md`.
-- [ ] **T09** — Pipeline de `mf-admin` en verde. *Hecho cuando:* CE-INV-03 y CE-INV-04.
+- [x] **T09** — Pipeline de `mf-admin` en verde. *Hecho cuando:* CE-INV-03 y CE-INV-04.
 
-Resultados y ajustes implementados: [verificacion-admin-inventario.md](verificacion-admin-inventario.md). T09 queda pendiente de una ejecución del workflow en GitHub para FE-003; el pipeline aprobado de FE-002 no valida estos cambios.
+Resultados y ajustes implementados: [verificacion-admin-inventario.md](verificacion-admin-inventario.md). T09 completada: el usuario confirmó el 2026-11-07 que el pipeline de FE-003 está en verde (CE-INV-04); pruebas, cobertura y build locales aprobados.
