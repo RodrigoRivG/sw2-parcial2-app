@@ -20,7 +20,7 @@ El backend vive en el repositorio `sw2-parcial2` y está implementado: los cuatr
 | 2 | FE-002 | [spec-admin-gestion.md](spec-admin-gestion.md) **(implementada y verificada)** | Parcelas, cultivos, campañas, costos manuales, producción e indicadores | `mf-admin` | CU-01 a CU-05 | RF-01 a RF-06 |
 | 3 | FE-003 | [spec-admin-inventario.md](spec-admin-inventario.md) **(implementada y verificada)** | Insumos, movimientos y estado del inventario | `mf-admin` | CU-06, CU-07, CU-24 | RF-07, RF-08, RF-33 |
 | 4 | FE-004 | [spec-admin-operaciones.md](spec-admin-operaciones.md) **(implementada y verificada)** | Programar labores; consultar labores, incidencias y Sagas; resolver labores `PENDIENTE_REVISION` | `mf-admin` | CU-10, CU-11, CU-12 | RF-11, RF-12, RF-13 |
-| 5 | FE-005 | `spec-admin-usuarios.md` *(por redactar)* | Usuarios con la API de administración de Keycloak y publicación de versiones de modelos de IA | `mf-admin` | CU-23 | RF-32 |
+| 5 | FE-005 | [spec-admin-usuarios.md](spec-admin-usuarios.md) *(revisada, pendiente de implementación)* | Usuarios con la API de administración de Keycloak y publicación de versiones de modelos de IA | `mf-admin` | CU-23 | RF-28, RF-32 |
 | 6 | FE-006 | `spec-campo-registro.md` *(por redactar)* | Labores e incidencias con foto, sin conexión, y sincronización por lotes | `mf-campo` | CU-10, CU-11, CU-13 | RF-11, RF-12, RF-15 a RF-17 |
 | 7 | FE-007 | `spec-campo-clasificacion.md` *(por redactar)* | Clasificación de imágenes con TensorFlow.js (sin conexión) y en el servidor | `mf-campo` | CU-16 | RF-20, RF-21 |
 | 8 | FE-008 | `spec-analisis-consultas.md` *(por redactar)* | Paneles de indicadores, inventario, labores e incidencias por GraphQL, con Recharts | `mf-analisis` | CU-05, CU-24 | RF-06, RF-27, RF-33 |
