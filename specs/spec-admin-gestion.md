@@ -197,6 +197,9 @@ Documentos a mano: `Constitucion.md` v1.1.0, `specs/README.md`, este archivo y, 
 | `paginas/campanias/produccion-campania.ts` | Pestaña Producción: muestra y, si `EN_CURSO`, formulario en línea; emite `cambio` |
 | `paginas/campanias/indicadores-campania.ts` | Pestaña Indicadores, solo lectura; se recarga cuando cambia la `version` de la campaña |
 | `componentes/mensaje-error.ts` | Muestra `mensajeError` y los `detalles`, con botón **Reintentar** opcional |
+| `componentes/pagina.ts` | *Añadido al implementar.* Clase base `PaginaConsulta`: señales `error` y `cargando`, `consultar(leer, aplicar)` que cancela la consulta anterior, y cancelación al destruir la página |
+| `componentes/material.ts` | *Añadido al implementar.* Arreglo `material` con los módulos de Material, `ReactiveFormsModule` y `MensajeError` que importan las páginas |
+| `componentes/paginador.ts` | *Añadido al implementar.* `MatPaginatorIntl` con textos en español |
 
 Se eliminan `InicioComponent.ts` y `servicios/servicio-prueba.ts` con su prueba.
 
