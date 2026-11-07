@@ -185,7 +185,7 @@ Pocas pruebas, con `http` simulado como en FE-002:
 
 La prueba de reglas también cubre el rechazo local de cantidades cero y la adaptación de cantidades `UNIDAD` al formulario de edición.
 
-Los cinco archivos de pruebas de servicios de Administración usan un mock de `@agro/compartido` que exporta `http` simulado y la clase real `ErrorApi`, cargada de forma diferida desde `compartido/src/error-api.ts`. Esto mantiene disponible la clase `ErrorApi` cuando los módulos compilados se comparten entre las pruebas de servicios y las de errores. Se corrigió tras detectar en CI que el mock completo `{ http: vi.fn() }` eliminaba esa exportación y hacía fallar `consulta.spec.ts`.
+`vitest.config.ts` resuelve `@agro/compartido` a un único adaptador de pruebas, `pruebas/compartido-simulado.ts`. El adaptador reexporta el módulo real y sustituye únicamente `http` por `vi.fn()`. Las cinco pruebas de servicios reinician ese mock en `beforeEach`, sin factorías `vi.mock` por archivo. Así todos los consumidores del bundle de pruebas utilizan la misma clase `ErrorApi`, tanto en las construcciones como en `instanceof`, independientemente del orden de ejecución. La configuración de la aplicación y el módulo compartido de producción no cambian.
 
 ## 2.4 Decisiones
 

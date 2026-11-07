@@ -64,7 +64,9 @@ Todos están incorporados en `spec-admin-inventario.md`, decisiones D-FE3-06 a D
 
 ## CI y repetición
 
-La primera ejecución de CI comunicada por el usuario falló en `consulta.spec.ts`: los mocks completos de `@agro/compartido` en las pruebas de servicios solo exportaban `http`, dejando `ErrorApi` sin exportar al reutilizarse el módulo compilado. Se corrigieron las cinco pruebas de servicios (parcelas, cultivos, campañas, insumos y movimientos) para exportar `http` simulado junto con la clase real `ErrorApi`, importada de forma diferida desde su archivo fuente. La importación diferida evita la referencia circular que aparece al cargar el módulo compartido completo en la factoría del mock con el runner de Angular. Es una corrección de las pruebas, sin cambios en el comportamiento de la aplicación. Tras el ajuste, la suite completa volvió a aprobar sus 16 pruebas en 10 archivos, con 100 % de cobertura de líneas reportada.
+CI detectó dos fallos relacionados en `consulta.spec.ts`: primero faltaba `ErrorApi` en los mocks de servicios; después, al importarla de forma diferida en cada factoría, aparecieron clases con distinta identidad y falló `instanceof`. La corrección final elimina las factorías por archivo y resuelve `@agro/compartido` mediante un único adaptador en `pruebas/compartido-simulado.ts`, configurado en `vitest.config.ts`. El adaptador reexporta el módulo real y sustituye solo `http`; las pruebas de servicios reinician ese mock antes de cada caso. No se modificó el código de producción.
+
+Verificación de la corrección final: 16 pruebas en 10 archivos aprobadas y 100 % de cobertura de líneas reportada, tanto con la configuración habitual como forzando un solo worker sin aislamiento y ejecutando los servicios antes de `consulta.spec.ts`. Para esta segunda comprobación se usó una configuración temporal de ordenación, eliminada al terminar; la configuración habitual conserva el paralelismo del runner.
 
 El workflow existente de `mf-admin` ya instala dependencias de Angular y `compartido`, ejecuta las pruebas con cobertura y construye el bundle. No necesitó cambios. Sus comandos de pruebas y build se verificaron localmente.
 

@@ -1,9 +1,6 @@
 import { http } from '@agro/compartido';
 import { ServicioCultivos } from './servicio-cultivos';
-vi.mock('@agro/compartido', async () => {
-  const { ErrorApi } = await import('../../../../compartido/src/error-api');
-  return { ErrorApi, http: vi.fn() };
-});
+beforeEach(() => vi.mocked(http).mockReset());
 it('transmite filtros y cancelación; fija KILOGRAMO y transmite versión', async () => {
   const servicio = new ServicioCultivos(),
     signal = new AbortController().signal;
