@@ -1,0 +1,53 @@
+<h2 mat-dialog-title>Registrar movimiento</h2>
+<mat-dialog-content>
+  <agro-mensaje-error [error]="error()" />
+  <form id="formulario-movimiento" [formGroup]="formulario" (ngSubmit)="guardar()">
+    <mat-form-field
+      ><mat-label>Insumo</mat-label
+      ><mat-select formControlName="idInsumo">
+        @for (i of catalogo; track i.id) {
+          <mat-option [value]="i.id">{{ i.nombre }}</mat-option>
+        }</mat-select
+      ><mat-error>Seleccione un insumo</mat-error></mat-form-field
+    >
+    @if (cargando()) {
+      <p role="status">Consultando stock actual…</p>
+    }
+    @if (elegido(); as insumo) {
+      <p>
+        Stock actual: <strong>{{ insumo.stock }} {{ etiquetas[insumo.unidad] }}</strong>
+      </p>
+    }
+    <mat-form-field
+      ><mat-label>Tipo</mat-label
+      ><mat-select formControlName="tipo"
+        ><mat-option value="ENTRADA">Entrada</mat-option
+        ><mat-option value="SALIDA">Salida</mat-option></mat-select
+      ></mat-form-field
+    >
+    <mat-form-field
+      ><mat-label>Cantidad</mat-label
+      ><input matInput inputmode="decimal" formControlName="cantidad" /><mat-error>{{
+        elegido()?.unidad === 'UNIDAD'
+          ? 'Use un entero mayor a cero'
+          : 'Use una cantidad mayor a cero con hasta 3 decimales'
+      }}</mat-error></mat-form-field
+    >
+    <mat-form-field
+      ><mat-label>Motivo</mat-label
+      ><input matInput formControlName="motivo" maxlength="200" /><mat-error
+        >Motivo obligatorio, máximo 200 caracteres</mat-error
+      ></mat-form-field
+    >
+  </form> </mat-dialog-content
+><mat-dialog-actions
+  ><button mat-button [disabled]="guardando()" (click)="dialogo.close()">Cancelar</button
+  ><button
+    mat-flat-button
+    type="submit"
+    form="formulario-movimiento"
+    [disabled]="formulario.invalid || guardando() || cargando() || !elegido()"
+  >
+    Guardar
+  </button></mat-dialog-actions
+>

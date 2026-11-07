@@ -1,0 +1,68 @@
+<h2 mat-dialog-title>{{ registro ? 'Editar insumo' : 'Nuevo insumo' }}</h2>
+<mat-dialog-content>
+  <agro-mensaje-error [error]="error()" />
+  <form id="formulario-insumo" [formGroup]="formulario" (ngSubmit)="guardar()">
+    <mat-form-field
+      ><mat-label>Nombre</mat-label
+      ><input matInput formControlName="nombre" maxlength="100" /><mat-error
+        >Nombre obligatorio, máximo 100 caracteres</mat-error
+      ></mat-form-field
+    >
+    <mat-form-field
+      ><mat-label>Categoría</mat-label
+      ><mat-select formControlName="categoria">
+        @for (c of categorias; track c) {
+          <mat-option [value]="c">{{ etiquetas[c] }}</mat-option>
+        }
+      </mat-select></mat-form-field
+    >
+    <mat-form-field
+      ><mat-label>Unidad</mat-label
+      ><mat-select formControlName="unidad">
+        @for (u of unidades; track u) {
+          <mat-option [value]="u">{{ etiquetas[u] }}</mat-option>
+        }
+      </mat-select></mat-form-field
+    >
+    <mat-form-field
+      ><mat-label>Nivel mínimo</mat-label
+      ><input matInput inputmode="decimal" formControlName="nivelMinimo" /><mat-error>{{
+        formulario.controls.unidad.value === 'UNIDAD'
+          ? 'Use un entero'
+          : 'Use un decimal con hasta 3 cifras decimales'
+      }}</mat-error></mat-form-field
+    >
+    <mat-form-field
+      ><mat-label>Costo unitario (Bs)</mat-label
+      ><input matInput inputmode="decimal" formControlName="costoUnitario" /><mat-error
+        >Use un decimal con hasta 4 cifras decimales</mat-error
+      ></mat-form-field
+    >
+    @if (!registro) {
+      <mat-form-field
+        ><mat-label>Stock inicial (opcional)</mat-label
+        ><input matInput inputmode="decimal" formControlName="stockInicial" /><mat-error>{{
+          formulario.controls.unidad.value === 'UNIDAD'
+            ? 'Use un entero'
+            : 'Use un decimal con hasta 3 cifras decimales'
+        }}</mat-error></mat-form-field
+      >
+    }
+    <mat-form-field
+      ><mat-label>Descripción</mat-label
+      ><textarea matInput formControlName="descripcion" maxlength="500"></textarea
+      ><mat-error>Máximo 500 caracteres</mat-error></mat-form-field
+    >
+  </form>
+</mat-dialog-content>
+<mat-dialog-actions
+  ><button mat-button [disabled]="guardando()" (click)="dialogo.close()">Cancelar</button
+  ><button
+    mat-flat-button
+    type="submit"
+    form="formulario-insumo"
+    [disabled]="formulario.invalid || guardando()"
+  >
+    Guardar
+  </button></mat-dialog-actions
+>

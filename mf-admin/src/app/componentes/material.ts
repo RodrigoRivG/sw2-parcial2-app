@@ -9,7 +9,9 @@ import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatCardModule } from '@angular/material/card';
 import { MensajeError } from './mensaje-error';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 export const material = [
+  MatCheckboxModule,
   ReactiveFormsModule,
   MatButtonModule,
   MatFormFieldModule,

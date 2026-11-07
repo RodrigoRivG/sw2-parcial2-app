@@ -23,5 +23,29 @@
     [active]="campanias.isActive"
     >Campañas</a
   >
+  <a
+    mat-tab-link
+    routerLink="/insumos"
+    routerLinkActive
+    #insumos="routerLinkActive"
+    [active]="insumos.isActive"
+    >Insumos</a
+  >
+  <a
+    mat-tab-link
+    routerLink="/movimientos"
+    routerLinkActive
+    #movimientos="routerLinkActive"
+    [active]="movimientos.isActive"
+    >Movimientos</a
+  >
+  <a
+    mat-tab-link
+    routerLink="/inventario"
+    routerLinkActive
+    #inventario="routerLinkActive"
+    [active]="inventario.isActive"
+    >Inventario</a
+  >
 </nav>
 <mat-tab-nav-panel #panel><router-outlet /></mat-tab-nav-panel>

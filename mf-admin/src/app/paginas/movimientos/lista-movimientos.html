@@ -1,0 +1,109 @@
+<h1>Movimientos</h1>
+@if (idSaga()) {
+  <p>
+    Filtrando por Saga: {{ idSaga() }}
+    <button mat-button (click)="quitarSaga()">Quitar filtro de Saga</button>
+  </p>
+}
+<form class="agro-herramientas" [formGroup]="filtros" (ngSubmit)="filtrar()">
+  <mat-form-field
+    ><mat-label>Insumo</mat-label
+    ><mat-select formControlName="idInsumo" (selectionChange)="filtrar()"
+      ><mat-option value="">Todos</mat-option>
+      @for (i of catalogo(); track i.id) {
+        <mat-option [value]="i.id">{{ i.nombre }}</mat-option>
+      }
+    </mat-select></mat-form-field
+  >
+  <mat-form-field
+    ><mat-label>Tipo</mat-label
+    ><mat-select formControlName="tipo" (selectionChange)="filtrar()"
+      ><mat-option value="">Todos</mat-option><mat-option value="ENTRADA">Entrada</mat-option
+      ><mat-option value="SALIDA">Salida</mat-option></mat-select
+    ></mat-form-field
+  >
+  <mat-form-field
+    ><mat-label>Desde</mat-label
+    ><input matInput type="date" formControlName="desde" (change)="filtrar()" /></mat-form-field
+  ><mat-form-field
+    ><mat-label>Hasta</mat-label
+    ><input matInput type="date" formControlName="hasta" (change)="filtrar()" /></mat-form-field
+  ><button mat-button type="submit">Buscar</button
+  ><button mat-flat-button type="button" [disabled]="!catalogoListo()" (click)="registrar()">
+    Registrar movimiento
+  </button>
+</form>
+@if (rangoInvalido()) {
+  <p class="agro-error" role="alert">Desde debe ser anterior o igual a Hasta. Revise las fechas.</p>
+}
+<agro-mensaje-error [error]="error()" [reintentable]="true" (reintentar)="cargar()" />
+@if (cargando()) {
+  <p role="status">Cargando movimientos…</p>
+}
+<div class="agro-tabla">
+  <table mat-table [dataSource]="items()">
+    <ng-container matColumnDef="fecha"
+      ><th mat-header-cell *matHeaderCellDef>Fecha y hora</th>
+      <td mat-cell *matCellDef="let m">{{ m.fecha | date: 'medium' }}</td></ng-container
+    >
+    <ng-container matColumnDef="insumo"
+      ><th mat-header-cell *matHeaderCellDef>Insumo</th>
+      <td mat-cell *matCellDef="let m">
+        {{ insumo(m.idInsumo)?.nombre ?? m.idInsumo.slice(0, 8) }}
+      </td></ng-container
+    >
+    <ng-container matColumnDef="tipo"
+      ><th mat-header-cell *matHeaderCellDef>Tipo</th>
+      <td mat-cell *matCellDef="let m">{{ etiquetas[m.tipo] }}</td></ng-container
+    >
+    <ng-container matColumnDef="cantidad"
+      ><th mat-header-cell *matHeaderCellDef>Cantidad</th>
+      <td mat-cell *matCellDef="let m">
+        {{ m.cantidad }} {{ etiquetas[insumo(m.idInsumo)?.unidad ?? ''] }}
+      </td></ng-container
+    >
+    <ng-container matColumnDef="stockResultante"
+      ><th mat-header-cell *matHeaderCellDef>Stock resultante</th>
+      <td mat-cell *matCellDef="let m">{{ m.stockResultante }}</td></ng-container
+    >
+    <ng-container matColumnDef="costoUnitario"
+      ><th mat-header-cell *matHeaderCellDef>Costo unitario</th>
+      <td mat-cell *matCellDef="let m">{{ m.costoUnitario }} Bs</td></ng-container
+    >
+    <ng-container matColumnDef="motivo"
+      ><th mat-header-cell *matHeaderCellDef>Motivo</th>
+      <td mat-cell *matCellDef="let m">{{ m.motivo }}</td></ng-container
+    >
+    <ng-container matColumnDef="origen"
+      ><th mat-header-cell *matHeaderCellDef>Origen</th>
+      <td mat-cell *matCellDef="let m">
+        {{ origen(m) }}
+        @if (m.idLabor) {
+          <small>Labor: {{ m.idLabor }}</small>
+        }
+        @if (m.idSaga) {
+          <small>Saga: {{ m.idSaga }}</small>
+        }
+      </td></ng-container
+    >
+    <ng-container matColumnDef="actor"
+      ><th mat-header-cell *matHeaderCellDef>Actor</th>
+      <td mat-cell *matCellDef="let m" [title]="m.actor">
+        {{ m.actor.slice(0, 8) }}
+      </td></ng-container
+    >
+    <tr mat-header-row *matHeaderRowDef="columnas"></tr>
+    <tr mat-row *matRowDef="let m; columns: columnas"></tr>
+  </table>
+</div>
+@if (!cargando() && !items().length) {
+  <p>No hay movimientos.</p>
+}
+<mat-paginator
+  [length]="total()"
+  [pageIndex]="pagina"
+  [pageSize]="20"
+  [hidePageSize]="true"
+  (page)="pagina = $event.pageIndex; cargar()"
+  aria-label="Paginación de movimientos"
+/>

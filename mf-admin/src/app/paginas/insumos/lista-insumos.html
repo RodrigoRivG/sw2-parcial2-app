@@ -1,0 +1,84 @@
+<h1>Insumos</h1>
+<form class="agro-herramientas" [formGroup]="filtros">
+  <mat-form-field
+    ><mat-label>Buscar por nombre</mat-label
+    ><input matInput formControlName="nombre" (input)="buscar()"
+  /></mat-form-field>
+  <mat-form-field
+    ><mat-label>Categoría</mat-label
+    ><mat-select formControlName="categoria" (selectionChange)="filtrar()"
+      ><mat-option value="">Todas</mat-option>
+      @for (c of categorias; track c) {
+        <mat-option [value]="c">{{ etiquetas[c] }}</mat-option>
+      }
+    </mat-select></mat-form-field
+  >
+  <mat-checkbox formControlName="soloConStock" (change)="filtrar()">Solo con stock</mat-checkbox
+  ><button mat-flat-button type="button" (click)="editar()">Nuevo insumo</button>
+</form>
+<agro-mensaje-error [error]="error()" [reintentable]="true" (reintentar)="cargar()" />
+@if (cargando()) {
+  <p role="status">Cargando insumos…</p>
+}
+<div class="agro-tabla">
+  <table mat-table [dataSource]="items()">
+    <ng-container matColumnDef="nombre"
+      ><th mat-header-cell *matHeaderCellDef>Nombre</th>
+      <td mat-cell *matCellDef="let i">
+        {{ i.nombre }}
+        @if (i.descripcion) {
+          <small>{{ i.descripcion }}</small>
+        }
+      </td></ng-container
+    >
+    <ng-container matColumnDef="categoria"
+      ><th mat-header-cell *matHeaderCellDef>Categoría</th>
+      <td mat-cell *matCellDef="let i">{{ etiquetas[i.categoria] }}</td></ng-container
+    >
+    <ng-container matColumnDef="unidad"
+      ><th mat-header-cell *matHeaderCellDef>Unidad</th>
+      <td mat-cell *matCellDef="let i">{{ etiquetas[i.unidad] }}</td></ng-container
+    >
+    <ng-container matColumnDef="stock"
+      ><th mat-header-cell *matHeaderCellDef>Stock</th>
+      <td mat-cell *matCellDef="let i">{{ i.stock }}</td></ng-container
+    >
+    <ng-container matColumnDef="nivelMinimo"
+      ><th mat-header-cell *matHeaderCellDef>Nivel mínimo</th>
+      <td mat-cell *matCellDef="let i">{{ i.nivelMinimo }}</td></ng-container
+    >
+    <ng-container matColumnDef="costoUnitario"
+      ><th mat-header-cell *matHeaderCellDef>Costo unitario</th>
+      <td mat-cell *matCellDef="let i">{{ i.costoUnitario }} Bs</td></ng-container
+    >
+    <ng-container matColumnDef="estado"
+      ><th mat-header-cell *matHeaderCellDef>Estado</th>
+      <td mat-cell *matCellDef="let i">
+        {{ i.stockBajo ? 'Stock bajo' : 'Disponible' }}
+      </td></ng-container
+    >
+    <ng-container matColumnDef="acciones"
+      ><th mat-header-cell *matHeaderCellDef>Acciones</th>
+      <td mat-cell *matCellDef="let i">
+        <button mat-button (click)="editar(i)">Editar</button
+        ><button mat-button [disabled]="!catalogoListo()" (click)="movimiento(i)">Movimiento</button
+        ><a mat-button routerLink="/movimientos" [queryParams]="{ idInsumo: i.id }"
+          >Ver movimientos</a
+        >
+      </td></ng-container
+    >
+    <tr mat-header-row *matHeaderRowDef="columnas"></tr>
+    <tr mat-row *matRowDef="let i; columns: columnas"></tr>
+  </table>
+</div>
+@if (!cargando() && !items().length) {
+  <p>No hay insumos.</p>
+}
+<mat-paginator
+  [length]="total()"
+  [pageIndex]="pagina"
+  [pageSize]="20"
+  [hidePageSize]="true"
+  (page)="pagina = $event.pageIndex; cargar()"
+  aria-label="Paginación de insumos"
+/>

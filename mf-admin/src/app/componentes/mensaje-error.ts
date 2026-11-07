@@ -24,6 +24,23 @@ export class MensajeError {
   readonly mensaje = mensajeError;
   detalles(): { campo: string; mensaje: string }[] {
     const error = this.error();
-    return error instanceof ErrorApi && Array.isArray(error.detalles) ? error.detalles : [];
+    if (!(error instanceof ErrorApi) || !Array.isArray(error.detalles)) return [];
+    return error.detalles.flatMap((detalle: Record<string, unknown>) => {
+      if (!detalle || typeof detalle !== 'object') return [];
+      if (typeof detalle['campo'] === 'string' && typeof detalle['mensaje'] === 'string')
+        return [{ campo: detalle['campo'], mensaje: detalle['mensaje'] }];
+      if (
+        typeof detalle['idInsumo'] === 'string' &&
+        typeof detalle['stockDisponible'] === 'string' &&
+        typeof detalle['cantidadSolicitada'] === 'string'
+      )
+        return [
+          {
+            campo: 'Stock',
+            mensaje: `Disponible: ${detalle['stockDisponible']}; solicitado: ${detalle['cantidadSolicitada']}`,
+          },
+        ];
+      return [];
+    });
   }
 }
