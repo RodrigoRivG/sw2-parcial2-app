@@ -1,0 +1,20 @@
+{
+    "private": true,
+    "name": "@agro/root-config",
+    "type": "module",
+    "scripts": {
+        "build": "tsc --noEmit && vite build",
+        "dev": "vite build --watch",
+        "test": "vitest run"
+    },
+    "dependencies": {
+        "single-spa": "6.0.3",
+        "systemjs": "6.15.1"
+    },
+    "devDependencies": {
+        "@types/node": "26.6.6",
+        "typescript": "6.0.2",
+        "vite": "7.3.7",
+        "vitest": "5.1.0"
+    }
+}

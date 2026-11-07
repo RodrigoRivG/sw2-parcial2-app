@@ -1,0 +1,6 @@
+{
+  "gatewayUrl": "http://localhost:8080",
+  "keycloakUrl": "http://localhost:8180",
+  "realm": "agro",
+  "clientId": "agro-web"
+}

@@ -1,0 +1,59 @@
+name: root-config
+on:
+  push:
+    paths: ["root-config/**","compartido/**","scripts/configurar-despliegue.mjs",".github/workflows/root-config.yml"]
+  pull_request:
+    paths: ["root-config/**","compartido/**","scripts/configurar-despliegue.mjs",".github/workflows/root-config.yml"]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verificar:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: root-config
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: root-config/package-lock.json
+      - run: npm ci
+      - run: npm ci
+        working-directory: compartido
+      - run: npm test
+      - name: Configurar URLs de producción
+        if: github.event_name == 'workflow_dispatch'
+        working-directory: .
+        env:
+          GATEWAY_URL: ${{ vars.GATEWAY_URL }}
+          KEYCLOAK_URL: ${{ vars.KEYCLOAK_URL }}
+          KEYCLOAK_REALM: ${{ vars.KEYCLOAK_REALM }}
+          KEYCLOAK_CLIENT_ID: ${{ vars.KEYCLOAK_CLIENT_ID }}
+        run: node scripts/configurar-despliegue.mjs
+      - run: npm run build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: root-config
+          path: dist/
+  desplegar:
+    if: github.event_name == 'workflow_dispatch'
+    needs: verificar
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: root-config
+          path: salida
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ vars.AWS_REGION || 'us-east-1' }}
+      - name: Publicar archivos
+        env:
+          AWS_BUCKET: ${{ secrets.AWS_BUCKET }}
+        run: aws s3 sync salida/ "s3://$AWS_BUCKET/" --cache-control "no-cache"
+

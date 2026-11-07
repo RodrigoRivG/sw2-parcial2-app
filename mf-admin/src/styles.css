@@ -1,0 +1,17 @@
+/* Material toma sus colores y tipografía de las variables compartidas. */
+app-root {
+  --mat-sys-primary: var(--agro-color-primario);
+  --mat-sys-surface: var(--agro-color-superficie);
+  --mat-sys-surface-container-low: var(--agro-color-superficie);
+  --mat-sys-on-surface: var(--agro-color-texto);
+  --mat-sys-outline-variant: var(--agro-color-borde);
+  --mat-sys-corner-medium: var(--agro-radio);
+  --mat-sys-title-large-font: var(--agro-fuente);
+  --mat-sys-title-large-size: 1.5rem;
+  --mat-sys-title-large-line-height: 2rem;
+  --mat-sys-title-large-weight: 600;
+  --mat-sys-title-large-tracking: normal;
+  font-family: var(--agro-fuente);
+}
+app-root .mat-mdc-card { border: 1px solid var(--agro-color-borde); padding: var(--agro-espaciado); }
+app-root .mat-mdc-card-title { color: var(--agro-color-primario); }

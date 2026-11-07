@@ -1,0 +1,9 @@
+{
+  "imports": {
+    "@agro/root-config": "/root-config.js",
+    "@agro/compartido": "/compartido/compartido.js",
+    "@agro/mf-admin": "/admin/main.js",
+    "@agro/mf-analisis": "/analisis/analisis.js",
+    "@agro/mf-campo": "/campo/campo.js"
+  }
+}

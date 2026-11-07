@@ -1,0 +1,20 @@
+{
+    "private": true,
+    "name": "@agro/compartido",
+    "type": "module",
+    "scripts": {
+        "build": "tsc --noEmit && vite build",
+        "dev": "vite build --watch",
+        "test": "vitest run --coverage"
+    },
+    "dependencies": {
+        "keycloak-js": "26.2.5"
+    },
+    "devDependencies": {
+        "@types/node": "26.6.6",
+        "@vitest/coverage-v8": "5.1.0",
+        "typescript": "6.0.2",
+        "vite": "7.3.7",
+        "vitest": "5.1.0"
+    }
+}

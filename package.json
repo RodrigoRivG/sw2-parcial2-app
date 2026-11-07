@@ -1,0 +1,8 @@
+{
+  "name": "agro-web",
+  "private": true,
+  "scripts": {
+    "construir": "node scripts/construir.mjs",
+    "servir": "npx serve@14.2.7 -s dist -l 9000"
+  }
+}

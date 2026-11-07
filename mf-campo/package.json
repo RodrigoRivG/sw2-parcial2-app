@@ -1,0 +1,27 @@
+{
+  "name": "@agro/mf-campo",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "vue-tsc --noEmit && vite build",
+    "dev": "vite build --watch",
+    "test": "vitest run --coverage"
+  },
+  "dependencies": {
+    "axios": "1.21.0",
+    "pinia": "4.1.0",
+    "single-spa-vue": "3.0.1",
+    "vue": "3.5.45"
+  },
+  "devDependencies": {
+    "@types/node": "26.6.6",
+    "@vitejs/plugin-vue": "6.0.10",
+    "@vitest/coverage-v8": "5.1.0",
+    "typescript": "6.0.2",
+    "vite": "7.3.7",
+    "vite-plugin-css-injected-by-js": "4.0.1",
+    "vite-plugin-pwa": "2.0.0",
+    "vitest": "5.1.0",
+    "vue-tsc": "3.3.14"
+  }
+}

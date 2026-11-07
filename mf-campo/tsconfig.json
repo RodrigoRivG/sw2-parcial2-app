@@ -1,0 +1,9 @@
+{
+  "compilerOptions": {
+    "target": "ES2022", "module": "ESNext", "moduleResolution": "bundler",
+    "strict": true, "skipLibCheck": true, "esModuleInterop": true,
+    "lib": ["ES2022", "DOM"], "types": ["node"],
+    "paths": { "@agro/compartido": ["../compartido/src/index.ts"] }
+  },
+  "include": ["src/**/*.ts", "src/**/*.vue", "vite.config.ts"]
+}
