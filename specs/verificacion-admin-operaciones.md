@@ -74,4 +74,4 @@ Los datos de soporte con `FE-004` permanecen en el backend local, según la spec
 
 El workflow existente de `mf-admin` ejecuta las pruebas con cobertura y construye el bundle; no necesitó cambios.
 
-**Pendiente CE-OPE-05 / T09:** ejecución del pipeline de GitHub para FE-004. Las ejecuciones aprobadas de FE-003 no validan estos cambios. No se realizó commit, push ni despliegue.
+**T09 / CE-OPE-05 completados:** el usuario confirmó el 2026-11-07 que el pipeline de FE-004 está en verde. Esta confirmación cierra la verificación remota pendiente. No se adjuntó enlace ni identificador de ejecución.

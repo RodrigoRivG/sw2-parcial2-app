@@ -4,7 +4,7 @@
 |---|---|
 | ID | FE-004 |
 | Archivo | `specs/spec-admin-operaciones.md` |
-| Estado | Implementada y verificada localmente (2026-11-07); CI remota pendiente |
+| Estado | Implementada y verificada (2026-11-07) |
 | Constitución | Microfrontends v1.1.0 |
 | Trazabilidad | CU-10, CU-11, CU-12 · RF-11, RF-12, RF-13 · RN-06, RN-08, RN-11, RN-13, RN-15, RN-16 · RNF-14, RNF-22 |
 | Depende de | FE-002 y FE-003 (implementadas): componentes, catálogos de parcelas, campañas e insumos, y el enlace `/admin/movimientos?idSaga=`; `servicio-operaciones` (implementado) |
@@ -252,6 +252,6 @@ Contrastada con `openapi.yaml`, las specs de labores y revisión y las implement
 - [x] **T06** — Formulario **Resolver**. *Hecho cuando:* historia 4 y CE-OPE-03, con datos preparados según 2.5.
 - [x] **T07** [P] — Lista y diálogo de incidencias. *Hecho cuando:* historia 5.
 - [x] **T08** — Verificación manual: CE-OPE-01 a CE-OPE-03 en Chrome y Edge. Se anota en `specs/verificacion-admin-operaciones.md`.
-- [ ] **T09** — Pipeline de `mf-admin` en verde. *Hecho cuando:* CE-OPE-04 y CE-OPE-05.
+- [x] **T09** — Pipeline de `mf-admin` en verde. *Hecho cuando:* CE-OPE-04 y CE-OPE-05.
 
-Resultados, ajustes y límites de la verificación: [verificacion-admin-operaciones.md](verificacion-admin-operaciones.md). Las 25 pruebas y el build completo están aprobados localmente; T09 sigue pendiente de la ejecución nueva del workflow en GitHub para FE-004.
+Resultados, ajustes y límites de la verificación: [verificacion-admin-operaciones.md](verificacion-admin-operaciones.md). Las 25 pruebas y el build completo están aprobados localmente. T09 completada: el usuario confirmó el 2026-11-07 que el pipeline de FE-004 está en verde (CE-OPE-05).
