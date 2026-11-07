@@ -62,7 +62,15 @@ No se guardan peticiones API ni tokens en caché. El registro de labores, Dexie 
 
 Los cinco archivos de `.github/workflows/` tienen YAML válido y ejecutan instalación limpia, pruebas y build. Campo prepara antes los archivos comunes para sus revisiones Workbox. Los pasos equivalentes se verificaron localmente en Windows.
 
-**Pendiente de T10 / CE-BASE-03:** ejecutar los cinco workflows en GitHub y confirmar sus resultados. Al registrar esta verificación todavía no había repositorio Git ni remoto en la carpeta; el usuario está creando el repositorio. La validación local no sustituye la ejecución en el runner Linux de GitHub.
+**T10 / CE-BASE-03 completados:** los cinco workflows terminaron con `conclusion: success` en GitHub para el commit `6a19bb1d22bbd45a443c6553757699d8ceec9367`. Resultados consultados el 2026-11-07:
+
+| Workflow | Ejecución aprobada |
+|---|---|
+| `root-config` | [42393901027](https://github.com/RodrigoRivG/sw2-parcial2-app/actions/runs/42393901027) |
+| `compartido` | [42393900981](https://github.com/RodrigoRivG/sw2-parcial2-app/actions/runs/42393900981) |
+| `mf-admin` | [42393900955](https://github.com/RodrigoRivG/sw2-parcial2-app/actions/runs/42393900955) |
+| `mf-analisis` | [42393900982](https://github.com/RodrigoRivG/sw2-parcial2-app/actions/runs/42393900982) |
+| `mf-campo` | [42393900928](https://github.com/RodrigoRivG/sw2-parcial2-app/actions/runs/42393900928) |
 
 El despliegue AWS es manual y no se ha ejecutado. Requiere secrets de AWS y variables públicas de producción descritas en el README. El trabajo de despliegue del contenedor no utiliza `--delete`.
 

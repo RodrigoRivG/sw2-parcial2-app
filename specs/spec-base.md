@@ -4,7 +4,7 @@
 |---|---|
 | ID | FE-001 |
 | Archivo | `specs/spec-base.md` |
-| Estado | Implementada localmente (2026-11-07); T10 pendiente de ejecución en GitHub |
+| Estado | Implementada y verificada (2026-11-07) |
 | Constitución | Microfrontends v1.0.0 |
 | Trazabilidad | CU-19 · RF-26, RF-27, RF-28 · RN-12, RN-15, RN-16 · RNF-04, RNF-07, RNF-12, RNF-15, RNF-16, RNF-20 |
 | Depende de | Backend de `sw2-parcial2` (gateway, `graphql-server`, realm `agro`): implementado |
@@ -290,8 +290,8 @@ Como técnico de campo, quiero que `/campo/` abra aunque no tenga señal, para p
 - [x] **T07** [P] — `mf-campo` sin service worker (2.6, salvo PWA), con `api.spec.ts`. *Hecho cuando:* historia 3, escenario 3.
 - [x] **T08** — Service worker de `mf-campo` (2.6, PWA). *Hecho cuando:* historia 4 completa.
 - [x] **T09** — Verificación manual: historia 3 (escenarios 4 a 6), casos borde y CE-BASE-01 con los cuatro usuarios en Chrome y Edge.
-- [ ] **T10** — Pipelines (2.7). *Hecho cuando:* CE-BASE-03.
+- [x] **T10** — Pipelines (2.7). *Hecho cuando:* CE-BASE-03.
 
 [P]: se puede hacer en paralelo con las demás tareas marcadas, una vez terminadas T01 a T02.
 
-Resultados y pasos para repetir: [verificacion-base.md](verificacion-base.md). T10 está implementada; se mantiene sin marcar hasta confirmar los cinco pipelines en GitHub (CE-BASE-03).
+Resultados y pasos para repetir: [verificacion-base.md](verificacion-base.md). Los cinco pipelines terminaron correctamente en GitHub para el commit `6a19bb1` (CE-BASE-03).
