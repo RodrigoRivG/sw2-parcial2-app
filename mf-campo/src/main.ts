@@ -1,7 +1,7 @@
 import { createApp, h } from 'vue';
 import { createPinia } from 'pinia';
 import singleSpaVue from 'single-spa-vue';
-import Inicio from './Inicio.vue';
+import Campo from './Campo.vue';
 
 const ciclos = singleSpaVue({
   createApp,
@@ -11,7 +11,7 @@ const ciclos = singleSpaVue({
         elemento = document.createElement('div'); elemento.id = 'agro-campo';
         document.getElementById('agro-contenido')!.append(elemento);
       }
-      return { el: elemento, render: () => h(Inicio) };
+      return { el: elemento, render: () => h(Campo) };
   },
   handleInstance: aplicacion => { aplicacion.use(createPinia()); },
 });

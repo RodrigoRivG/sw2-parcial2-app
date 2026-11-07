@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "axios": "1.21.0",
+    "dexie": "4.4.7",
     "pinia": "4.1.0",
     "single-spa-vue": "3.0.1",
     "vue": "3.5.45"
@@ -17,6 +18,7 @@
     "@types/node": "26.6.6",
     "@vitejs/plugin-vue": "6.0.10",
     "@vitest/coverage-v8": "5.1.0",
+    "fake-indexeddb": "6.2.7",
     "typescript": "6.0.2",
     "vite": "7.3.7",
     "vite-plugin-css-injected-by-js": "4.0.1",

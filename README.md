@@ -26,6 +26,10 @@ Mantener `npm.cmd run servir` abierto. En otra terminal, dentro del proyecto edi
 
 Ejecutar `npm.cmd test` dentro de cada proyecto. La integración con usuarios reales y las pruebas sin conexión se describen en [specs/verificacion-base.md](specs/verificacion-base.md). No hay una suite de pruebas de extremo a extremo.
 
+Campo (FE-006) permite realizar labores programadas, registrar labores realizadas e incidencias con foto y consultar su historial. Abrir `/campo/` con `tecnico.prueba` y conexión antes de trabajar sin red: descarga los catálogos y recuerda la identidad, sin guardar tokens. Los registros se guardan primero en IndexedDB y se envían por lotes al recuperar conexión y sesión. Los errores definitivos se conservan; los temporales se reintentan sin cambiar el cuerpo original. Evidencias en [specs/verificacion-campo-registro.md](specs/verificacion-campo-registro.md).
+
+Si ya había una versión de Campo abierta al reconstruir, cerrar todas las pestañas controladas por su service worker y volver a abrir Campo con conexión para activar la nueva versión antes de verificarla sin red.
+
 ## Versiones y decisiones verificadas
 
 - Angular 21.2.26 y `single-spa-angular` 21.0.2: Angular 22 fue probado primero, pero el helper webpack de `single-spa-angular` 22.0.1 falla por publicar CommonJS dentro de un paquete ESM. La spec permite bajar una versión mayor al fallar T02. La configuración se hizo manualmente porque `ng add` no ejecutó acciones con la publicación 22.

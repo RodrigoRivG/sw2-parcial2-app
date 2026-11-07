@@ -1,0 +1,31 @@
+import { expect, it, vi } from 'vitest';
+import { aUtc, ahoraLocal, cantidadValida, insumosValidos, noFutura } from './validacion';
+import { etiqueta, fechaLocal } from './etiquetas';
+import type { Insumo } from '../modelos';
+it('valida cantidades exactas como texto, unidades enteras, duplicados y límite de filas', () => {
+  const insumos: Insumo[] = [{ id: 'a', nombre: 'A', unidad: 'UNIDAD', stock: '10' }, { id: 'b', nombre: 'B', unidad: 'LITRO', stock: '10' }];
+  for (const cantidad of ['0', '0.000', '-1', '1.0001', '1234567890123', '1e2', '2,5', '']) expect(cantidadValida(cantidad, 'LITRO')).toBe(false);
+  expect(cantidadValida('0.001', 'KILOGRAMO')).toBe(true);
+  expect(cantidadValida('12.000', 'UNIDAD')).toBe(false);
+  expect(cantidadValida('12', 'UNIDAD')).toBe(true);
+  expect(insumosValidos([], insumos)).toBe(true);
+  expect(insumosValidos([{ idInsumo: 'a', cantidad: '2' }, { idInsumo: 'b', cantidad: '2.5' }], insumos)).toBe(true);
+  expect(insumosValidos([{ idInsumo: 'a', cantidad: '1' }, { idInsumo: 'a', cantidad: '2' }], insumos)).toBe(false);
+  expect(insumosValidos([{ idInsumo: 'x', cantidad: '1' }], insumos)).toBe(false);
+  expect(insumosValidos(Array.from({ length: 21 }, (_, i) => ({ idInsumo: String(i), cantidad: '1' })), insumos)).toBe(false);
+});
+it('convierte hora local a UTC y limita el futuro a cinco minutos', () => {
+  const ahora = Date.parse('2026-11-07T12:00:00Z');
+  expect(noFutura('2026-11-07T12:05:00Z', ahora)).toBe(true);
+  expect(noFutura('2026-11-07T12:05:01Z', ahora)).toBe(false);
+  expect(noFutura('', ahora)).toBe(false);
+  const local = '2026-11-07T08:15';
+  expect(aUtc(local)).toBe(new Date(2026, 10, 7, 8, 15).toISOString());
+  vi.useFakeTimers(); vi.setSystemTime(ahora);
+  expect(new Date(ahoraLocal()).getHours()).toBe(new Date(ahora).getHours());
+  vi.useRealTimers();
+  expect(etiqueta('STOCK_INSUFICIENTE')).toBe('Stock insuficiente');
+  expect(etiqueta('DESCONOCIDO')).toBe('DESCONOCIDO');
+  expect(fechaLocal('2026-11-07')).toContain('2026');
+  expect(fechaLocal('2026-11-07T12:00:00Z')).toContain('2026');
+});
