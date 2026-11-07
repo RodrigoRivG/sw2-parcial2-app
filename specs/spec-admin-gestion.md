@@ -4,7 +4,7 @@
 |---|---|
 | ID | FE-002 |
 | Archivo | `specs/spec-admin-gestion.md` |
-| Estado | Borrador (2026-11-07) |
+| Estado | Implementada y verificada localmente (2026-11-07); CI remota pendiente |
 | Constitución | Microfrontends v1.1.0 |
 | Trazabilidad | CU-01 a CU-05 · RF-01 a RF-06 · RN-01, RN-02, RN-03, RN-15, RN-16 · RNF-05, RNF-12, RNF-15 |
 | Depende de | FE-001 (implementada); `servicio-gestion` (implementado) |
@@ -240,13 +240,15 @@ Lógica pura y servicios, con `http` simulado como en FE-001. Pocas pruebas que 
 
 # 3. Tareas
 
-- [ ] **T01** — Modelos, `consulta.ts` y `reglas-campania.ts` con sus pruebas. *Hecho cuando:* `npm test` en verde.
-- [ ] **T02** — Navegación (RQ-GES-01), `mensaje-error.ts` y eliminación de la pantalla de prueba. *Hecho cuando:* las tres pestañas navegan y `/admin/` redirige a parcelas.
-- [ ] **T03** — Parcelas: servicio, prueba, lista y diálogo. *Hecho cuando:* historia 1.
-- [ ] **T04** [P] — Cultivos: servicio, prueba, lista y diálogo. *Hecho cuando:* historia 2.
-- [ ] **T05** — Campañas: servicio (parte de campaña), prueba, lista y diálogo de creación. *Hecho cuando:* historia 3.
-- [ ] **T06** — Detalle de campaña: datos, resumen, edición y cambio de estado. *Hecho cuando:* historia 4.
-- [ ] **T07** — Pestaña Costos con su diálogo. *Hecho cuando:* historia 5.
-- [ ] **T08** [P] — Pestañas Producción e Indicadores. *Hecho cuando:* historias 6 y 7.
-- [ ] **T09** — Verificación manual: CE-GES-01 y CE-GES-02 en Chrome y Edge, casos borde de errores (409, 400 con detalles, 404 de campaña). Se anota en `specs/verificacion-admin-gestion.md`.
+- [x] **T01** — Modelos, `consulta.ts` y `reglas-campania.ts` con sus pruebas. *Hecho cuando:* `npm test` en verde.
+- [x] **T02** — Navegación (RQ-GES-01), `mensaje-error.ts` y eliminación de la pantalla de prueba. *Hecho cuando:* las tres pestañas navegan y `/admin/` redirige a parcelas.
+- [x] **T03** — Parcelas: servicio, prueba, lista y diálogo. *Hecho cuando:* historia 1.
+- [x] **T04** [P] — Cultivos: servicio, prueba, lista y diálogo. *Hecho cuando:* historia 2.
+- [x] **T05** — Campañas: servicio (parte de campaña), prueba, lista y diálogo de creación. *Hecho cuando:* historia 3.
+- [x] **T06** — Detalle de campaña: datos, resumen, edición y cambio de estado. *Hecho cuando:* historia 4.
+- [x] **T07** — Pestaña Costos con su diálogo. *Hecho cuando:* historia 5.
+- [x] **T08** [P] — Pestañas Producción e Indicadores. *Hecho cuando:* historias 6 y 7.
+- [x] **T09** — Verificación manual: CE-GES-01 y CE-GES-02 en Chrome y Edge, casos borde de errores (409, 400 con detalles, 404 de campaña). Se anota en `specs/verificacion-admin-gestion.md`.
 - [ ] **T10** — Pipeline de `mf-admin` en verde. *Hecho cuando:* CE-GES-03 y CE-GES-04.
+
+Resultados y limitaciones de la verificación: [verificacion-admin-gestion.md](verificacion-admin-gestion.md). T10 sigue pendiente de la ejecución nueva del pipeline en GitHub; pruebas, cobertura y build locales aprobados.

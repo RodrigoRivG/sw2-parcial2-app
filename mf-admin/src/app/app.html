@@ -1,1 +1,27 @@
-<router-outlet />
+<nav mat-tab-nav-bar [tabPanel]="panel" aria-label="Gestión agrícola">
+  <a
+    mat-tab-link
+    routerLink="/parcelas"
+    routerLinkActive
+    #parcelas="routerLinkActive"
+    [active]="parcelas.isActive"
+    >Parcelas</a
+  >
+  <a
+    mat-tab-link
+    routerLink="/cultivos"
+    routerLinkActive
+    #cultivos="routerLinkActive"
+    [active]="cultivos.isActive"
+    >Cultivos</a
+  >
+  <a
+    mat-tab-link
+    routerLink="/campanias"
+    routerLinkActive
+    #campanias="routerLinkActive"
+    [active]="campanias.isActive"
+    >Campañas</a
+  >
+</nav>
+<mat-tab-nav-panel #panel><router-outlet /></mat-tab-nav-panel>

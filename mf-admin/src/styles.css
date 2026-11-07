@@ -13,5 +13,52 @@ app-root {
   --mat-sys-title-large-tracking: normal;
   font-family: var(--agro-fuente);
 }
-app-root .mat-mdc-card { border: 1px solid var(--agro-color-borde); padding: var(--agro-espaciado); }
-app-root .mat-mdc-card-title { color: var(--agro-color-primario); }
+app-root .mat-mdc-card {
+  border: 1px solid var(--agro-color-borde);
+  padding: var(--agro-espaciado);
+}
+app-root .mat-mdc-card-title {
+  color: var(--agro-color-primario);
+}
+/* Los diálogos viven en el overlay de CDK, fuera de app-root. */
+.cdk-overlay-container {
+  --mat-sys-primary: var(--agro-color-primario);
+  --mat-sys-surface: var(--agro-color-superficie);
+  --mat-sys-on-surface: var(--agro-color-texto);
+  font-family: var(--agro-fuente);
+}
+.cdk-overlay-container .mat-mdc-dialog-surface {
+  background: var(--agro-color-superficie);
+  border-radius: var(--agro-radio);
+}
+.cdk-overlay-container form,
+app-root agro-produccion-campania form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--agro-espaciado);
+  padding-top: var(--agro-espaciado);
+}
+.agro-herramientas {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--agro-espaciado);
+}
+.agro-tabla {
+  overflow-x: auto;
+}
+app-root table {
+  width: 100%;
+  background: var(--agro-color-superficie);
+}
+app-root small {
+  display: block;
+}
+app-root mat-tab-nav-panel,
+app-root .mat-mdc-tab-body-content {
+  display: block;
+  padding-top: var(--agro-espaciado);
+}
+.mat-mdc-dialog-actions {
+  gap: var(--agro-espaciado);
+}
