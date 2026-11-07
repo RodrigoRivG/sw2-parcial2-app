@@ -1,0 +1,68 @@
+<h1>Modelos de IA</h1>
+<agro-mensaje-error [error]="error()" [reintentable]="true" (reintentar)="cargar()" />
+<agro-mensaje-error [error]="errorPublicacion()" />
+@if (cargando()) {
+  <p>Cargando modelos…</p>
+}
+@for (grupo of grupos(); track grupo.nombre) {
+  <h2>{{ grupo.nombre }}</h2>
+  <p>{{ grupo.vigente ? 'Versión vigente: ' + grupo.vigente.version : 'Sin versión vigente' }}</p>
+  <div class="agro-tabla">
+    <table mat-table [dataSource]="grupo.versiones">
+      <ng-container matColumnDef="version"
+        ><th mat-header-cell *matHeaderCellDef>Versión</th>
+        <td mat-cell *matCellDef="let v">{{ v.version }}</td></ng-container
+      >
+      <ng-container matColumnDef="estado"
+        ><th mat-header-cell *matHeaderCellDef>Estado</th>
+        <td mat-cell *matCellDef="let v">{{ etiquetas[v.estado] }}</td></ng-container
+      >
+      <ng-container matColumnDef="entrenamiento"
+        ><th mat-header-cell *matHeaderCellDef>Entrenamiento</th>
+        <td mat-cell *matCellDef="let v">
+          {{ v.fechaEntrenamiento | date: 'short' }}
+        </td></ng-container
+      >
+      <ng-container matColumnDef="publicacion"
+        ><th mat-header-cell *matHeaderCellDef>Publicación</th>
+        <td mat-cell *matCellDef="let v">
+          {{ v.fechaPublicacion ? (v.fechaPublicacion | date: 'short') : '—' }}
+        </td></ng-container
+      >
+      <ng-container matColumnDef="metrica"
+        ><th mat-header-cell *matHeaderCellDef>Métrica principal</th>
+        <td mat-cell *matCellDef="let v">
+          {{ v.metricaPrincipal.nombre }}: {{ v.metricaPrincipal.valor | number: '1.0-4' }}<br />{{
+            etiquetas[v.metricaPrincipal.sentido]
+          }}
+        </td></ng-container
+      >
+      <ng-container matColumnDef="filas"
+        ><th mat-header-cell *matHeaderCellDef>Filas por origen</th>
+        <td mat-cell *matCellDef="let v">
+          @for (fila of v.filasPorOrigen | keyvalue; track fila.key) {
+            <div>{{ fila.key }}: {{ fila.value }}</div>
+          }
+        </td></ng-container
+      >
+      <ng-container matColumnDef="acciones"
+        ><th mat-header-cell *matHeaderCellDef>Acciones</th>
+        <td mat-cell *matCellDef="let v">
+          <button mat-button (click)="metricas(v)">Ver métricas</button>
+          @if (v.estado === 'CANDIDATA') {
+            <button mat-button (click)="publicar(v)">Publicar</button>
+          }
+        </td></ng-container
+      >
+      <tr mat-header-row *matHeaderRowDef="columnas"></tr>
+      <tr
+        mat-row
+        *matRowDef="let v; columns: columnas"
+        [class.vigente]="v.estado === 'VIGENTE'"
+      ></tr>
+    </table>
+  </div>
+  @if (!cargando() && !error() && !grupo.versiones.length) {
+    <p>No hay versiones registradas</p>
+  }
+}

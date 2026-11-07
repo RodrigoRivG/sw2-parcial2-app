@@ -1,0 +1,93 @@
+<h1>Usuarios</h1>
+@if (prohibido()) {
+  <p class="agro-error" role="alert">
+    Su cuenta no tiene permiso para administrar usuarios en Keycloak
+  </p>
+} @else {
+  <div class="agro-herramientas">
+    <mat-form-field
+      ><mat-label>Buscar usuarios</mat-label
+      ><input
+        matInput
+        [value]="busqueda"
+        (input)="buscar($any($event.target).value)" /></mat-form-field
+    ><button mat-flat-button [disabled]="representaciones().length !== 3" (click)="editar()">
+      Nuevo usuario
+    </button>
+  </div>
+  <agro-mensaje-error
+    [error]="error()"
+    [reintentable]="true"
+    (reintentar)="cargar()"
+  /><agro-mensaje-error
+    [error]="errorRoles()"
+    [reintentable]="true"
+    (reintentar)="cargar()"
+  /><agro-mensaje-error [error]="errorAccion()" />
+  @if (cargando()) {
+    <p role="status">Cargando usuarios…</p>
+  }
+  <div class="agro-tabla">
+    <table mat-table [dataSource]="items()">
+      <ng-container matColumnDef="username"
+        ><th mat-header-cell *matHeaderCellDef>Usuario</th>
+        <td mat-cell *matCellDef="let u">{{ u.username }}</td></ng-container
+      >
+      <ng-container matColumnDef="nombre"
+        ><th mat-header-cell *matHeaderCellDef>Nombre</th>
+        <td mat-cell *matCellDef="let u">{{ u.firstName }} {{ u.lastName }}</td></ng-container
+      >
+      <ng-container matColumnDef="correo"
+        ><th mat-header-cell *matHeaderCellDef>Correo</th>
+        <td mat-cell *matCellDef="let u">{{ u.email }}</td></ng-container
+      >
+      <ng-container matColumnDef="roles"
+        ><th mat-header-cell *matHeaderCellDef>Roles</th>
+        <td mat-cell *matCellDef="let u">
+          @if (u.roles === null) {
+            No disponibles
+          } @else {
+            @for (rol of u.roles; track rol) {
+              <span>{{ etiquetas[rol] }} </span>
+            }
+          }
+        </td></ng-container
+      >
+      <ng-container matColumnDef="estado"
+        ><th mat-header-cell *matHeaderCellDef>Estado</th>
+        <td mat-cell *matCellDef="let u">{{ u.enabled ? 'Activo' : 'Inactivo' }}</td></ng-container
+      >
+      <ng-container matColumnDef="acciones"
+        ><th mat-header-cell *matHeaderCellDef>Acciones</th>
+        <td mat-cell *matCellDef="let u">
+          <button
+            mat-button
+            [disabled]="ocupada() || representaciones().length !== 3"
+            (click)="editar(u)"
+          >
+            Editar
+          </button>
+          @if (!u.enabled || desactivable(u)) {
+            <button mat-button [disabled]="ocupada()" (click)="cambiarEstado(u)">
+              {{ u.enabled ? 'Desactivar' : 'Activar' }}
+            </button>
+          }
+          <button mat-button (click)="contrasena(u)">Restablecer contraseña</button>
+        </td></ng-container
+      >
+      <tr mat-header-row *matHeaderRowDef="columnas"></tr>
+      <tr mat-row *matRowDef="let u; columns: columnas"></tr>
+    </table>
+  </div>
+  @if (!cargando() && !items().length) {
+    <p>No hay usuarios.</p>
+  }
+  <mat-paginator
+    [length]="total()"
+    [pageIndex]="pagina"
+    [pageSize]="20"
+    [hidePageSize]="true"
+    (page)="pagina = $event.pageIndex; cargar()"
+    aria-label="Paginación de usuarios"
+  />
+}

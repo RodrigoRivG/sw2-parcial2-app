@@ -1,0 +1,26 @@
+<h2 mat-dialog-title>Restablecer contraseña</h2>
+<mat-dialog-content
+  ><p>{{ usuario.username }} deberá cambiarla al iniciar sesión.</p>
+  <agro-mensaje-error [error]="error()" />
+  <form id="formulario-contrasena" [formGroup]="formulario" (ngSubmit)="guardar()">
+    <mat-form-field
+      ><mat-label>Contraseña temporal</mat-label
+      ><input
+        matInput
+        type="password"
+        formControlName="contrasena"
+        autocomplete="new-password"
+      /><mat-error>Contraseña obligatoria</mat-error></mat-form-field
+    >
+  </form></mat-dialog-content
+><mat-dialog-actions
+  ><button mat-button [disabled]="guardando()" (click)="dialogo.close()">Cancelar</button
+  ><button
+    mat-flat-button
+    type="submit"
+    form="formulario-contrasena"
+    [disabled]="formulario.invalid || guardando()"
+  >
+    Restablecer
+  </button></mat-dialog-actions
+>

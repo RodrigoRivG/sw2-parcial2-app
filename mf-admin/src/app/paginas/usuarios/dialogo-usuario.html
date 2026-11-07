@@ -1,0 +1,81 @@
+<h2 mat-dialog-title>{{ usuario() ? 'Editar usuario' : 'Nuevo usuario' }}</h2>
+<mat-dialog-content>
+  <agro-mensaje-error
+    [error]="error()"
+    [reintentable]="!rolesListos()"
+    (reintentar)="cargarRoles()"
+  />
+  @if (cargando()) {
+    <p role="status">Consultando roles…</p>
+  }
+  @if (alta.estado === 'CREADA') {
+    <p role="status">La cuenta está creada. Reintentar buscará su ID sin volver a crearla.</p>
+  }
+  @if (alta.estado === 'INCIERTA') {
+    <p role="status">
+      El resultado de la creación es incierto. Reintente la búsqueda antes de realizar otra alta.
+    </p>
+  }
+  @if (alta.recuperable) {
+    <p>Se encontró {{ alta.recuperable.username }}. Confirme que desea continuar con esa cuenta.</p>
+    <button mat-button (click)="recuperar()">Confirmar recuperación</button>
+  }
+  <form id="formulario-usuario" [formGroup]="formulario" (ngSubmit)="guardar()">
+    <mat-form-field
+      ><mat-label>Usuario</mat-label
+      ><input matInput formControlName="username" autocomplete="off" /><mat-error
+        >Use minúsculas, dígitos, punto, guion o guion bajo</mat-error
+      ></mat-form-field
+    >
+    <mat-form-field
+      ><mat-label>Nombre</mat-label><input matInput formControlName="firstName" /><mat-error
+        >Nombre obligatorio</mat-error
+      ></mat-form-field
+    >
+    <mat-form-field
+      ><mat-label>Apellido</mat-label><input matInput formControlName="lastName" /><mat-error
+        >Apellido obligatorio</mat-error
+      ></mat-form-field
+    >
+    <mat-form-field
+      ><mat-label>Correo</mat-label
+      ><input matInput type="email" formControlName="email" /><mat-error
+        >Ingrese un correo válido</mat-error
+      ></mat-form-field
+    >
+    @if (!usuario() && alta.estado === 'NUEVA') {
+      <mat-form-field
+        ><mat-label>Contraseña temporal</mat-label
+        ><input
+          matInput
+          type="password"
+          formControlName="contrasena"
+          autocomplete="new-password"
+        /><mat-error>Contraseña obligatoria</mat-error></mat-form-field
+      >
+    }
+    <mat-form-field
+      ><mat-label>Roles</mat-label
+      ><mat-select formControlName="roles" multiple>
+        @for (rol of roles; track rol) {
+          <mat-option [value]="rol" [disabled]="bloqueado(rol)">{{ etiquetas[rol] }}</mat-option>
+        }</mat-select
+      ><mat-error>Seleccione al menos un rol</mat-error></mat-form-field
+    >
+    @if (usuario()) {
+      <mat-checkbox formControlName="enabled">Activo</mat-checkbox>
+    }
+  </form></mat-dialog-content
+><mat-dialog-actions
+  ><button mat-button [disabled]="guardando()" (click)="dialogo.close()">Cancelar</button
+  ><button
+    mat-flat-button
+    form="formulario-usuario"
+    type="submit"
+    [disabled]="
+      formulario.invalid || !rolesListos() || guardando() || cargando() || !!alta.recuperable
+    "
+  >
+    {{ !usuario() && alta.estado !== 'NUEVA' ? 'Reintentar búsqueda' : 'Guardar' }}
+  </button></mat-dialog-actions
+>

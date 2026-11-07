@@ -4,7 +4,7 @@
 |---|---|
 | ID | FE-005 |
 | Archivo | `specs/spec-admin-usuarios.md` |
-| Estado | Revisada contra el contrato y lecturas locales; pendiente de implementación (2026-11-07) |
+| Estado | Implementada y verificada localmente; pendiente del pipeline de `mf-admin` (2026-11-07) |
 | Constitución | Microfrontends v1.1.0 |
 | Trazabilidad | CU-23 · RF-28, RF-32 · RN-15, RN-16 · RNF-15 · constitución de IA §5 (publicación de versiones) |
 | Depende de | FE-002 a FE-004 (implementadas): componentes y patrones de `mf-admin`; realm `agro` (RQ-KC-05) y `servicio-ia` (`spec-prediccion.md`), implementados |
@@ -38,7 +38,7 @@ La revisión de FE-005 confirmó además, usando la sesión de `agro-web` desde 
 - `GET /roles/{rol}` y `GET /roles/{rol}/users` → `403` con `admin.prueba`. Los permisos actuales no permiten basar la interfaz en esos endpoints.
 - `GET /users/{sub}/role-mappings/realm`, `/available` y `/composite` → `200`. Los roles asignados y disponibles de la propia cuenta proporcionan las representaciones de los tres roles de usuario sin ampliar permisos del realm.
 - La búsqueda simple `search=prue` → 0 cuentas; `search=*prue*` → 4. Para cumplir la búsqueda por contenido se envía el patrón con asteriscos tanto al listado como al conteo.
-- `GET /api/ia/v1/modelos` → `503 SERVICIO_NO_DISPONIBLE` en el entorno revisado. El esquema y las reglas de publicación se contrastaron con `modelos/esquemas.py`, `router.py` y `reglas.py`; la verificación real de modelos requiere que el servicio esté disponible.
+- En la revisión previa, `GET /api/ia/v1/modelos` respondió `503 SERVICIO_NO_DISPONIBLE`. Al implementar, el servicio ya devolvía `rendimiento` y `patrones` v1 como candidatas; ambas se publicaron desde la interfaz. El esquema y las reglas se contrastaron con `modelos/esquemas.py`, `router.py` y `reglas.py`.
 
 ## 1.1 Escenarios de usuario y pruebas
 
@@ -162,7 +162,8 @@ Documentos a mano: `Constitucion.md` v1.1.0, `specs/README.md`, las specs FE-002
 | `modelos/usuarios.ts` | `UsuarioKeycloak` (`id`, `username`, `firstName`, `lastName`, `email`, `enabled`), `RolKeycloak` (`id`, `name`), `RolUsuario` (`'administrador' \| 'gerencia' \| 'tecnico_campo'`), `DatosUsuario` |
 | `modelos/ia.ts` | `VersionModelo` (respuesta de `GET /modelos`: `nombre`, `version`, `estado`, `fechaEntrenamiento`, `fechaPublicacion`, `filasPorOrigen`, `variables`, `hiperparametros`, `metricas`, `metricaPrincipal { nombre, valor, sentido }`, `justificacion`) y `EstadoVersion` |
 | `servicios/cliente-keycloak.ts` | `keycloak<T>(ruta, opciones)`: URL base, token, renovación tras `401`, `SIN_CONEXION` ante error de red, conversión de errores (casos borde) y `204`/cuerpo vacío → `null` |
-| `servicios/servicio-usuarios.ts` | `listar(busqueda, pagina, signal)` (usuarios + total + roles por usuario), `crear(datos, roles)`, `buscarPorUsuarioExacto(username, signal)` (recupera una creación parcial), `representacionesRoles(signal)` (asignados + disponibles de la propia cuenta), `actualizar(id, datos)`, `rolesDe(id)`, `cambiarRoles(id, actuales, deseados)`, `restablecerContrasena(id, valor)` |
+| `servicios/servicio-usuarios.ts` | `listar(busqueda, pagina, signal)` (usuarios + total + roles por usuario), `crear(datos)` (solo la cuenta; los roles se asignan después), `buscarPorUsuarioExacto(username, signal)`, `representacionesRoles(signal)` (asignados + disponibles de la propia cuenta), `actualizar(id, datos)`, `rolesDe(id)`, `cambiarRoles(id, actuales, deseados)`, `restablecerContrasena(id, valor)` |
+| `servicios/creacion-usuario.ts` | Etapas en memoria `NUEVA`, `INCIERTA`, `CREADA`, `IDENTIFICADA`, sin almacenar contraseñas; conserva el usuario antes de conocer su ID y evita repetir un alta ya enviada |
 | `servicios/servicio-modelos.ts` | `listar(signal)` y `publicar(nombre, version, justificacion?)` |
 | `servicios/reglas-usuarios.ts` | `diferenciaRoles(actuales, deseados)` → `{ agregar, quitar }` limitado a los tres roles; `puedeDesactivar(usuario, sub)`; `rolBloqueado(usuario, sub, rol)`; `patronUsuario`; `agruparVersiones(versiones)`; `etiquetasAdministracion` |
 | `paginas/usuarios/lista-usuarios.ts` | Tabla, buscador, paginador, **Nuevo usuario** y acciones por fila |
@@ -192,6 +193,7 @@ Se reutilizan `PaginaConsulta`, `material.ts`, `MensajeError`, `consulta.ts` y l
 | `servicios/servicio-usuarios.spec.ts` | Rutas y cuerpos de RQ-USU-03 con el transporte inyectado: listado y conteo con `*texto*`, roles por usuario, representaciones desde asignados y disponibles, filtro `service-account-*`, búsqueda exacta, secuencia de creación y recuperación tras fallar cada etapa, actualización parcial, roles y contraseña temporal |
 | `servicios/reglas-usuarios.spec.ts` | `diferenciaRoles` (agrega, quita, ignora roles ajenos), `puedeDesactivar` y `rolBloqueado` con la propia cuenta y otra, `patronUsuario`, `agruparVersiones` (orden y vigente) |
 | `servicios/servicio-modelos.spec.ts` | Listar y publicar con y sin justificación |
+| `paginas/modelos/dialogo-publicacion.spec.ts` | Lógica de publicación: conserva el diálogo ante `422`, exige justificación recortada, comunica `409` a la lista y respeta la cancelación de la confirmación; no prueba maquetación |
 
 ## 2.4 Decisiones
 
@@ -206,6 +208,7 @@ Se reutilizan `PaginaConsulta`, `material.ts`, `MensajeError`, `consulta.ts` y l
 | D-FE5-07 | Recuperar una creación por etapas y conservar el usuario antes de conocer su ID | La consulta exacta del ID puede fallar después de un `POST` correcto; repetir la creación produciría un duplicado |
 | D-FE5-08 | Búsqueda por contenido con `*texto*` en listado y conteo | El buscador por defecto de Keycloak usa prefijos; la historia requiere coincidencias dentro del texto |
 | D-FE5-09 | Transporte de Keycloak inyectado para los tests de usuarios | El runner de Angular no admite mocks de módulos relativos; se evita repetir el problema de identidad de módulos observado en FE-003 |
+| D-FE5-10 | Confirmar la recuperación de un alta con respuesta perdida | Una búsqueda exacta identifica una cuenta, pero no prueba por sí sola quién la creó; no se le asignan roles automáticamente |
 
 ## 2.5 Verificación sin candidatas
 
@@ -221,13 +224,31 @@ La semántica de búsqueda se corroboró con la [documentación oficial de Keycl
 
 ---
 
+## 2.7 Implementación y ajustes documentados (2026-11-07)
+
+T03 se repitió **antes de implementar** y pasó en Chrome desde `http://localhost:9000` con el token de `agro-web`: usuarios, conteo y mapeos de roles asignados y disponibles respondieron `200`, sin bloqueo CORS. No fue necesario cambiar el realm. Las escrituras posteriores también funcionaron desde Chrome y Edge.
+
+Se implementaron las dos rutas, servicios y diálogos descritos. Ajustes concretos respecto del plan:
+
+- `CreacionUsuario` separa las etapas del alta para probarlas. Si se perdió su respuesta y la búsqueda encuentra una cuenta, **Confirmar recuperación** pide confirmación explícita antes de continuar con ella. Si no se encuentra, conserva el estado incierto y permite reintentar la búsqueda; ese diálogo no repite el alta automáticamente.
+- Al identificar una cuenta nueva se actualiza también su perfil antes de asignar roles, conservando las correcciones del formulario durante una recuperación parcial. El servicio envía únicamente los campos del contrato.
+- La edición no permite guardar hasta leer los roles iniciales; ofrece **Reintentar** si falla esa lectura. Nombre y apellido no admiten solo espacios. Los diálogos bloquean su cierre mientras se envían escrituras.
+- La justificación está disponible desde el primer intento, como opcional; si contiene texto exige 20 caracteres recortados. Tras `METRICAS_INFERIORES` pasa a obligatoria. Las métricas anidadas también se presentan con hasta cuatro decimales, sin calcular métricas nuevas.
+- Se agregaron dos pruebas de la lógica del diálogo de publicación para los estados `422` y `409`, sin probar maquetación.
+
+Las cuentas `fe005.tecnico.chrome` y `fe005.tecnico.edge` se crearon desde la interfaz, completaron la contraseña obligatoria y accedieron a `/campo/`. Se probaron edición, cambios de roles, protección de la cuenta propia, duplicados, activación, desactivación y restablecimiento de contraseña. Ambas quedaron inactivas y conservaron `default-roles-agro`.
+
+`rendimiento` v1 se publicó en Chrome sin justificación y `patrones` v1 en Edge con justificación. Ambas quedaron vigentes y repetir su publicación devolvió `409 VERSION_NO_PUBLICABLE`. No había versiones de `clasificador` ni una segunda candidata con métricas inferiores: el flujo de `422` se verificó con pruebas unitarias, sin entrenar ni crear versiones adicionales.
+
+Resultado local: 38 pruebas en 18 archivos, cobertura de líneas de servicios **99,05 %**, construcción de los cinco proyectos y reconstrucción final de `mf-admin` correctas. Falta comprobar el pipeline remoto de esta implementación. Evidencias y límites en [verificacion-admin-usuarios.md](verificacion-admin-usuarios.md).
+
 # 3. Tareas
 
-- [ ] **T01** — `modelos/usuarios.ts`, `modelos/ia.ts`, `cliente-keycloak.ts` y `reglas-usuarios.ts` con sus pruebas. *Hecho cuando:* `npm test` en verde.
-- [ ] **T02** — Servicios de usuarios y modelos con sus pruebas. *Hecho cuando:* cobertura ≥ 80 %.
-- [ ] **T03** — Antes de implementar las pantallas, comprobar desde el navegador las lecturas de usuarios y de roles asignados/disponibles con el token de `agro-web`. *Hecho cuando:* las rutas usadas por RQ-USU-03 responden en Chrome sin bloqueo CORS; si no, se detiene la spec y se avisa. Las lecturas con `admin.prueba` se comprobaron en la revisión previa; se repetirán al integrar el cliente.
-- [ ] **T04** — Rutas, pestañas y lista de usuarios. *Hecho cuando:* historia 1.
-- [ ] **T05** — Diálogos de usuario y contraseña. *Hecho cuando:* historias 2 y 3, y CE-USU-02.
-- [ ] **T06** [P] — Lista de modelos y diálogos. *Hecho cuando:* historia 4 (o 2.5).
-- [ ] **T07** — Verificación manual: CE-USU-01 a CE-USU-03 en Chrome y Edge. Se anota en `specs/verificacion-admin-usuarios.md`.
+- [x] **T01** — `modelos/usuarios.ts`, `modelos/ia.ts`, `cliente-keycloak.ts` y `reglas-usuarios.ts` con sus pruebas. *Hecho cuando:* `npm test` en verde.
+- [x] **T02** — Servicios de usuarios y modelos con sus pruebas. *Hecho cuando:* cobertura ≥ 80 %.
+- [x] **T03** — Antes de implementar las pantallas, comprobar desde el navegador las lecturas de usuarios y de roles asignados/disponibles con el token de `agro-web`. *Hecho cuando:* las rutas usadas por RQ-USU-03 responden en Chrome sin bloqueo CORS; si no, se detiene la spec y se avisa. Repetida antes de implementar: lecturas con `admin.prueba`, origen `localhost:9000` y token de `agro-web`, todas `200`; escrituras verificadas después en Chrome y Edge.
+- [x] **T04** — Rutas, pestañas y lista de usuarios. *Hecho cuando:* historia 1.
+- [x] **T05** — Diálogos de usuario y contraseña. *Hecho cuando:* historias 2 y 3, y CE-USU-02.
+- [x] **T06** [P] — Lista de modelos y diálogos. *Hecho cuando:* historia 4 (o 2.5).
+- [x] **T07** — Verificación manual: CE-USU-01 a CE-USU-03 en Chrome y Edge. Se anota en `specs/verificacion-admin-usuarios.md`.
 - [ ] **T08** — Pipeline de `mf-admin` en verde. *Hecho cuando:* CE-USU-04 y CE-USU-05.

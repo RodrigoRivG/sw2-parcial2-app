@@ -12,6 +12,8 @@ import { ListaLabores } from './paginas/labores/lista-labores';
 import { DetalleLabor } from './paginas/labores/detalle-labor';
 import { DetalleSaga } from './paginas/sagas/detalle-saga';
 import { ListaIncidencias } from './paginas/incidencias/lista-incidencias';
+import { ListaUsuarios } from './paginas/usuarios/lista-usuarios';
+import { ListaModelos } from './paginas/modelos/lista-modelos';
 export const routes: Routes = [
   { path: '', pathMatch: 'full', redirectTo: 'parcelas' },
   { path: 'parcelas', component: ListaParcelas },
@@ -25,5 +27,7 @@ export const routes: Routes = [
   { path: 'labores/:id', component: DetalleLabor },
   { path: 'sagas/:id', component: DetalleSaga },
   { path: 'incidencias', component: ListaIncidencias },
+  { path: 'usuarios', component: ListaUsuarios },
+  { path: 'modelos', component: ListaModelos },
   { path: '**', component: EmptyRouteComponent },
 ];

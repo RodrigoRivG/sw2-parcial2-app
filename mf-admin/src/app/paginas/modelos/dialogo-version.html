@@ -1,0 +1,23 @@
+<h2 mat-dialog-title>{{ version.nombre }} · Versión {{ version.version }}</h2>
+<mat-dialog-content>
+  <h3>Métricas</h3>
+  @for (metrica of version.metricas | keyvalue; track metrica.key) {
+    <p>
+      <strong>{{ metrica.key }}:</strong>
+      @if (esNumero(metrica.value)) {
+        {{ metrica.value | number: '1.0-4' }}
+      } @else {
+        {{ detalle(metrica.value) }}
+      }
+    </p>
+  }
+  <h3>Variables</h3>
+  <p>{{ version.variables.join(', ') || 'Sin variables registradas' }}</p>
+  <h3>Hiperparámetros</h3>
+  <pre>{{ version.hiperparametros | json }}</pre>
+  <h3>Justificación</h3>
+  <p>{{ version.justificacion || 'Sin justificación registrada' }}</p>
+</mat-dialog-content>
+<mat-dialog-actions align="end"
+  ><button mat-button mat-dialog-close>Cerrar</button></mat-dialog-actions
+>

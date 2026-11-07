@@ -1,0 +1,26 @@
+<h2 mat-dialog-title>Publicar {{ version.nombre }} · Versión {{ version.version }}</h2>
+<mat-dialog-content>
+  <agro-mensaje-error [error]="error()" />
+  @if (requiereJustificacion()) {
+    <p>
+      Las métricas son inferiores a la versión vigente. Escriba una justificación de al menos 20
+      caracteres para publicar.
+    </p>
+  }
+  <form [formGroup]="formulario" (ngSubmit)="publicar()" id="publicacion-modelo">
+    <mat-form-field
+      ><mat-label
+        >Justificación {{ requiereJustificacion() ? '(obligatoria)' : '(opcional)' }}</mat-label
+      ><textarea matInput formControlName="justificacion" rows="4"></textarea
+      ><mat-error
+        >Escriba al menos 20 caracteres sin contar espacios de los extremos</mat-error
+      ></mat-form-field
+    >
+  </form>
+</mat-dialog-content>
+<mat-dialog-actions align="end"
+  ><button mat-button mat-dialog-close [disabled]="guardando()">Cancelar</button
+  ><button mat-flat-button type="submit" form="publicacion-modelo" [disabled]="guardando()">
+    Publicar
+  </button></mat-dialog-actions
+>

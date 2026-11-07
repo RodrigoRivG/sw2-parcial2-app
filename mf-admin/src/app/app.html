@@ -63,5 +63,21 @@
     [active]="incidencias.isActive"
     >Incidencias</a
   >
+  <a
+    mat-tab-link
+    routerLink="/usuarios"
+    routerLinkActive
+    #usuarios="routerLinkActive"
+    [active]="usuarios.isActive"
+    >Usuarios</a
+  >
+  <a
+    mat-tab-link
+    routerLink="/modelos"
+    routerLinkActive
+    #modelos="routerLinkActive"
+    [active]="modelos.isActive"
+    >Modelos de IA</a
+  >
 </nav>
 <mat-tab-nav-panel #panel><router-outlet /></mat-tab-nav-panel>
