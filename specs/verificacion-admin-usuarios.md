@@ -58,4 +58,4 @@ Las pruebas nuevas verifican el cliente directo de Keycloak (cabeceras, renovaci
 
 Los casos de error que requieren condiciones no existentes en el entorno (renovación fallida, altas parcialmente aplicadas, política de contraseña rechazada o candidata con métricas inferiores) se cubren con transporte simulado y pruebas de lógica; no se atribuyen a escrituras reales.
 
-Pendiente: ejecutar y confirmar el **pipeline remoto de `mf-admin`** después del commit. Las ejecuciones verdes anteriores corresponden a specs previas.
+El usuario confirmó el **pipeline remoto en verde** después de la implementación. Con esta confirmación se completa T08 y se cierra FE-005. No se dispone aquí del enlace ni del identificador de la ejecución; la confirmación procede del usuario.

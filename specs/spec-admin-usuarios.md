@@ -4,7 +4,7 @@
 |---|---|
 | ID | FE-005 |
 | Archivo | `specs/spec-admin-usuarios.md` |
-| Estado | Implementada y verificada localmente; pendiente del pipeline de `mf-admin` (2026-11-07) |
+| Estado | Implementada y verificada; pipeline de `mf-admin` en verde confirmado por el usuario (2026-11-07) |
 | Constitución | Microfrontends v1.1.0 |
 | Trazabilidad | CU-23 · RF-28, RF-32 · RN-15, RN-16 · RNF-15 · constitución de IA §5 (publicación de versiones) |
 | Depende de | FE-002 a FE-004 (implementadas): componentes y patrones de `mf-admin`; realm `agro` (RQ-KC-05) y `servicio-ia` (`spec-prediccion.md`), implementados |
@@ -240,7 +240,7 @@ Las cuentas `fe005.tecnico.chrome` y `fe005.tecnico.edge` se crearon desde la in
 
 `rendimiento` v1 se publicó en Chrome sin justificación y `patrones` v1 en Edge con justificación. Ambas quedaron vigentes y repetir su publicación devolvió `409 VERSION_NO_PUBLICABLE`. No había versiones de `clasificador` ni una segunda candidata con métricas inferiores: el flujo de `422` se verificó con pruebas unitarias, sin entrenar ni crear versiones adicionales.
 
-Resultado local: 38 pruebas en 18 archivos, cobertura de líneas de servicios **99,05 %**, construcción de los cinco proyectos y reconstrucción final de `mf-admin` correctas. Falta comprobar el pipeline remoto de esta implementación. Evidencias y límites en [verificacion-admin-usuarios.md](verificacion-admin-usuarios.md).
+Resultado local: 38 pruebas en 18 archivos, cobertura de líneas de servicios **99,05 %**, construcción de los cinco proyectos y reconstrucción final de `mf-admin` correctas. El usuario confirmó el pipeline remoto en verde; FE-005 queda cerrada. Evidencias y límites en [verificacion-admin-usuarios.md](verificacion-admin-usuarios.md).
 
 # 3. Tareas
 
@@ -251,4 +251,4 @@ Resultado local: 38 pruebas en 18 archivos, cobertura de líneas de servicios **
 - [x] **T05** — Diálogos de usuario y contraseña. *Hecho cuando:* historias 2 y 3, y CE-USU-02.
 - [x] **T06** [P] — Lista de modelos y diálogos. *Hecho cuando:* historia 4 (o 2.5).
 - [x] **T07** — Verificación manual: CE-USU-01 a CE-USU-03 en Chrome y Edge. Se anota en `specs/verificacion-admin-usuarios.md`.
-- [ ] **T08** — Pipeline de `mf-admin` en verde. *Hecho cuando:* CE-USU-04 y CE-USU-05.
+- [x] **T08** — Pipeline de `mf-admin` en verde. CE-USU-04 verificado localmente; CE-USU-05 confirmado por el usuario.
