@@ -45,7 +45,7 @@ Los registros de verificación quedan en el backend local, como prevé la spec. 
 
 El workflow existente `.github/workflows/mf-admin.yml` instala las dependencias de Angular y de `compartido`, ejecuta las pruebas con cobertura y construye el bundle. Sus comandos de pruebas y build se ejecutaron localmente correctamente.
 
-**Pendiente:** ejecución del workflow en GitHub para estos cambios (CE-GES-04 / parte remota de T10). No se realizó commit, push ni despliegue. Una ejecución anterior de FE-001 no valida FE-002.
+**T10 / CE-GES-04 completados:** el usuario confirmó el 2026-11-07 que el pipeline de FE-002 está en verde. Esta confirmación cierra la verificación remota pendiente. No se adjuntó el enlace ni el identificador de ejecución.
 
 ## Repetir
 
@@ -53,4 +53,4 @@ El workflow existente `.github/workflows/mf-admin.yml` instala las dependencias 
 2. Entrar como `admin.prueba` en Chrome y Edge y repetir el ciclo con nombres nuevos que incluyan `FE-002`.
 3. Comprobar los errores indicados, la edición permitida por estado y que el detalle se actualiza tras cada escritura.
 4. Para concurrencia, abrir el mismo recurso en dos sesiones de edición, guardar en una y después en la otra: se debe mostrar el conflicto y recargar los datos actuales.
-5. Al publicar los cambios en GitHub, comprobar la ejecución nueva del workflow de `mf-admin` antes de cerrar T10.
+5. Tras cambios posteriores, comprobar una nueva ejecución del workflow de `mf-admin` en GitHub.
