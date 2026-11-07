@@ -64,6 +64,8 @@ Todos están incorporados en `spec-admin-inventario.md`, decisiones D-FE3-06 a D
 
 ## CI y repetición
 
+La primera ejecución de CI comunicada por el usuario falló en `consulta.spec.ts`: los mocks completos de `@agro/compartido` en las pruebas de servicios solo exportaban `http`, dejando `ErrorApi` sin exportar al reutilizarse el módulo compilado. Se corrigieron las cinco pruebas de servicios (parcelas, cultivos, campañas, insumos y movimientos) para exportar `http` simulado junto con la clase real `ErrorApi`, importada de forma diferida desde su archivo fuente. La importación diferida evita la referencia circular que aparece al cargar el módulo compartido completo en la factoría del mock con el runner de Angular. Es una corrección de las pruebas, sin cambios en el comportamiento de la aplicación. Tras el ajuste, la suite completa volvió a aprobar sus 16 pruebas en 10 archivos, con 100 % de cobertura de líneas reportada.
+
 El workflow existente de `mf-admin` ya instala dependencias de Angular y `compartido`, ejecuta las pruebas con cobertura y construye el bundle. No necesitó cambios. Sus comandos de pruebas y build se verificaron localmente.
 
 **Pendiente T09 / CE-INV-04:** ejecutar el pipeline de GitHub con estos cambios. El pipeline aprobado de FE-002 no corresponde a FE-003. No se realizó commit, push ni despliegue.

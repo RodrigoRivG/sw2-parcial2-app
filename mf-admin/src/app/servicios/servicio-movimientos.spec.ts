@@ -1,6 +1,9 @@
 import { http } from '@agro/compartido';
 import { ServicioMovimientos } from './servicio-movimientos';
-vi.mock('@agro/compartido', () => ({ http: vi.fn() }));
+vi.mock('@agro/compartido', async () => {
+  const { ErrorApi } = await import('../../../../compartido/src/error-api');
+  return { ErrorApi, http: vi.fn() };
+});
 it('envía todos los filtros y cancelación, y registra una cantidad decimal como texto', async () => {
   const s = new ServicioMovimientos(),
     signal = new AbortController().signal;

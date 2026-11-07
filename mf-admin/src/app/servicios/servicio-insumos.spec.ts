@@ -1,7 +1,10 @@
 import { http } from '@agro/compartido';
 import { ServicioInsumos } from './servicio-insumos';
 import { DatosInsumo } from '../modelos/inventario';
-vi.mock('@agro/compartido', () => ({ http: vi.fn() }));
+vi.mock('@agro/compartido', async () => {
+  const { ErrorApi } = await import('../../../../compartido/src/error-api');
+  return { ErrorApi, http: vi.fn() };
+});
 it('respeta filtros booleanos, paginación y cancelación de catálogo, insumos y estado', async () => {
   const s = new ServicioInsumos(),
     signal = new AbortController().signal;
