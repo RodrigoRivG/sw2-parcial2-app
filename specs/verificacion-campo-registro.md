@@ -54,4 +54,4 @@ Las pruebas cubren límites y orden de lotes, multipart y foto, resultados mixto
 
 Las cantidades de 50 operaciones y 35 MB, el cambio de usuario con pendientes, los rechazos definitivos y los fallos simulados de canvas se verificaron con pruebas unitarias; no se atribuyen a lotes reales grandes ni a cambios reales de cuenta con pendientes. El entorno no tenía suficientes registros propios para observar Cargar más en Historial; la vista implementa cursores independientes y cancela consultas al cambiar de vista.
 
-**CE-CAM-06 / T09 pendiente:** los cambios están locales; no se hizo commit ni push y no se ejecutó el pipeline remoto con ellos. El workflow existente de Campo ya instala, prueba y construye contenedor, compartido y Campo en el orden requerido. No se desplegó en AWS.
+**CE-CAM-06 / T09 cumplidos:** el usuario confirmó el 2026-11-07 que el pipeline de `mf-campo` terminó en verde. Esta confirmación completa T09 junto con CE-CAM-05; T01 a T09 quedan completadas. El workflow de Campo instala, prueba y construye contenedor, compartido y Campo en el orden requerido. No se desplegó en AWS.

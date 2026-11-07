@@ -4,7 +4,7 @@
 |---|---|
 | ID | FE-006 |
 | Archivo | `specs/spec-campo-registro.md` |
-| Estado | Implementada y verificada localmente (2026-11-07); pipeline pendiente |
+| Estado | Implementada y verificada (2026-11-07) |
 | Constitución | Microfrontends v1.1.0 |
 | Trazabilidad | CU-10, CU-11, CU-13 · RF-11, RF-12, RF-14 a RF-17 · RN-06, RN-11, RN-12, RN-15, RN-16 · RNF-09, RNF-13, RNF-14, RNF-15, RNF-16 |
 | Depende de | FE-001 (implementada): `mf-campo`, service worker y arranque sin conexión; `servicio-operaciones` (sincronización, labores, incidencias), `servicio-gestion` e `servicio-inventario` (implementados) |
@@ -247,6 +247,6 @@ La prueba existente `api.spec.ts` se conserva.
 - [x] **T06** — Pendientes y sincronización con el backend. *Hecho cuando:* historia 5.
 - [x] **T07** [P] — Historial. *Hecho cuando:* historia 6.
 - [x] **T08** — Verificación manual: CE-CAM-01 a CE-CAM-04. Se anota en `specs/verificacion-campo-registro.md`.
-- [ ] **T09** — Pipeline de `mf-campo` en verde. *Hecho cuando:* CE-CAM-05 y CE-CAM-06.
+- [x] **T09** — Pipeline de `mf-campo` en verde. *Hecho cuando:* CE-CAM-05 y CE-CAM-06.
 
-Resultados en [verificacion-campo-registro.md](verificacion-campo-registro.md). CE-CAM-05 aprobado localmente: 15 pruebas en 6 archivos y 98,98 % de cobertura de líneas en servicios y stores. T09 permanece pendiente hasta ejecutar el pipeline con estos cambios en GitHub.
+Resultados en [verificacion-campo-registro.md](verificacion-campo-registro.md). CE-CAM-05 aprobado localmente: 15 pruebas en 6 archivos y 98,98 % de cobertura de líneas en servicios y stores. T09 completada: el usuario confirmó el 2026-11-07 que el pipeline de `mf-campo` está en verde (CE-CAM-06). T01 a T09 completadas.
