@@ -2,7 +2,7 @@
 
 Un archivo por funcionalidad, cada uno con tres partes: **Spec** (qué hace), **Plan** (cómo se construye) y **Tareas** (en qué orden se implementa).
 
-- Constitución de referencia: Microfrontends v1.0.0 (2026-11-07). Si un archivo la contradice, prevalece la constitución.
+- Constitución de referencia: Microfrontends v1.1.0 (2026-11-07). Si un archivo la contradice, prevalece la constitución.
 - Documento de requisitos: `SW2_Parcial_2.pdf`.
 - Criterio: lo mínimo que cumpla el documento de requisitos y consuma lo que el backend **ya implementa**. El sistema se despliega para la evaluación y se apaga horas después: nada de complejidad para producción.
 
@@ -16,8 +16,8 @@ El backend vive en el repositorio `sw2-parcial2` y está implementado: los cuatr
 
 | Orden | ID | Archivo | Funcionalidad | Microfrontend | CU | RF |
 |---|---|---|---|---|---|---|
-| 1 | FE-001 | [spec-base.md](spec-base.md) | Aplicación contenedora, sesión compartida, módulo compartido y los tres microfrontends montados con una consulta de prueba | Todos | CU-19 | RF-26, RF-27, RF-28 |
-| 2 | FE-002 | `spec-admin-gestion.md` *(por redactar)* | Parcelas, cultivos, campañas, costos manuales, producción e indicadores | `mf-admin` | CU-01 a CU-05 | RF-01 a RF-06 |
+| 1 | FE-001 | [spec-base.md](spec-base.md) **(implementada y verificada)** | Aplicación contenedora, sesión compartida, módulo compartido y los tres microfrontends montados con una consulta de prueba | Todos | CU-19 | RF-26, RF-27, RF-28 |
+| 2 | FE-002 | [spec-admin-gestion.md](spec-admin-gestion.md) *(borrador, pendiente de implementación)* | Parcelas, cultivos, campañas, costos manuales, producción e indicadores | `mf-admin` | CU-01 a CU-05 | RF-01 a RF-06 |
 | 3 | FE-003 | `spec-admin-inventario.md` *(por redactar)* | Insumos, movimientos y estado del inventario | `mf-admin` | CU-06, CU-07, CU-24 | RF-07, RF-08, RF-33 |
 | 4 | FE-004 | `spec-admin-operaciones.md` *(por redactar)* | Programar labores; consultar labores, incidencias y Sagas; resolver labores `PENDIENTE_REVISION` | `mf-admin` | CU-10, CU-12 | RF-11, RF-13 |
 | 5 | FE-005 | `spec-admin-usuarios.md` *(por redactar)* | Usuarios con la API de administración de Keycloak y publicación de versiones de modelos de IA | `mf-admin` | CU-23 | RF-32 |
@@ -26,7 +26,8 @@ El backend vive en el repositorio `sw2-parcial2` y está implementado: los cuatr
 | 8 | FE-008 | `spec-analisis-consultas.md` *(por redactar)* | Paneles de indicadores, inventario, labores e incidencias por GraphQL, con Recharts | `mf-analisis` | CU-05, CU-24 | RF-06, RF-27, RF-33 |
 | 9 | FE-009 | `spec-analisis-ia.md` *(por redactar)* | Predicción, análisis de patrones, agente y reportes por texto o voz | `mf-analisis` | CU-14, CU-15, CU-17, CU-18 | RF-18, RF-19, RF-23 a RF-25 |
 
-- FE-001 bloquea todas las demás. Después, los tres microfrontends son independientes entre sí.
+- FE-001 está completada: T01 a T10 verificadas, incluidas las ejecuciones de los cinco pipelines en GitHub. Evidencias y resultados en [verificacion-base.md](verificacion-base.md).
+- Las funcionalidades FE-002 a FE-009 quedan desbloqueadas por FE-001. Los tres microfrontends son independientes entre sí, respetando las dependencias particulares de cada spec.
 - El orden sigue la prioridad de la sección 3.6.3 del documento: primero lo alto (gestión, inventario, labores), al final la IA.
 
 ## Decisiones transversales
@@ -43,6 +44,7 @@ El backend vive en el repositorio `sw2-parcial2` y está implementado: los cuatr
 
 | Requisito | Descripción resumida | Archivos |
 |---|---|---|
+| RF-01 a RF-06, RN-01 a RN-03 | Parcelas, cultivos, campañas, costos, producción e indicadores | admin-gestion |
 | RF-26, RNF-07 | single-spa con carga solo del microfrontend activo | base |
 | RF-27 | React consulta por GraphQL | base, analisis-consultas |
 | RF-28 | Keycloak con SSO y tres roles | base |
@@ -51,6 +53,7 @@ El backend vive en el repositorio `sw2-parcial2` y está implementado: los cuatr
 | RF-32 | Gestión de usuarios desde Angular | admin-usuarios |
 | RN-12 | Sesión válida para sincronizar | base, campo-registro |
 | RN-15, RN-16 | Roles en la interfaz; el servidor decide | base, todas |
+| RNF-05 | Consultas en menos de 3 s | admin-gestion, todas |
 | RNF-12 | Variables CSS compartidas | base |
 | RNF-13 | Interfaz de campo simple | campo-registro |
 | RNF-15 | Chrome y Edge | todas |
@@ -66,3 +69,4 @@ Se completa con cada spec.
 - SystemJS para todos los proyectos (Angular lo exige con `single-spa-angular`) y un import map con URL relativas, igual en local y en la nube.
 - Desarrollo sobre la carpeta `dist/` servida en `localhost:9000`, sin servidores de desarrollo por microfrontend ni *proxies*. Así el service worker de `/campo/` funciona en local igual que en la nube.
 - Sin dependencias compartidas entre frameworks; solo `@agro/compartido` (sesión, HTTP y errores) y `estilos.css`.
+- Tras FE-001: versiones fijadas en Angular 21 y Vite 7, y despliegue con `configurar-despliegue.mjs` (constitución 1.1.0).

@@ -2,7 +2,7 @@
 
 | Campo | Valor |
 |---|---|
-| Versión | 1.0.0 (2026-11-07) |
+| Versión | 1.1.0 (2026-11-07) |
 | Alcance | Aplicación contenedora de single-spa, módulo compartido y los tres microfrontends web (Angular, React y Vue.js). Flutter no está incluida |
 | Documento de requisitos | `SW2_Parcial_2.pdf` (Módulos 5, 6 y 7; RF-15 a RF-17, RF-21, RF-26 a RF-28, RF-32; RNF-07, RNF-12 a RNF-16, RNF-20) |
 | Repositorio | Propio, separado del backend (`sw2-parcial2`). Las rutas de este documento son relativas a ese repositorio |
@@ -37,6 +37,10 @@ Los microfrontends son la cara web del sistema. Cada uno atiende a un rol y solo
 
 - Node.js LTS en Windows, sin Docker ni WSL en desarrollo. Cada proyecto tiene su propio `package.json` y su `package-lock.json`, y se instala con `npm ci`.
 - **Versiones:** se fija la última versión estable de cada librería al crear el proyecto. **Excepción:** Angular se fija a la última versión mayor que tenga `single-spa-angular` **publicada en npm** (el paquete sigue la versión de Angular).
+- **Versiones fijadas en FE-001** (no se actualizan sin una spec que lo diga):
+  - Angular 21.2.x con `single-spa-angular` 21.0.2 y TypeScript 5.9. La 22 se probó y su helper de webpack falla como CommonJS dentro de un paquete ESM. La configuración de single-spa en Angular se hizo a mano porque `ng add` no hizo nada.
+  - Vite 7.x y `vite-plugin-css-injected-by-js` 4.0.1, porque Vite 8 eliminó la salida `system`.
+  - TypeScript 6 y Vitest 5 en los demás proyectos.
 - Cada microfrontend empaqueta su propio framework. **No** se comparten Angular, React ni Vue por el import map: así se evitan choques de versiones entre frameworks.
 - Lo único que se comparte en tiempo de ejecución es `@agro/compartido` (sección 5).
 - Navegadores: Chrome y Edge actualizados (RNF-15).
@@ -90,7 +94,7 @@ Es un *utility module* de single-spa: un solo archivo SystemJS cargado por el im
 | Export | Qué hace |
 |---|---|
 | `configuracion` | Lee `/config.json` una vez: `gatewayUrl`, `keycloakUrl`, `realm`, `clientId` |
-| `sesion` | Envuelve la **única** instancia de `keycloak-js`: `iniciar()`, `usuario()` (`sub`, `nombre`, `roles`), `tieneRol(rol)`, `obtenerToken()` (renueva si le quedan menos de 30 s), `iniciarSesion()`, `cerrarSesion()`, `conectado()` |
+| `sesion` | Envuelve la **única** instancia de `keycloak-js`: `iniciar()`, `usuario()` (`sub`, `nombre`, `roles`), `tieneRol(rol)`, `obtenerToken()` (renueva si le quedan menos de 30 s; `obtenerToken(true)` fuerza la renovación tras un `401`), `iniciarSesion()`, `cerrarSesion()`, `conectado()` |
 | `http` | `fetch` hacia el gateway: agrega `Authorization: Bearer`, genera `X-Correlation-Id` y convierte las respuestas de error en `ErrorApi` |
 | `ErrorApi` | `estado`, `codigo`, `mensaje`, `detalles`, `idCorrelacion`, según el formato común de errores del backend |
 
@@ -137,7 +141,7 @@ Lo fijan las constituciones y specs del backend; los microfrontends lo respetan 
   - en `mf-campo`, la cola offline, el armado del lote y la interpretación de su respuesta;
   - en cada microfrontend, los servicios que transforman datos.
 - Sin pruebas de extremo a extremo automatizadas. La integración se verifica a mano con el backend real, siguiendo los pasos de cada spec.
-- Herramientas: Vitest en `compartido`, `root-config`, `mf-analisis` y `mf-campo`; el *runner* que trae Angular en `mf-admin`.
+- Herramientas: Vitest en `compartido`, `root-config`, `mf-analisis` y `mf-campo`; el *runner* que trae Angular en `mf-admin` (`ng test`, que usa Vitest 4).
 - **Cobertura:** 80 % de líneas en los archivos de lógica (carpetas `servicios/` y `stores/`, y todo `compartido`). Los componentes no cuentan.
 
 ## 10. Construcción, CI y despliegue
@@ -145,8 +149,8 @@ Lo fijan las constituciones y specs del backend; los microfrontends lo respetan 
 - `npm run construir` (raíz) compila los cinco proyectos en `dist/`. `npm run servir` lo publica en `http://localhost:9000` con `npx serve -s dist -l 9000`.
 - **Desarrollo:** `npm run servir` en una terminal y, en otra, el *watch* del proyecto que se esté editando (`npm run dev`: `vite build --watch` o `ng build --watch`), que escribe en su carpeta de `dist/`. Se recarga el navegador para ver los cambios. Así se desarrolla igual que en producción, sin *proxies* ni servidores por microfrontend.
 - `localhost:9000` es el origen que ya aceptan el client `agro-web` y el CORS del gateway. El backend corre en Docker (WSL) y se alcanza desde Windows en `localhost:8080` (gateway) y `localhost:8180` (Keycloak).
-- **Un pipeline por proyecto** en `.github/workflows/<proyecto>.yml`, filtrado por su carpeta: `npm ci`, pruebas, build (RNF-20). El despliegue a S3 es un job manual (`workflow_dispatch`) que sube la carpeta del proyecto al bucket.
-- **Nube:** S3 + CloudFront en AWS (sección 1.8.5 del documento). `config.json` de producción apunta al gateway y a Keycloak de Azure. La URL de CloudFront se agrega a las redirecciones de `agro-web` y a `CORS_ORIGENES_PERMITIDOS` del gateway al desplegar.
+- **Un pipeline por proyecto** en `.github/workflows/<proyecto>.yml`, filtrado por su carpeta: `npm ci`, pruebas, build (RNF-20). El despliegue a S3 es un job manual (`workflow_dispatch`) que sube la carpeta del proyecto al bucket, sin `--delete`. Los pipelines que consumen `compartido` también lo instalan, para que TypeScript resuelva los tipos de `keycloak-js`. El pipeline de `mf-campo` además construye el contenedor y `compartido`, porque Workbox calcula las revisiones del precaché con los archivos comunes reales.
+- **Nube:** S3 + CloudFront en AWS (sección 1.8.5 del documento). En el despliegue manual, `scripts/configurar-despliegue.mjs` reescribe `root-config/public/config.json` antes de construir. Toma los valores de las variables del repositorio en GitHub: `GATEWAY_URL` y `KEYCLOAK_URL` del gateway y del Keycloak de Azure, más `KEYCLOAK_REALM` y `KEYCLOAK_CLIENT_ID`, que son opcionales. Los secrets de AWS (`AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_BUCKET`) van como secrets de GitHub. La URL de CloudFront se agrega a las redirecciones de `agro-web` y a `CORS_ORIGENES_PERMITIDOS` del gateway al desplegar.
 
 ## 11. Convenciones
 
@@ -172,3 +176,4 @@ Las mismas del backend (constitución común, Convenciones), adaptadas al fronte
 | Versión | Fecha | Cambios |
 |---|---|---|
 | 1.0.0 | 2026-11-07 | Primera versión |
+| 1.1.0 | 2026-11-07 | Tras implementar FE-001: versiones fijadas (Angular 21, Vite 7), `ng test` con Vitest, `obtenerToken(true)`, `configurar-despliegue.mjs` y detalles de los pipelines |

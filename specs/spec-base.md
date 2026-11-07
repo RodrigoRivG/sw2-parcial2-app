@@ -22,7 +22,7 @@ Contenido:
 
 ## Contexto
 
-No existe ningún frontend. Esta spec deja lista la estructura sobre la que se construyen todas las pantallas:
+Al iniciar FE-001 no existía ningún frontend. Su implementación dejó lista la estructura sobre la que se construyen todas las pantallas:
 
 - el repositorio con sus cinco proyectos;
 - la aplicación contenedora de single-spa;
@@ -33,6 +33,8 @@ No existe ningún frontend. Esta spec deja lista la estructura sobre la que se c
 Cada microfrontend hace **una sola consulta real** al backend para probar que el token, el CORS y el gateway funcionan de punta a punta. Esa pantalla es provisional y se reemplaza en las specs de cada microfrontend.
 
 `mf-campo` además registra su service worker, para dejar probado desde el principio el punto más delicado: que `/campo/` abra sin conexión.
+
+T01 a T10 están completadas. El plan siguiente refleja la implementación resultante; las pruebas, verificaciones de navegador y ejecuciones de GitHub Actions están registradas en [verificacion-base.md](verificacion-base.md). El despliegue real en AWS permanece fuera del alcance de esta spec.
 
 ## 1.1 Escenarios de usuario y pruebas
 
@@ -148,7 +150,7 @@ Como técnico de campo, quiero que `/campo/` abra aunque no tenga señal, para p
 
 - `package.json` sin dependencias, con dos scripts:
   - `construir`: `node scripts/construir.mjs`;
-  - `servir`: `npx serve@<versión fijada> -s dist -l 9000`.
+  - `servir`: `npx serve@14.2.7 -s dist -l 9000`.
 - `scripts/construir.mjs`:
   1. borra `dist/`;
   2. ejecuta `npm run build` en `root-config`, `compartido`, `mf-admin`, `mf-analisis` y `mf-campo`, **en ese orden**, porque `mf-campo` calcula las revisiones de los archivos de la raíz que ya están en `dist/`;
@@ -165,7 +167,8 @@ Como técnico de campo, quiero que `/campo/` abra aunque no tenga señal, para p
 | `public/importmap.json` | `@agro/root-config` → `/root-config.js`, `@agro/compartido` → `/compartido/compartido.js`, `@agro/mf-admin` → `/admin/main.js`, `@agro/mf-analisis` → `/analisis/analisis.js`, `@agro/mf-campo` → `/campo/campo.js` |
 | `public/config.json` | Valores locales de D-01 |
 | `public/estilos.css` | Variables `--agro-*` y estilos mínimos de `body`, barra y botones |
-| `src/main.ts` | Arranque de RQ-BASE-03, registro de las tres aplicaciones |
+| `src/main.ts` | Ejecuta `arrancar()` y muestra un botón para reintentar si falla el inicio |
+| `src/arranque.ts` | Arranque de RQ-BASE-03, redirecciones y registro de las tres aplicaciones |
 | `src/rutas.ts` | Funciones puras `rutaInicial(roles)`, `puedeActivar(prefijo, roles)` y `enlacesVisibles(roles)`. Son lo que se prueba |
 | `src/layout.ts` | Barra y páginas de inicio y "Sin permiso" con DOM plano (sin framework) |
 
@@ -186,29 +189,32 @@ Como técnico de campo, quiero que `/campo/` abra aunque no tenga señal, para p
 | Archivo | Contenido |
 |---|---|
 | `src/index.ts` | Exports de RQ-BASE-05 |
-| `src/configuracion.ts` | `cargarConfiguracion()` (un `fetch('/config.json')` en memoria) |
-| `src/sesion.ts` | Comprobación de Keycloak (3 s, `AbortController`), `keycloak-js` con `login-required`, `pkceMethod: 'S256'` y `checkLoginIframe: false`; usuario, roles, token, inicio y cierre de sesión |
+| `src/configuracion.ts` | `configuracion()` comparte en memoria la promesa de `fetch('/config.json')`; permite reintentar si la carga falla |
+| `src/sesion.ts` | Comprobación de Keycloak (3 s, `AbortSignal.timeout`), `keycloak-js` con `login-required`, `pkceMethod: 'S256'` y `checkLoginIframe: false`; usuario, roles, token, inicio y cierre de sesión |
 | `src/http.ts` | RQ-BASE-06 |
 | `src/error-api.ts` | `class ErrorApi extends Error` |
 
 - Vite con `rollupOptions.output.format: 'system'`, `entryFileNames: 'compartido.js'`, `preserveEntrySignatures: 'strict'` y `outDir: '../dist/compartido'`. `keycloak-js` va empaquetado dentro.
 - Tipos para los demás proyectos: cada uno apunta `paths` de su `tsconfig.json` a `../compartido/src/index.ts`, solo para el compilador. En runtime, `@agro/compartido` es externo y lo resuelve el import map.
 - `cerrarSesion()` llama a `keycloak.logout({ redirectUri: origin + '/' })`.
+- `obtenerToken()` renueva con 30 s de margen; `obtenerToken(true)` fuerza la renovación para los clientes Apollo y Axios tras un `401`. `http` usa la misma renovación forzada mediante un helper interno, sin agregar exports al módulo público.
 
 ## 2.4 `mf-admin` (Angular)
 
-1. `npx @angular/cli@<versión fijada> new mf-admin --routing --style=css --ssr=false`, con la versión mayor de Angular que tenga `single-spa-angular` publicada en npm.
-2. `ng add single-spa-angular`: cambia el builder a `@angular-builders/custom-webpack` y crea `main.single-spa.ts`, `extra-webpack.config.js` y `EmptyRouteComponent`.
-3. `ng add @angular/material`.
+1. Se generó el proyecto con Angular CLI 22.2.6 y se probó `single-spa-angular` 22.0.1. Al fallar el helper webpack publicado, se aplicó la alternativa de T02: Angular 21.2.26, CLI 21.2.29 y `single-spa-angular` 21.0.2.
+2. La integración se configuró manualmente porque `ng add` no ejecutó acciones con la publicación 22: builder `@angular-builders/custom-webpack` 21.1.0, `main.single-spa.ts`, `extra-webpack.config.js` y `EmptyRouteComponent`.
+3. Se instalaron Angular Material y CDK 21.2.14; los estilos de Material toman las variables compartidas.
 4. Ajustes:
    - `outputPath: '../dist/admin'` y `outputHashing: 'none'`. La ruta pública de los *chunks* la resuelve `single-spa-angular` desde la URL del import map; no se usa `deployUrl`, que está obsoleto;
    - `externals: ['@agro/compartido']` en `extra-webpack.config.js`;
    - `APP_BASE_HREF` con `/admin/`;
    - ruta `**` → `EmptyRouteComponent`.
+   - `index: ''`, para que Angular no genere un HTML independiente del contenedor;
+   - arranque standalone con `provideSingleSpaPlatform()`, `provideSingleSpa()` y `provideZoneChangeDetection()`; `zone.js` queda empaquetado en Angular.
 5. Pantalla provisional `InicioComponent` en la ruta `''`, con un servicio `ServicioPrueba` que llama a `http('/api/gestion/v1/parcelas?tamanio=1')` de `@agro/compartido`.
 6. Material: un tema que toma `--agro-color-primario` y la fuente de `estilos.css`.
 
-`npm run dev` = `ng build --watch`. **Riesgo principal de la spec:** si el montaje falla con la versión de Angular elegida, se baja una versión mayor (T02).
+`npm run dev` = `ng build --watch`. El riesgo de montaje de T02 quedó resuelto con Angular 21 y verificado desde `dist/` en Chrome.
 
 ## 2.5 `mf-analisis` (React)
 
@@ -252,7 +258,10 @@ Como técnico de campo, quiero que `/campo/` abra aunque no tenga señal, para p
 - job `verificar`: Node LTS, `npm ci`, `npm test`, `npm run build`, con `working-directory` en el proyecto;
 - job `desplegar`: solo con `workflow_dispatch`. Usa `aws s3 sync` de su carpeta de `dist/` al bucket, con credenciales en *secrets* (`AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_BUCKET`). Queda escrito pero sin probar hasta el despliegue.
 - `root-config` despliega sin `--delete`, para no borrar las carpetas de los microfrontends.
-- Los proyectos que usan `@agro/compartido` solo lo necesitan para los tipos: el pipeline hace checkout del repositorio completo y no compila `compartido`.
+- Los pipelines hacen checkout del repositorio completo. `@agro/compartido` sigue siendo externo en los bundles de sus consumidores.
+- Los consumidores instalan también las dependencias de `compartido` para resolver sus tipos. El pipeline de Campo, además, compila `root-config` y `compartido` antes de su propio build, porque Workbox calcula las revisiones de esos archivos. Los demás consumidores no compilan `compartido`.
+- Los filtros incluyen las dependencias compartidas y el propio workflow. Contenedor y Campo incluyen también `scripts/configurar-despliegue.mjs`.
+- Al ejecutar `workflow_dispatch`, contenedor y Campo aplican `GATEWAY_URL` y `KEYCLOAK_URL` desde las variables del repositorio antes del build. `KEYCLOAK_REALM` y `KEYCLOAK_CLIENT_ID` son opcionales. El despliegue usa `AWS_REGION` (por defecto `us-east-1`).
 
 ## 2.8 Pruebas
 
@@ -260,10 +269,13 @@ Como técnico de campo, quiero que `/campo/` abra aunque no tenga señal, para p
 |---|---|---|
 | `compartido` | `sesion.spec.ts` | Con `keycloak-js` simulado: usuario y roles filtrados, `name` o `preferred_username`, `tieneRol`, Keycloak que no responde → `conectado() = false` sin llamar a `init`, `obtenerToken` llama a `updateToken(30)` |
 | `compartido` | `http.spec.ts` | Con `fetch` simulado: headers, `204`, error con formato común → `ErrorApi`, error sin formato → `ERROR_DESCONOCIDO`, red caída → `SIN_CONEXION`, `401` → renueva y repite una vez, `401` repetido → `iniciarSesion` |
+| `compartido` | `configuracion.spec.ts` | Carga única, validación de la configuración y reintento tras un error |
 | `root-config` | `rutas.spec.ts` | `rutaInicial`, `puedeActivar` y `enlacesVisibles` con los cuatro usuarios de prueba y un usuario sin roles |
 | `mf-campo` | `api.spec.ts` | El interceptor agrega token y correlación; error de Axios → `ErrorApi` |
+| `mf-admin` | `app.spec.ts`, `servicio-prueba.spec.ts` | Arranque del componente raíz y consulta del total de parcelas con señal de cancelación |
+| `mf-analisis` | `apollo.spec.ts`, `errores.spec.ts` | Autorización, correlación, consulta GraphQL, renovación tras `401` y mensajes de error |
 
-`mf-admin` y `mf-analisis` no tienen lógica propia en esta spec: sus `npm test` corren las pruebas que trae el proyecto generado, ajustadas para que pasen.
+Resultado: 23 pruebas aprobadas. `compartido` y la lógica de los consumidores alcanzaron el 100 % de cobertura de líneas medida, con un mínimo exigido de 80 %. Angular usa su runner con Vitest 4.1.12; los demás proyectos, Vitest 5.1.0. Los resultados detallados constan en el registro de verificación.
 
 ## 2.9 Decisiones
 
