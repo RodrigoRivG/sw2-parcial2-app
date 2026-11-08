@@ -1,6 +1,6 @@
 # Verificación FE-008 — Análisis por GraphQL
 
-Fecha: 2026-11-08. Implementación local; cierre pendiente por foto histórica ausente, tiempo inicial y pipeline remoto.
+Fecha: 2026-11-08. Implementación y pipeline en verde; cierre manual pendiente por foto histórica ausente y tiempo inicial.
 
 ## Entorno y alcance
 
@@ -87,10 +87,10 @@ En `mf-analisis`:
 - Cobertura sobre `src/servicios/` y `src/apollo.ts`: **100 % de líneas**, 98.46 % de sentencias y 93.87 % de ramas. El JSON de cobertura incluye `graficos.ts`, `formato.ts`, `etiquetas.ts`, `errores.ts` y `apollo.ts`; el reporte de consola abrevia los archivos completamente cubiertos.
 - `npm.cmd run build`: TypeScript estricto y Vite en verde. Salida SystemJS `dist/analisis/analisis.js`, aproximadamente 885 kB / 262 kB gzip. Vite advierte por superar 500 kB; se conserva la configuración de entrada única de FE-001.
 - Recharts **3.10.1** fijado en `package.json` y lockfile. Los gráficos no animan la entrada, para mostrarse de inmediato al cambiar de panel o tamaño.
-- El workflow existente `.github/workflows/mf-analisis.yml` ya instala, prueba y construye. **CE-ANA-05 pendiente:** no se hizo commit, push ni ejecución remota de este cambio.
+- El workflow existente `.github/workflows/mf-analisis.yml` ya instala, prueba y construye. **CE-ANA-05 cumplido según confirmación del usuario el 2026-11-08:** pipeline en verde. No se proporcionó el enlace de la ejecución; no se verificó de forma independiente.
 
 ## Pendientes de cierre
 
 1. Foto válida y verificación visual de descarga completa; paginación con más datos de campañas e incidencias, cuando existan.
 2. Repetir la primera carga y resolver o aceptar expresamente el incumplimiento inicial de 3 s.
-3. Ejecutar el pipeline de GitHub sobre estos cambios y registrar el enlace de la ejecución en verde.
+El pipeline ya está en verde según confirmación del usuario; queda por adjuntar su enlace como evidencia documental, sin bloquear T09.

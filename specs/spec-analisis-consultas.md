@@ -4,7 +4,7 @@
 |---|---|
 | ID | FE-008 |
 | Archivo | `specs/spec-analisis-consultas.md` |
-| Estado | Implementada localmente (2026-11-08); cierre de verificación y CI pendiente |
+| Estado | Implementada y pipeline en verde (2026-11-08); cierre de verificación manual pendiente |
 | Constitución | Microfrontends v1.1.0 |
 | Trazabilidad | CU-05, CU-24 · RF-06, RF-27, RF-33 · RN-03, RN-15, RN-16 · RNF-05, RNF-08, RNF-12, RNF-15 |
 | Depende de | FE-001 (implementada): `mf-analisis` con Apollo Client; `graphql-server` (`spec-consultas.md`, implementado) por `/api/graphql` del gateway |
@@ -211,10 +211,10 @@ Se elimina `Inicio.tsx`.
 - [x] **T06** [P] — Panel **Inventario**. *Hecho cuando:* historia 4.
 - [x] **T07** — Errores por sección. *Hecho cuando:* historia 5 y CE-ANA-02.
 - [ ] **T08** — Verificación manual: CE-ANA-01 a CE-ANA-03 en Chrome y Edge. Se anota en `specs/verificacion-analisis-consultas.md`.
-- [ ] **T09** — Pipeline de `mf-analisis` en verde. *Hecho cuando:* CE-ANA-04 y CE-ANA-05.
+- [x] **T09** — Pipeline de `mf-analisis` en verde. *Hecho cuando:* CE-ANA-04 y CE-ANA-05.
 
 ## Resultado local (2026-11-08)
 
 Recharts 3.10.1 fijado. Nueve pruebas en cuatro archivos pasan, con 100 % de líneas sobre `src/servicios/` y `src/apollo.ts`; `npm run build` compila. Los paneles, filtros, detalle, paginación por cursor, recuperación tras fallo de red y errores parciales se comprobaron con gerencia en Chrome y Edge. Inventario fue detenido con autorización explícita del usuario y restaurado al terminar.
 
-T04 y T08 conservan pendientes por el objeto de foto ausente y la primera consulta superior a 3 s. T09 requiere ejecutar el workflow sobre estos cambios en GitHub; las comprobaciones locales equivalentes pasan. Evidencias, mediciones y pasos de cierre en [verificacion-analisis-consultas.md](verificacion-analisis-consultas.md).
+T04 y T08 conservan pendientes por el objeto de foto ausente y la primera consulta superior a 3 s. T09 completada: el usuario confirmó el pipeline en verde el 2026-11-08. No se proporcionó el enlace de la ejecución. Evidencias, mediciones y pasos de cierre en [verificacion-analisis-consultas.md](verificacion-analisis-consultas.md).
