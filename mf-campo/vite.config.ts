@@ -22,6 +22,7 @@ export default defineConfig(({ command }) => ({
       globPatterns: ['**/*.{js,css,svg,webmanifest}'],
       navigateFallback: '/index.html', navigateFallbackAllowlist: [/^\/campo\//],
       cleanupOutdatedCaches: true,
+      maximumFileSizeToCacheInBytes: 10 * 1024 * 1024,
       additionalManifestEntries: command === 'build' ? archivosRaiz.map(archivo => ({
         url: '/' + archivo,
         revision: createHash('sha256').update(readFileSync(
@@ -30,7 +31,8 @@ export default defineConfig(({ command }) => ({
       })) : [],
     },
   })],
-  test: { coverage: { provider: 'v8', include: ['src/servicios/**/*.ts', 'src/stores/**/*.ts'], exclude: ['**/*.spec.ts'], thresholds: { lines: 80 } } },
+  // TF.js se comprueba con el modelo real en navegador; no se simula la inferencia en Vitest.
+  test: { coverage: { provider: 'v8', include: ['src/servicios/**/*.ts', 'src/stores/**/*.ts'], exclude: ['**/*.spec.ts', 'src/servicios/clasificador.ts'], thresholds: { lines: 80 } } },
   build: {
     outDir: '../dist/campo', emptyOutDir: true,
     rollupOptions: {

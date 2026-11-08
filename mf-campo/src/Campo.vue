@@ -9,9 +9,11 @@ import VistaLabores from './vistas/VistaLabores.vue';
 import VistaIncidencia from './vistas/VistaIncidencia.vue';
 import VistaPendientes from './vistas/VistaPendientes.vue';
 import VistaHistorial from './vistas/VistaHistorial.vue';
+import { crearClasificador } from './servicios/clasificador';
 const referencias = usarReferencias(), operaciones = usarOperaciones();
 const pestania = ref('Labores'), red = ref(navigator.onLine), lista = ref(false), error = ref(''), aviso = ref('');
 const conSesion = ref(sesion.conectado());
+const clasificador = crearClasificador();
 let desmontada = false;
 function estadoRed() { red.value = navigator.onLine; conSesion.value = sesion.conectado(); }
 async function entrar() { try { await sesion.iniciarSesion(); } catch (causa) { error.value = mensajeError(causa); } }
@@ -32,18 +34,20 @@ onMounted(async () => {
     }
   } catch (causa) { error.value = mensajeError(causa); }
 });
-onUnmounted(() => { desmontada = true; operaciones.detener(); window.removeEventListener('online', estadoRed); window.removeEventListener('offline', estadoRed); });
+onUnmounted(() => { desmontada = true; clasificador.liberar(); operaciones.detener(); window.removeEventListener('online', estadoRed); window.removeEventListener('offline', estadoRed); });
 </script>
 <template>
   <section class="agro-panel agro-campo">
     <header><p class="campo-ceja">TÉCNICO DE CAMPO</p><h1>Campo</h1>
       <p v-if="referencias.fecha">{{ red ? 'Datos actualizados:' : 'Sin conexión · datos del' }} {{ fechaLocal(referencias.fecha) }}</p>
       <p v-else>{{ red ? 'Prepare el dispositivo antes de salir al campo' : 'Sin conexión' }}</p>
+      <p>{{ referencias.modelo ? `Clasificador ${referencias.modelo.versionModelo}` : 'Clasificador no disponible' }}</p>
       <p v-if="!conSesion">{{ operaciones.identidad?.nombre ? `Trabajando en este dispositivo como ${operaciones.identidad.nombre}. ` : '' }}<span v-if="red">Inicie sesión para sincronizar</span><span v-else>Los registros se guardan en este dispositivo</span></p>
       <button v-if="red && !conSesion" @click="entrar">Iniciar sesión</button>
       <button v-if="red && conSesion" :disabled="referencias.actualizando" @click="referencias.actualizar">{{ referencias.actualizando ? 'Actualizando…' : 'Actualizar datos' }}</button>
     </header>
     <p v-if="error" class="agro-error" role="alert">{{ error }}</p>
+    <p v-if="referencias.errorModelo" class="agro-error" role="alert">{{ referencias.errorModelo }}</p>
     <p v-for="(mensaje, clave) in referencias.errores" :key="clave" class="agro-error" role="alert">No se actualizó {{ clave }}: {{ mensaje }}</p>
     <p v-if="aviso" role="status">{{ aviso }}</p>
     <nav class="campo-pestanas" aria-label="Vistas de Campo">
@@ -55,7 +59,7 @@ onUnmounted(() => { desmontada = true; operaciones.detener(); window.removeEvent
       <VistaHistorial v-else-if="pestania === 'Historial'" :red="red" :con-sesion="conSesion" />
       <p v-else-if="!operaciones.identidad || !referencias.preparada">Abra Campo con conexión al menos una vez para preparar el dispositivo</p>
       <VistaLabores v-else-if="pestania === 'Labores'" @guardada="guardada" />
-      <VistaIncidencia v-else @guardada="guardada" />
+      <VistaIncidencia v-else :clasificador="clasificador" :red="red" :con-sesion="conSesion" @guardada="guardada" />
     </template>
   </section>
 </template>

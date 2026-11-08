@@ -1,0 +1,20 @@
+import { expect, it } from 'vitest';
+import { clasificacionAdjunta, confianzaTexto, interpretar, porcentaje, resultadoDeVideo } from './resultado';
+import type { EtiquetaModelo, ResultadoVideo } from '../modelos';
+const etiquetas: EtiquetaModelo[] = [0, 1, 2].map(indice => ({ indice, categoria: `C${indice}`, nombre: `Clase ${indice}`, cultivo: 'SOYA', tipoIncidenciaSugerido: 'ENFERMEDAD' }));
+it('interpreta top 3, umbral y empates en orden de índice sin alterar probabilidades ni metadatos', () => {
+  const claro = interpretar([0.1, 0.8, 0.1], etiquetas, '0.50', 'clasificador-1');
+  expect(claro.categoria).toBe('C1'); expect(claro.alternativas.map(a => a.categoria)).toEqual(['C0', 'C2']);
+  expect(claro.clasificacion).toEqual({ categoria: 'C1', confianza: '0.8000', versionModelo: 'clasificador-1', origen: 'DISPOSITIVO' });
+  const bajo = interpretar([0.4, 0.4, 0.2], etiquetas, '0.50', 'clasificador-1');
+  expect(bajo.categoria).toBe('INDETERMINADO'); expect(bajo.cultivo).toBeNull(); expect(bajo.tipoIncidenciaSugerido).toBeNull();
+  expect(bajo.alternativas.map(a => a.categoria)).toEqual(['C0', 'C1', 'C2']);
+  expect(interpretar([0.5, 0.3, 0.2], etiquetas, '0.50', 'v').categoria).toBe('C0');
+  expect(() => interpretar([0.1], etiquetas, '0.5', 'v')).toThrow('etiquetas');
+  expect(() => interpretar([NaN, 0, 1], etiquetas, '0.5', 'v')).toThrow('inválidas');
+  expect([confianzaTexto(1), confianzaTexto(0), confianzaTexto(0.87312)]).toEqual(['1.0000', '0.0000', '0.8731']);
+  expect(porcentaje('0.8731')).toBe('87.31 %');
+  expect(Object.keys(clasificacionAdjunta(claro))).toEqual(['categoria', 'confianza', 'versionModelo', 'origen']);
+  const video = resultadoDeVideo({ categoriaPredominante: 'C1', nombre: 'Clase 1', confianza: '0.8', clasificacion: claro.clasificacion, aviso: 'Aviso', orientativo: true } as ResultadoVideo);
+  expect(video.categoria).toBe('C1'); expect(video.alternativas).toEqual([]);
+});
