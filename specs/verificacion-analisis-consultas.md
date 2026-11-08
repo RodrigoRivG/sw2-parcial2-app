@@ -1,6 +1,6 @@
 # Verificación FE-008 — Análisis por GraphQL
 
-Fecha: 2026-11-08. Implementación y pipeline en verde; cierre manual pendiente por foto histórica ausente y tiempo inicial.
+Fecha: 2026-11-08. **FE-008 implementada y verificada; T01 a T09 completas.** Pipeline en verde según confirmación del usuario. El cierre manual comprobó una foto nueva y los cuatro paneles con el backend en caliente, conforme a D-FE8-09 y D-FE8-10. Se conservan abajo las evidencias iniciales y el diagnóstico del entorno.
 
 ## Entorno y alcance
 
@@ -8,9 +8,9 @@ Fecha: 2026-11-08. Implementación y pipeline en verde; cierre manual pendiente 
 - Backend existente en `\\wsl.localhost\Ubuntu\home\rodrigo\proyectos\sw2-parcial2`, gateway `localhost:8080`, Keycloak `localhost:8180`.
 - Contratos revisados: `servicios/graphql-server/src/esquema/esquema.graphql` y `servicios/graphql-server/specs/spec-consultas.md`.
 - Chrome y Edge en modo headless, con perfiles independientes de verificación y `gerencia.prueba`. Recorridos operados mediante DevTools; no se agregó una suite automatizada de extremo a extremo.
-- Se usaron datos existentes de FE-002 a FE-006, sin crear ni modificar registros.
+- En la primera verificación se usaron datos existentes de FE-002 a FE-006, sin crear ni modificar registros. Para el cierre, el usuario autorizó una incidencia nueva con foto desde Campo, como excepción prevista en D-FE8-10; su identificación y resultados se detallan al final.
 
-## Resultados
+## Resultados iniciales
 
 | Recorrido | Resultado observado |
 |---|---|
@@ -69,7 +69,7 @@ Duraciones observadas en los recursos de red del navegador para `POST /api/graph
 | Inventario Edge | 190 ms; filtros 28 a 68 ms |
 | Segunda página de labores sin inventario | 2067 ms Chrome y 2069 ms Edge, con respuesta parcial |
 
-Las consultas normales posteriores quedaron bajo 3 s. **No se declara CE-ANA-03 cumplido sin reservas:** la primera carga lo superó. Se conserva esta evidencia; no se atribuye una causa no demostrada ni se altera el backend para ocultarla.
+La primera carga superó los 3 s y quedó registrada como observación de arranque en frío. Estas mediciones históricas se conservan. CE-ANA-03 se verificó después con el criterio revisado de backend en caliente (D-FE8-09), según la sección de cierre al final de este documento.
 
 ## Foto histórica ausente
 
@@ -77,7 +77,7 @@ La incidencia `3ab1a366-eaa8-419f-b7b4-fc5295427efc` devuelve una URL firmada nu
 
 En ambos navegadores se comprobó el manejo del error y que **Actualizar** vuelve a consultar las incidencias y vuelve a intentar la imagen. El archivo sigue ausente, por lo que no se afirma que su miniatura se haya decodificado o que la descarga haya funcionado. No se guardaron URLs firmadas ni credenciales en esta evidencia.
 
-Para cerrar T04 y CE-ANA-01: disponer de una foto válida en una incidencia existente de campaña y repetir miniatura, apertura en otra pestaña y actualización. No se crearon datos de sustitución, conforme a §1.4 de la spec.
+Esta foto histórica no se restauró. T04 y CE-ANA-01 se cerraron con una incidencia nueva registrada desde Campo, conforme a la excepción posterior D-FE8-10, comprobando miniatura, apertura en otra pestaña y actualización. El registro de cierre se documenta al final.
 
 ## Pruebas y construcción
 
@@ -89,8 +89,82 @@ En `mf-analisis`:
 - Recharts **3.10.1** fijado en `package.json` y lockfile. Los gráficos no animan la entrada, para mostrarse de inmediato al cambiar de panel o tamaño.
 - El workflow existente `.github/workflows/mf-analisis.yml` ya instala, prueba y construye. **CE-ANA-05 cumplido según confirmación del usuario el 2026-11-08:** pipeline en verde. No se proporcionó el enlace de la ejecución; no se verificó de forma independiente.
 
-## Pendientes de cierre
+## Estado del cierre
 
-1. Foto válida y verificación visual de descarga completa; paginación con más datos de campañas e incidencias, cuando existan.
-2. Repetir la primera carga y resolver o aceptar expresamente el incumplimiento inicial de 3 s.
-El pipeline ya está en verde según confirmación del usuario; queda por adjuntar su enlace como evidencia documental, sin bloquear T09.
+T04 y T08 completadas con las comprobaciones documentadas al final. El pipeline está en verde según confirmación del usuario; queda por adjuntar su enlace como evidencia documental, sin bloquear T09. La ausencia de suficientes registros para recorrer una segunda página de campañas e incidencias se conserva como límite de los datos usados, sin crear datos adicionales fuera de la incidencia autorizada.
+
+## Diagnóstico de los pendientes en el backend (2026-11-08)
+
+Revisión hecha desde `sw2-parcial2`, sin modificar el backend:
+
+- **Primera carga.** En los registros de `graphql-server`, las dos primeras consultas del día (13:28:54 UTC) fueron `Cultivos` con 4.538 ms y 1 error, y `Campanias` con 4.553 ms, 29 llamadas y 33 errores de campo. Coinciden con el plazo total de 4,5 s de GraphQL (`spec-consultas.md`, historia 7): los servicios no respondieron a tiempo en su primer uso tras el arranque del backend. Las mismas consultas, a las 13:29:14, tardaron 79 y 582 ms sin errores. Durante el resto de la verificación, la consulta más lenta sin servicios caídos fue `Campanias`, con 2.311 ms. Se trata de un arranque en frío del backend; la spec ajusta CE-ANA-03 (D-FE8-09).
+- **Foto ausente.** El volumen `localstack-data` ocupa 76 KB y no contiene objetos de S3: LocalStack se configura sin persistencia (`SERVICES: s3`, bucket creado por `docker/localstack/init` al arrancar). Al apagar el equipo se perdieron las fotos, mientras las incidencias siguieron en DynamoDB. La spec pasa a verificar la foto con una incidencia nueva registrada desde Campo (D-FE8-10).
+- **`fechaReferencia`.** `esquema.graphql` declara `Labor.fechaReferencia: FechaHora!`, y operaciones devuelve `AAAA-MM-DD` para las labores programadas (RQ-LAB-15). Es un defecto de `graphql-server`, registrado en D-FE8-11; el frontend no usa el campo (D-FE8-07).
+
+## Cierre manual de T04 y T08 (2026-11-08)
+
+Comprobación realizada entre las 11:05 y las 11:07, hora de Bolivia (UTC−04:00), sobre el build existente, sin cambios al código de las aplicaciones. Chrome 156 y Edge 157 en modo headless, con perfiles independientes. No se reiniciaron ni detuvieron servicios durante este cierre.
+
+### Incidencia registrada desde Campo
+
+Con sesión de `tecnico.prueba` (Tomás Técnico), se usó el formulario **Incidencia** de `/campo/`, se seleccionó la campaña indicada y se adjuntó un JPEG de prueba existente mediante el control de archivo. Se pulsó **Guardar** una sola vez; Campo realizó su guardado local y la sincronización habitual.
+
+| Dato | Valor |
+|---|---|
+| Incidencia / operación | `57b70729-b1c2-4e7e-b9d2-3a0d6da3019c` |
+| Campaña | `121256de-3e2d-4771-a244-4e04b0fccb82` |
+| Parcela | `8093d837-7ffd-49a9-900d-3cdb99237832` |
+| Descripción | `FE-008 cierre: foto registrada desde Campo (2026-11-08)` |
+| Tipo | `OTRO` |
+| Foto | JPEG, 40 437 bytes, 384 × 256 píxeles |
+| Resultado de Campo | `SINCRONIZADA`, `repetida: false`, mismo identificador de recurso |
+| Hora de sincronización comprobada | 11:05:08, hora de Bolivia |
+
+Con `gerencia.prueba`, se abrió el detalle de esa campaña en **Análisis**, en ambos navegadores:
+
+- La incidencia apareció con su descripción y **Tomás Técnico** como persona que la registró.
+- La miniatura descargó y decodificó la foto: `complete: true`, `naturalWidth: 384`, `naturalHeight: 256`.
+- Al pulsarla, se abrió una pestaña nueva y su documento de imagen también decodificó los 384 × 256 píxeles. El enlace conserva `target="_blank"` y `rel="noopener noreferrer"`.
+- Se simuló un error de la miniatura para comprobar **Actualizar** sin esperar los diez minutos de caducidad. El botón volvió a consultar las incidencias, obtuvo una URL firmada diferente y volvió a decodificar la foto en ambos navegadores.
+- No hubo excepciones de la aplicación. No se guardaron credenciales ni URLs firmadas en la evidencia.
+
+**T04 y la parte pendiente de CE-ANA-01: cumplidas.** La foto histórica ausente continúa como observación del entorno; no impide verificar la funcionalidad con el registro nuevo autorizado.
+
+### Cuatro paneles con el backend en caliente
+
+En cada navegador se abrió **Campañas** una vez y se esperó la respuesta completa. Después se recargó `/analisis/` y se recorrieron **Campañas**, **Detalle**, **Comparar** e **Inventario**, con sesión de `gerencia.prueba`.
+
+Se midió mediante los eventos de **Network** de DevTools, desde el inicio de la primera solicitud GraphQL del panel hasta el final de la última respuesta necesaria. En el detalle, este tramo incluye la consulta de campaña y las consultas posteriores de labores e incidencias. Las duraciones se redondean a milisegundos; no son solo el máximo de las solicitudes individuales. Se comprobó además que la vista terminara de cargar sin alertas.
+
+| Panel | Chrome 156: tramo completo | Edge 157: tramo completo | Consultas incluidas |
+|---|---:|---:|---|
+| Campañas | 164 ms | 239 ms | `Cultivos`, `Campanias` |
+| Detalle | 170 ms | 299 ms | `Detalle`, `Labores`, `Incidencias` |
+| Comparar | 37 ms | 48 ms | `Cultivos`, `Comparar` |
+| Inventario | 75 ms | 74 ms | `Inventario` |
+
+Todas las respuestas fueron **HTTP 200**, con **0 errores GraphQL**, sin alertas ni excepciones de la aplicación. Se mostraron 11 campañas, 5 campañas finalizadas, 12 insumos y el detalle con sus listas. Las ocho mediciones de panel quedaron por debajo de 3000 ms; el mayor tramo fue de **299 ms**.
+
+Duraciones de las solicitudes individuales:
+
+| Solicitud | Chrome 156 | Edge 157 |
+|---|---:|---:|
+| Cultivos en Campañas | 35 ms | 127 ms |
+| Campanias | 163 ms | 237 ms |
+| Detalle | 70 ms | 127 ms |
+| Labores | 53 ms | 111 ms |
+| Incidencias | 86 ms | 159 ms |
+| Cultivos en Comparar | 37 ms | 40 ms |
+| Comparar | 37 ms | 47 ms |
+| Inventario | 75 ms | 74 ms |
+
+Correlaciones de referencia para reproducir la trazabilidad:
+
+| Consulta | Chrome 156 | Edge 157 |
+|---|---|---|
+| Campanias | `445e1963-c10e-4f70-bf05-9693785fbf48` | `476c072a-7fb2-47ad-b5c9-7c25ae98050a` |
+| Detalle | `fa5a874a-8910-4b71-9bd4-b8f892de14eb` | `65cbf266-3c4b-499d-964c-eda6efa237b0` |
+| Comparar | `36c9decc-cbc4-4b9c-ae06-92f1234e7c99` | `b4bfd62b-9c82-401d-837e-a81a5477802f` |
+| Inventario | `c52ac736-f3db-480e-a8f9-7b7c59c5e199` | `865f519a-3426-4653-a129-8f23f9a36427` |
+
+**CE-ANA-03 y T08: cumplidas con el criterio vigente D-FE8-09.** CE-ANA-02 ya estaba verificado y no se repitió la detención de inventario. Se conservan las pruebas, build y confirmación de CI previos, puesto que este cierre solo agregó el dato autorizado y actualizó documentación.

@@ -4,7 +4,7 @@
 |---|---|
 | ID | FE-008 |
 | Archivo | `specs/spec-analisis-consultas.md` |
-| Estado | Implementada y pipeline en verde (2026-11-08); cierre de verificación manual pendiente |
+| Estado | Implementada y verificada (2026-11-08); pipeline en verde confirmado por el usuario |
 | Constitución | Microfrontends v1.1.0 |
 | Trazabilidad | CU-05, CU-24 · RF-06, RF-27, RF-33 · RN-03, RN-15, RN-16 · RNF-05, RNF-08, RNF-12, RNF-15 |
 | Depende de | FE-001 (implementada): `mf-analisis` con Apollo Client; `graphql-server` (`spec-consultas.md`, implementado) por `/api/graphql` del gateway |
@@ -123,14 +123,16 @@ Como gerencia, quiero ver lo que sí responde cuando un servicio está caído (R
 
 - **CE-ANA-01:** las historias 1 a 4 se cumplen con `gerencia.prueba` en Chrome y Edge contra el backend local, con los datos de FE-002 a FE-006.
 - **CE-ANA-02:** con `servicio-inventario` detenido (`docker compose stop servicio-inventario`, con autorización del usuario, y levantado al terminar), la historia 5 se cumple.
-- **CE-ANA-03:** cada panel responde en menos de 3 s (RNF-05), medido en la pestaña **Network**.
+- **CE-ANA-03:** cada panel responde en menos de 3 s (RNF-05), medido en la pestaña **Network** con el backend en caliente. La primera consulta tras levantar el backend se registra aparte y no cuenta para el criterio (D-FE8-09). Antes de medir se hace una consulta de calentamiento: abrir **Campañas** una vez y recargar.
 - **CE-ANA-04:** `npm test` de `mf-analisis` en verde con cobertura de líneas ≥ 80 % sobre `src/servicios/` y `src/apollo.ts`.
 - **CE-ANA-05:** el pipeline de `mf-analisis` termina en verde.
 
 ## 1.4 Supuestos
 
 - Para el examen, menos de 50 cultivos y menos de 50 campañas finalizadas por filtro (una página de **Comparar**).
-- Los datos de verificación son los de FE-002 a FE-006; esta spec no crea datos.
+- Los datos de verificación son los de FE-002 a FE-006. La única excepción es una incidencia con foto, registrada desde `mf-campo` (FE-006) como `tecnico.prueba` con "FE-008" en la descripción y en una campaña con labores, para verificar la miniatura (D-FE8-10).
+- LocalStack (S3 local) **no conserva los objetos** al reiniciarse: el volumen `localstack-data` no guarda archivos de S3, porque la persistencia es una función de pago de LocalStack. Las incidencias registradas antes del último arranque siguen en DynamoDB, pero su foto responde `404 NoSuchKey`. En la nube, S3 sí persiste.
+- Tras levantar el backend, la primera consulta que recorre GraphQL → gateway → servicios es lenta. En la verificación, las dos primeras tardaron 4.538 y 4.553 ms en `graphql-server`, que es el plazo total de 4,5 s, con respuesta parcial (33 errores de campo). Las mismas consultas, 20 s después, tardaron 79 y 582 ms.
 
 ## 1.5 Fuera de alcance
 
@@ -198,6 +200,9 @@ Se elimina `Inicio.tsx`.
 | D-FE8-06 | Una página de 50 en **Comparar** e **Inventario** | Es el máximo de GraphQL y alcanza para el examen; el gráfico muestra una sola página |
 | D-FE8-07 | Consultar `fechaProgramada` y `fechaEjecucion` para la fecha de una labor | En el backend real, pedir `fechaReferencia` en una labor programada produce `ERROR_INTERNO` y anula la lista. Se usan los campos existentes sin modificar el backend |
 | D-FE8-08 | Declarar `errorPolicy: 'all'` también en `fetchMore` y conservar errores por página | Apollo 4 establece `none` por defecto para `fetchMore`, aunque `useQuery` tenga `all`; la prueba con inventario detenido detectó la pérdida de la página parcial |
+| D-FE8-09 | CE-ANA-03 se mide con el backend en caliente; la primera consulta tras el arranque se registra aparte | La demora de la primera carga es del arranque del backend, no del frontend: los registros de `graphql-server` muestran que se agotó su plazo total de 4,5 s en la primera consulta y que las siguientes, idénticas, respondieron en menos de 0,6 s. Para la evaluación, conviene abrir **Campañas** una vez después de levantar el backend |
+| D-FE8-10 | La foto se verifica con una incidencia nueva registrada desde Campo | LocalStack pierde los objetos al reiniciarse; actualizar la URL no recupera un archivo que ya no existe. Crear la incidencia desde `mf-campo` verifica además el recorrido completo de FE-006 a FE-008 |
+| D-FE8-11 | Defecto del backend registrado: `Labor.fechaReferencia` | El esquema de `graphql-server` lo declara `FechaHora!`, pero operaciones devuelve una fecha sin hora (`AAAA-MM-DD`) mientras la labor está programada (RQ-LAB-15 de operaciones), y el escalar responde `ERROR_INTERNO`. El frontend no lo pide (D-FE8-07). Corregirlo es un cambio en `graphql-server` (por ejemplo, tipo `String!` o un escalar que acepte ambas formas), pendiente para una revisión del backend |
 
 ---
 
@@ -206,15 +211,15 @@ Se elimina `Inicio.tsx`.
 - [x] **T01** — Dependencia de Recharts, `modelos.ts`, `consultas.ts` y las funciones de `servicios/` con sus pruebas. *Hecho cuando:* `npm test` en verde con cobertura ≥ 80 %.
 - [x] **T02** — `Analisis.tsx` con pestañas; se elimina `Inicio.tsx`. *Hecho cuando:* las pestañas navegan.
 - [x] **T03** — Panel **Campañas**. *Hecho cuando:* historia 1.
-- [ ] **T04** — Detalle de campaña con labores e incidencias. Implementado y probado, salvo la descarga de la foto histórica: su objeto devuelve `404 NoSuchKey`. *Hecho cuando:* historia 2 completa con un objeto disponible.
+- [x] **T04** — Detalle de campaña con labores e incidencias. La incidencia `57b70729-b1c2-4e7e-b9d2-3a0d6da3019c` se registró desde Campo como `tecnico.prueba` en la campaña `121256de-3e2d-4771-a244-4e04b0fccb82`. En Chrome y Edge se verificaron miniatura, apertura en otra pestaña y **Actualizar**, con una URL nueva y la imagen decodificada (D-FE8-10).
 - [x] **T05** [P] — Panel **Comparar**. *Hecho cuando:* historia 3.
 - [x] **T06** [P] — Panel **Inventario**. *Hecho cuando:* historia 4.
 - [x] **T07** — Errores por sección. *Hecho cuando:* historia 5 y CE-ANA-02.
-- [ ] **T08** — Verificación manual: CE-ANA-01 a CE-ANA-03 en Chrome y Edge. Se anota en `specs/verificacion-analisis-consultas.md`.
+- [x] **T08** — Verificación manual: CE-ANA-01 a CE-ANA-03 en Chrome y Edge. Tras abrir **Campañas** una vez y recargar, los cuatro paneles respondieron en menos de 3 s, sin errores GraphQL. El tramo completo de red más lento fue de 299 ms (Detalle, Edge). Evidencias en `specs/verificacion-analisis-consultas.md` (D-FE8-09).
 - [x] **T09** — Pipeline de `mf-analisis` en verde. *Hecho cuando:* CE-ANA-04 y CE-ANA-05.
 
 ## Resultado local (2026-11-08)
 
 Recharts 3.10.1 fijado. Nueve pruebas en cuatro archivos pasan, con 100 % de líneas sobre `src/servicios/` y `src/apollo.ts`; `npm run build` compila. Los paneles, filtros, detalle, paginación por cursor, recuperación tras fallo de red y errores parciales se comprobaron con gerencia en Chrome y Edge. Inventario fue detenido con autorización explícita del usuario y restaurado al terminar.
 
-T04 y T08 conservan pendientes por el objeto de foto ausente y la primera consulta superior a 3 s. T09 completada: el usuario confirmó el pipeline en verde el 2026-11-08. No se proporcionó el enlace de la ejecución. Evidencias, mediciones y pasos de cierre en [verificacion-analisis-consultas.md](verificacion-analisis-consultas.md).
+T04 y T08 completadas: se registró una incidencia nueva con foto desde Campo y se verificó el recorrido en Análisis en Chrome y Edge; también se midieron los cuatro paneles con el backend en caliente, conforme a D-FE8-09 y D-FE8-10. Todas las tareas T01 a T09 están completas. T09 se basa en la confirmación del usuario del pipeline en verde el 2026-11-08; no se proporcionó el enlace de la ejecución. La pérdida de fotos históricas en LocalStack, el arranque en frío y el defecto de `fechaReferencia` se conservan como observaciones del entorno y del backend, sin bloquear FE-008 con los criterios revisados. Evidencias y mediciones en [verificacion-analisis-consultas.md](verificacion-analisis-consultas.md).
