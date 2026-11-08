@@ -1,2 +1,143 @@
-.agro-analisis h1 { color: var(--agro-color-primario); }
-.agro-analisis .agro-etiqueta { letter-spacing: .12em; font-size: .8rem; }
+.agro-analisis h1 {
+  color: var(--agro-color-primario);
+}
+.agro-analisis .agro-etiqueta {
+  letter-spacing: 0.12em;
+  font-size: 0.8rem;
+}
+.agro-analisis {
+  min-width: 0;
+}
+.agro-analisis h2 {
+  margin-top: 1.8rem;
+}
+.agro-analisis h3,
+.agro-analisis h4 {
+  color: var(--agro-color-primario);
+}
+.agro-analisis button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+.ana-pestanias,
+.ana-filtros,
+.ana-paginador {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--agro-espaciado);
+  align-items: center;
+  margin: 1.5rem 0;
+}
+.ana-pestanias button[aria-current] {
+  color: var(--agro-color-superficie);
+  background: var(--agro-color-primario);
+}
+.ana-filtros label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.ana-filtros label.ana-casilla {
+  flex-direction: row;
+  align-items: center;
+}
+.ana-filtros input,
+.ana-filtros select {
+  font: inherit;
+  padding: 0.6rem;
+  border: 1px solid var(--agro-color-borde);
+  border-radius: var(--agro-radio);
+  background: var(--agro-color-superficie);
+  color: var(--agro-color-texto);
+}
+.ana-tabla {
+  overflow-x: auto;
+  max-width: 100%;
+}
+.agro-analisis table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+.agro-analisis th,
+.agro-analisis td {
+  text-align: left;
+  padding: 0.8rem;
+  border-bottom: 1px solid var(--agro-color-borde);
+  vertical-align: top;
+}
+.agro-analisis th {
+  background: var(--agro-color-fondo);
+}
+.ana-enlace {
+  border: 0;
+  padding: 0;
+  text-decoration: underline;
+  text-align: left;
+}
+.ana-indicadores {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--agro-espaciado);
+}
+.ana-indicadores > div {
+  flex: 1 1 10rem;
+  padding: 1rem;
+  border: 1px solid var(--agro-color-borde);
+  border-radius: var(--agro-radio);
+}
+.ana-indicadores dd {
+  margin: 0.6rem 0 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+.ana-distintivo {
+  font-weight: 600;
+  color: var(--agro-color-primario);
+}
+.ana-seccion {
+  margin-top: 1.5rem;
+  padding-top: 0.8rem;
+  border-top: 1px solid var(--agro-color-borde);
+}
+.ana-costos {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: center;
+  gap: 1rem;
+}
+.ana-grafico {
+  width: 100%;
+  min-width: 0;
+  margin: 1rem 0;
+}
+.ana-tooltip {
+  padding: 0.7rem;
+  background: var(--agro-color-superficie);
+  border: 1px solid var(--agro-color-borde);
+  border-radius: var(--agro-radio);
+}
+.ana-stock-bajo {
+  color: var(--agro-color-error);
+  font-weight: 600;
+}
+.ana-lista {
+  list-style: none;
+  padding: 0;
+}
+.ana-lista > li {
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--agro-color-borde);
+}
+.ana-foto {
+  display: block;
+  width: 160px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: var(--agro-radio);
+}
+@media (max-width: 700px) {
+  .ana-costos {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

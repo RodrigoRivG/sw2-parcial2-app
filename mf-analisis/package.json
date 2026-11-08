@@ -12,6 +12,7 @@
     "graphql": "16.15.0",
     "react": "19.3.1",
     "react-dom": "19.3.1",
+    "recharts": "3.10.1",
     "rxjs": "7.8.2",
     "single-spa-react": "6.0.2"
   },
