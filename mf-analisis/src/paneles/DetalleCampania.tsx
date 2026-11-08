@@ -11,6 +11,7 @@ import { Grafico } from '../componentes/Graficos';
 import { ListaCursor } from '../componentes/ListaCursor';
 import { CombinedGraphQLErrors } from '@apollo/client/errors';
 import { errorDeSeccion } from '../servicios/errores';
+import { ListaPredicciones } from '../componentes/ListaPredicciones';
 function Foto({ url, actualizar }: { url: string; actualizar: () => void }) {
   const [fallo, cambiarFallo] = useState(false);
   return fallo ? (
@@ -29,7 +30,15 @@ function Foto({ url, actualizar }: { url: string; actualizar: () => void }) {
     </a>
   );
 }
-export function DetalleCampania({ id, volver }: { id: string; volver: () => void }) {
+export function DetalleCampania({
+  id,
+  volver,
+  estimar,
+}: {
+  id: string;
+  volver: () => void;
+  estimar: (id: string) => void;
+}) {
   const consulta = useQuery<{ campania: Campania | null }>(DETALLE, {
     variables: { id },
     errorPolicy: 'all',
@@ -119,6 +128,11 @@ export function DetalleCampania({ id, volver }: { id: string; volver: () => void
                 </div>
               </>
             )}
+          </section>
+          <section className="ana-seccion">
+            <h3>Predicciones</h3>
+            <button onClick={() => estimar(id)}>Estimar</button>
+            <ListaPredicciones key={id} idCampania={id} />
           </section>
           <section className="ana-seccion">
             <h3>Labores</h3>

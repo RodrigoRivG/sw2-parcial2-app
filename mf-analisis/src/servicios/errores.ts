@@ -25,7 +25,10 @@ export function errorDeSeccion(
 }
 export function mensajeError(error: unknown): string {
   if (error instanceof ErrorApi) {
-    return error.mensaje + (error.estado >= 500 ? `\nCorrelación: ${error.idCorrelacion}` : '');
+    return (
+      error.mensaje +
+      (error.estado >= 500 && error.idCorrelacion ? `\nCorrelación: ${error.idCorrelacion}` : '')
+    );
   }
   if (CombinedGraphQLErrors.is(error)) {
     return error.errors

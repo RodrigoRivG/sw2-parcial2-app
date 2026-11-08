@@ -1,5 +1,21 @@
 import type { Campania, Finalizada, Insumo, Monto } from '../modelos';
 import { etiqueta } from './etiquetas';
+import type { AnalisisPatrones, Prediccion } from '../modelos-ia';
+export function barrasIntervalo(p: Prediccion) {
+  return [
+    ['Mínimo', p.intervalo.minimo],
+    ['Estimado', p.rendimientoEstimado],
+    ['Máximo', p.intervalo.maximo],
+    ...(p.rendimientoReal == null ? [] : [['Real', p.rendimientoReal]]),
+  ].map(([etiqueta, texto]) => ({ etiqueta, valor: Number(texto), texto: `${texto} ${p.unidad}` }));
+}
+export function barrasGrupos(analisis: AnalisisPatrones) {
+  return analisis.grupos.map((g) => ({
+    etiqueta: g.descripcion,
+    valor: g.cantidad,
+    texto: `${g.cantidad} campañas`,
+  }));
+}
 export function barrasIndicadores(items: Campania[]) {
   return items
     .filter(

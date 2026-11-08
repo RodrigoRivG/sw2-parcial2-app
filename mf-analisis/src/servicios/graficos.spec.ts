@@ -5,7 +5,32 @@ import {
   tortaCostos,
   dispersionFinalizadas,
   barrasInventario,
+  barrasIntervalo,
+  barrasGrupos,
 } from './graficos';
+import type { Prediccion, AnalisisPatrones } from '../modelos-ia';
+it('muestra el intervalo y el rendimiento real sin alterar los decimales, y las cantidades de grupos', () => {
+  const prediccion = {
+    intervalo: { minimo: '2810.00', maximo: '3390.75' },
+    rendimientoEstimado: '3120.40',
+    rendimientoReal: null,
+    unidad: 'kg/ha',
+  } as Prediccion;
+  expect(barrasIntervalo(prediccion)).toEqual([
+    { etiqueta: 'Mínimo', valor: 2810, texto: '2810.00 kg/ha' },
+    { etiqueta: 'Estimado', valor: 3120.4, texto: '3120.40 kg/ha' },
+    { etiqueta: 'Máximo', valor: 3390.75, texto: '3390.75 kg/ha' },
+  ]);
+  expect(barrasIntervalo({ ...prediccion, rendimientoReal: '2800.00' }).at(-1)).toEqual({
+    etiqueta: 'Real',
+    valor: 2800,
+    texto: '2800.00 kg/ha',
+  });
+  expect(
+    barrasGrupos({ grupos: [{ descripcion: 'Costo alto', cantidad: 4 }] } as AnalisisPatrones),
+  ).toEqual([{ etiqueta: 'Costo alto', valor: 4, texto: '4 campañas' }]);
+  expect(barrasGrupos({ grupos: [] } as unknown as AnalisisPatrones)).toEqual([]);
+});
 it('convierte solo para la geometría y conserva los textos exactos; excluye indicadores incompletos', () => {
   const campanias = [
     {

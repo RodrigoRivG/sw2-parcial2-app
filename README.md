@@ -34,6 +34,8 @@ La incidencia de Campo también admite clasificación orientativa en el disposit
 
 Análisis (FE-008) está implementada y verificada en Chrome y Edge: **Campañas**, su detalle, **Comparar** e **Inventario**, con consultas por GraphQL, gráficos Recharts y datos parciales ante fallos. Abrir `/analisis/` con `gerencia.prueba`. Las pruebas y el build local pasan; el usuario confirmó el pipeline en verde. El cierre verificó una foto nueva registrada desde Campo y los cuatro paneles por debajo de 3 s con el backend en caliente. Evidencias y observaciones del entorno en [specs/verificacion-analisis-consultas.md](specs/verificacion-analisis-consultas.md).
 
+FE-009 agrega **Predicción**, **Patrones**, **Asistente** y **Reportes** en `/analisis/`, además de predicciones en el detalle de campaña. Las llamadas de IA usan REST por el gateway; los trabajos se consultan cada 2 s, con cancelación al cambiar de pestaña y opción de retomarlos. Se verificaron los recorridos por texto y las descargas en Chrome y Edge, y el usuario confirmó una grabación real de voz correcta en Chrome. Los modelos `rendimiento` y `patrones`, Ollama y Whisper deben estar disponibles. Las pruebas y el build local pasan; el pipeline de este cambio queda pendiente. Evidencias en [specs/verificacion-analisis-ia.md](specs/verificacion-analisis-ia.md).
+
 ## Versiones y decisiones verificadas
 
 - Angular 21.2.26 y `single-spa-angular` 21.0.2: Angular 22 fue probado primero, pero el helper webpack de `single-spa-angular` 22.0.1 falla por publicar CommonJS dentro de un paquete ESM. La spec permite bajar una versión mayor al fallar T02. La configuración se hizo manualmente porque `ng add` no ejecutó acciones con la publicación 22.

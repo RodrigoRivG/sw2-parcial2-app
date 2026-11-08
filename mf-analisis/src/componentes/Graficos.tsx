@@ -62,7 +62,14 @@ export function Grafico({
       <ResponsiveContainer width="100%" height={320}>
         {tipo === 'costos' ? (
           <PieChart>
-            <Pie data={datos} dataKey="valor" nameKey="etiqueta" outerRadius={105} label isAnimationActive={false}>
+            <Pie
+              data={datos}
+              dataKey="valor"
+              nameKey="etiqueta"
+              outerRadius={105}
+              label
+              isAnimationActive={false}
+            >
               {datos.map((d, i) => (
                 <Cell key={d.etiqueta} fill={primario} fillOpacity={1 - i * 0.18} />
               ))}
