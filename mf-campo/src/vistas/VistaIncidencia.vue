@@ -127,7 +127,8 @@ async function guardar() {
     <label>Foto<input type="file" accept="image/jpeg,image/png" capture="environment" required :disabled="guardando" @change="elegir"></label>
     <p v-if="procesando" role="status">Preparando foto…</p><img v-if="previa" :src="previa" alt="Vista previa de la incidencia">
     <p class="campo-ayuda">JPEG o PNG. Se reduce a 1600 px si es necesario; máximo 10 MB.</p>
-    <p v-if="clasificando" role="status">Clasificando en el dispositivo… Puede completar el formulario.</p>
+    <p v-if="clasificando && clasificador.preparando.value" role="status">Preparando el clasificador…</p>
+    <p v-else-if="clasificando" role="status">Clasificando en el dispositivo… Puede completar el formulario.</p>
     <p v-if="lento" role="status">Clasificación lenta en este navegador</p>
     <p v-if="errorDispositivo" role="status">{{ errorDispositivo }}</p>
     <ResultadoClasificacion v-if="dispositivo" :resultado="dispositivo" origen="Dispositivo" :seleccionado="adjuntar && seleccionado === 'dispositivo'" @adjuntar="elegirResultado('dispositivo')" />

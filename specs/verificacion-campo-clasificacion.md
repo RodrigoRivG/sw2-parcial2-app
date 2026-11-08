@@ -1,6 +1,6 @@
 # Verificación FE-007 — Clasificación en Campo
 
-Fecha: 2026-11-07, America/La_Paz. Windows, Campo servido desde `dist/` en `http://localhost:9000`, gateway `http://localhost:8080`, Keycloak `http://localhost:8180`, realm `agro`, client `agro-web`. Backend con IA levantado por el usuario y clasificador publicado previamente por él. La implementación de los flujos está realizada; la aceptación completa sigue pendiente por latencia inicial y equivalencia de una foto de soya.
+Fecha: 2026-11-07, America/La_Paz. Windows, Campo servido desde `dist/` en `http://localhost:9000`, gateway `http://localhost:8080`, Keycloak `http://localhost:8180`, realm `agro`, client `agro-web`. Backend con IA levantado por el usuario y clasificador publicado previamente por él. La implementación incluye el calentamiento de RQ-CLA-12; la aceptación sigue pendiente por el bloqueo del hilo principal durante ese calentamiento y por dos discrepancias de categoría en maíz. Las secciones iniciales conservan la evidencia anterior al calentamiento; la revisión con los criterios nuevos se registra al final.
 
 Se usaron Chrome y Edge con `tecnico.prueba`, y Administración con `admin.prueba`, mediante DevTools. Las credenciales se utilizaron únicamente en memoria. No se entrenó ni publicó otra versión, no se modificó código del backend y no se agregó una suite E2E. Los registros de prueba llevan `FE-007` en la descripción.
 
@@ -38,13 +38,13 @@ La referencia aportada en `mf-campo/pruebas/referencia-preprocesamiento.json` se
 
 Además, se comprobó la foto real `SOYA_ROYA/ASDID_soybean_rust_1041.jpg` de los fixtures públicos. Se calculó `preparar_imagen` dentro del contenedor de IA y se comparó con el navegador sobre la misma foto: **diferencia máxima 0 y media 0 en los 150528 valores del tensor**.
 
-Para esa foto, los dos modelos eligen `SOYA_ROYA`, pero TF.js devuelve `0.8321` y el servidor `0.8968`: **diferencia 0.0647**, mayor que el máximo 0.05 de CE-CLA-02. El mismo modelo TF.js en CPU devuelve `0.8321`, igual que en WebGL. La evidencia descarta el preprocesamiento y el backend gráfico como explicación de esta diferencia observada; queda por revisar la equivalencia del modelo servido y su exportación TF.js. No se comprobó una causa más específica ni se modificó el backend.
+Para esa foto, los dos modelos eligen `SOYA_ROYA`, pero TF.js devuelve `0.8321` y el servidor `0.8968`: **diferencia 0.0647**, mayor que el máximo 0.05 del criterio anterior. El criterio revisado admite 0.10, por lo que esta foto ahora cumple. El mismo modelo TF.js en CPU devuelve `0.8321`, igual que en WebGL. La evidencia descarta el preprocesamiento y el backend gráfico como explicación de esta diferencia observada. La cuantización uint8 de los pesos TF.js es una explicación razonable, pero no se aisló su contribución exacta. No se modificó el backend.
 
-## Rendimiento inicial
+## Rendimiento antes del calentamiento
 
 La primera clasificación con WebGL del perfil Chrome tardó unos **9144 ms** y la primera de Edge **8876 ms**, por encima de los 5 s de la historia 2. Chrome informa una GPU AMD Radeon 680M mediante ANGLE/D3D11. Las inferencias siguientes tardaron unos 125–130 ms; después de recargar con la caché gráfica preparada se observaron unos 956–1116 ms. La CPU sin WebGL, en la simulación indicada, tardó unos 1342 ms.
 
-Por ello, el registro y la clasificación offline funcionan, pero el límite de 5 s no se da por aprobado para la primera inferencia WebGL. Se mantiene la estrategia de la spec: intentar WebGL y usar CPU si falla. La elección de otra estrategia de arranque requiere revisar este criterio con esos datos.
+Estos resultados motivaron la revisión de la spec: RQ-CLA-12 prepara el clasificador antes de pedir una foto y el tiempo de la foto se mide una vez terminado el calentamiento. La implementación y las medidas de ese calentamiento se registran debajo.
 
 ## Pruebas y build
 
@@ -52,14 +52,52 @@ Por ello, el registro y la clasificación offline funcionan, pero el límite de 
 
 Las pruebas nuevas cubren interpretación, umbral, alternativas, cuatro campos exactos de la clasificación, referencia de Pillow, lectura y liberación del bitmap, descarga y hashes, conservación atómica del modelo anterior, migración de Dexie, multipart de imagen/video, sondeo hasta completado o fallido, cancelación y límite de cuatro minutos. Las pruebas de FE-006 siguen aprobadas.
 
-`npm.cmd run build`: TypeScript y Vite aprobados. `campo.js` pesa **1120297 bytes**, y figura en las **11 entradas** del precaché generado por Workbox. Se configuró el margen de 10 MiB previsto; en este build el archivo está por debajo incluso del límite predeterminado de 2 MiB. Permanece el aviso informativo de Vite para bundles mayores de 500 kB.
+`npm.cmd run build`: TypeScript y Vite aprobados. El build con calentamiento pesa **1122237 bytes** en `campo.js`, y figura en las **11 entradas** del precaché generado por Workbox. Se configuró el margen de 10 MiB previsto; en este build el archivo está por debajo incluso del límite predeterminado de 2 MiB. Permanece el aviso informativo de Vite para bundles mayores de 500 kB.
 
 ## Estado de aceptación
 
 - **T01, T02 y T03:** completadas.
-- **T04:** código implementado y precaché/offline verificados; pendiente el límite de tiempo de la primera inferencia.
-- **T05:** código y petición al servidor verificados; pendiente CE-CLA-02 para la foto de soya indicada.
+- **T04:** calentamiento implementado y fotos posteriores en menos de 5 s; pendiente la estrategia para evitar el bloqueo del hilo principal superior a 1 s.
+- **T05:** comparación de seis fotos ejecutada con el criterio revisado; cuatro cumplen y dos de maíz fallan por categoría distinta. Pendiente revisar la equivalencia de los modelos.
 - **T06 / CE-CLA-03:** completados con video real y resultado adjuntado y sincronizado.
-- **T07:** verificación parcial; los dos hallazgos anteriores impiden cerrar CE-CLA-01 a CE-CLA-04 en conjunto.
+- **T07:** verificación parcial; el bloqueo y las discrepancias de maíz impiden el cierre conjunto.
 - **CE-CLA-05:** cumplido localmente.
-- **T08 / CE-CLA-06:** pendientes del pipeline de GitHub con estos cambios; no se hizo commit ni push, ni despliegue AWS.
+- **T08 / CE-CLA-06:** el usuario confirmó en verde el pipeline anterior el 2026-11-07. Se requiere un nuevo pipeline para los cambios de calentamiento; T08 queda pendiente de esa revalidación. No se desplegó en AWS.
+
+## Revisión de RQ-CLA-12 y CE-CLA-02 (2026-11-07)
+
+### Calentamiento implementado
+
+Campo programa la preparación con `requestIdleCallback`, con tiempo límite de 1 s, o `setTimeout` si no está disponible. Se dispara después de cargar un modelo ya guardado y después de la primera descarga o de una nueva versión. La programación se cancela al desmontar Campo. Una promesa compartida evita calentamientos duplicados si llega una foto mientras se prepara; las cargas e inferencias se serializan y se liberan los tensores y los pesos al terminar su uso. El encabezado presenta «Preparando el clasificador…» y después «Clasificador listo». El formulario usa el primer mensaje mientras espera la preparación.
+
+Se usó otro perfil limpio de Chrome, con directorio propio y puerto de DevTools 9348, sin modelo ni caché previa de ese perfil. Se inició sesión como `tecnico.prueba`, se descargó el modelo y se midió automáticamente su primer calentamiento. Se registró una traza compatible con Performance de DevTools y una acción programada sobre pestaña y formulario durante el calentamiento.
+
+| Caso | Calentamiento | Tarea `FireIdleCallback` del hilo principal | Demora de la acción de formulario | Primera foto después |
+|---|---:|---:|---:|---:|
+| Perfil nuevo, al terminar la primera descarga | 10909 ms | 10902 ms | 10940 ms | 1013 ms |
+| Mismo perfil, recarga offline con modelo persistido | 1521 ms | 1513 ms | 1541 ms | 334 ms |
+
+La acción del formulario se programó para 200 ms después de observar el inicio; los tiempos de su columna incluyen esa espera nominal y la demora de ejecución. Al ejecutarse, la pestaña Incidencia abrió y el campo recibió el texto esperado. La traza, independientemente de los temporizadores de una ventana oculta, confirma las tareas largas indicadas: el trabajo sigue ocupando el hilo principal.
+
+**T04 permanece abierta:** el calentamiento reduce el tiempo posterior de la foto y funciona sin red, pero incumple el límite de respuesta de la interfaz de 1 s definido por RQ-CLA-12. Se informó al usuario durante el trabajo, antes de cerrar la tarea. Hace falta decidir otra estrategia; no se cambió a CPU por defecto ni se alteró la arquitectura del frontend. No se entrenó ni publicó otra versión para simular un cambio de modelo.
+
+Las trazas y medidas de esta ronda están en el directorio local ignorado `.verificacion-herramientas/`: `fe007-traza-inicial.json`, `fe007-traza-offline.json`, `fe007-medicion-inicial.json` y `fe007-medicion-offline.json`. Las URL de las trazas se guardaron sin consultas y se retiraron campos de autenticación o cabeceras antes de escribirlas. La red se restauró después de la prueba offline.
+
+### Comparación de seis fotos
+
+Se fijó la selección antes de comparar: tres fotos de maíz y tres de soya, incluida una sana y `ASDID_soybean_rust_1041.jpg`. Se usó el mismo archivo en ambos modos y se aplicó el criterio revisado: categoría idéntica en las seis fotos y diferencia de confianza de hasta 0.10. Se repitió la ronda en dos perfiles y se obtuvieron los mismos valores.
+
+| Foto pública del fixture | Dispositivo: categoría / confianza | Servidor: categoría / confianza | Diferencia | Cumple |
+|---|---|---|---:|---|
+| `MAIZ_ROYA_COMUN/PlantVillage_image__1016_.jpg` | `MAIZ_ROYA_COMUN` / 0.9997 | `MAIZ_ROYA_COMUN` / 0.9810 | 0.0187 | Sí |
+| `MAIZ_MANCHA_GRIS/PlantVillage_image__105_.jpg` | `MAIZ_MANCHA_GRIS` / 0.7534 | `MAIZ_TIZON_NORTENO` / 0.5350 | 0.2184 | No |
+| `MAIZ_TIZON_NORTENO/PlantVillage_image__106_.jpg` | `MAIZ_MANCHA_GRIS` / 0.6448 | `MAIZ_TIZON_NORTENO` / 0.8163 | 0.1715 | No |
+| `SOYA_ROYA/ASDID_soybean_rust_1041.jpg` | `SOYA_ROYA` / 0.8321 | `SOYA_ROYA` / 0.8968 | 0.0647 | Sí |
+| `SOYA_MANCHA_OJO_RANA/ASDID_frogeye_103.jpg` | `SOYA_MANCHA_OJO_RANA` / 0.9834 | `SOYA_MANCHA_OJO_RANA` / 0.8840 | 0.0994 | Sí |
+| `SOYA_SANA/ASDID_healthy_1029.jpg` | `SOYA_SANA` / 0.9858 | `SOYA_SANA` / 0.9687 | 0.0171 | Sí |
+
+Las confianzas listadas corresponden a la categoría principal de cada modo. Si las categorías son distintas, el caso ya falla independientemente de la diferencia de esos valores. Las fotos posteriores al calentamiento tardaron menos de 1 s en la segunda ronda del perfil nuevo.
+
+Para las dos fotos de maíz que fallaron, se calculó también el tensor de Pillow dentro del contenedor de IA y se comparó con el navegador: en cada foto, **máximo 0 y media 0 en los 150528 valores**. Por ello, la discrepancia observada no procede del preprocesamiento. Queda por revisar la equivalencia del modelo servido y su variante TF.js; no se modificó el backend ni se eligieron otras fotos para sustituir las que fallaron.
+
+**T05 y T07 permanecen abiertas.** La foto de roya de soya ya cumple la tolerancia nueva, pero CE-CLA-02 en conjunto no se cumple (4/6). Se mantienen las 24 pruebas aprobadas y el 98,98 % de cobertura de líneas, y el build con calentamiento está aprobado localmente. Estos cambios todavía no se han publicado con commit/push ni ejecutado en el pipeline remoto.

@@ -30,7 +30,7 @@ Campo (FE-006) permite realizar labores programadas, registrar labores realizada
 
 Si ya había una versión de Campo abierta al reconstruir, cerrar todas las pestañas controladas por su service worker y volver a abrir Campo con conexión para activar la nueva versión antes de verificarla sin red.
 
-La incidencia de Campo también admite clasificación orientativa en el dispositivo con TensorFlow.js, en el servidor o mediante un video corto (FE-007). Con el perfil `ia` levantado y un clasificador publicado, **Actualizar datos** descarga y verifica el modelo para usarlo sin red. El técnico elige qué resultado adjuntar o guarda sin clasificación. La implementación tiene pendientes de aceptación sobre el primer arranque de WebGL y la equivalencia de confianza de una foto de soya, documentados en [specs/verificacion-campo-clasificacion.md](specs/verificacion-campo-clasificacion.md).
+La incidencia de Campo también admite clasificación orientativa en el dispositivo con TensorFlow.js, en el servidor o mediante un video corto (FE-007). Con el perfil `ia` levantado y un clasificador publicado, **Actualizar datos** descarga y verifica el modelo para usarlo sin red. El modelo se prepara al abrir Campo o después de descargarlo; la interfaz indica cuándo está listo. El técnico elige qué resultado adjuntar o guarda sin clasificación. Siguen pendientes de aceptación el bloqueo de la interfaz durante el calentamiento inicial y las discrepancias de categoría entre dispositivo y servidor en dos fotos de maíz, documentados en [specs/verificacion-campo-clasificacion.md](specs/verificacion-campo-clasificacion.md).
 
 ## Versiones y decisiones verificadas
 

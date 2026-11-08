@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref } from 'vue';
+import { onMounted, onUnmounted, ref, watch } from 'vue';
 import { sesion } from '@agro/compartido';
 import { usarOperaciones } from './stores/operaciones';
 import { usarReferencias } from './stores/referencias';
@@ -14,7 +14,26 @@ const referencias = usarReferencias(), operaciones = usarOperaciones();
 const pestania = ref('Labores'), red = ref(navigator.onLine), lista = ref(false), error = ref(''), aviso = ref('');
 const conSesion = ref(sesion.conectado());
 const clasificador = crearClasificador();
+const { preparando, versionPreparada, errorPreparacion } = clasificador;
 let desmontada = false;
+let turnoLibre: number | undefined, temporizador: ReturnType<typeof setTimeout> | undefined;
+function cancelarPreparacionProgramada() {
+  if (turnoLibre !== undefined) window.cancelIdleCallback(turnoLibre);
+  if (temporizador !== undefined) clearTimeout(temporizador);
+  turnoLibre = undefined; temporizador = undefined;
+}
+watch([lista, () => referencias.modelo?.versionModelo], ([listaParaUsar]) => {
+  cancelarPreparacionProgramada();
+  const modelo = referencias.modelo;
+  if (!listaParaUsar || !modelo || desmontada) return;
+  // El cambio de versión cubre tanto la lectura local como una descarga inicial o nueva.
+  const preparar = () => {
+    turnoLibre = undefined; temporizador = undefined;
+    if (!desmontada) void clasificador.calentar(modelo).catch(() => { /* errorPreparacion se presenta debajo. */ });
+  };
+  if ('requestIdleCallback' in window) turnoLibre = window.requestIdleCallback(preparar, { timeout: 1000 });
+  else temporizador = setTimeout(preparar, 0);
+}, { flush: 'post' });
 function estadoRed() { red.value = navigator.onLine; conSesion.value = sesion.conectado(); }
 async function entrar() { try { await sesion.iniciarSesion(); } catch (causa) { error.value = mensajeError(causa); } }
 function guardada() { aviso.value = 'Registro guardado en el dispositivo'; pestania.value = 'Pendientes'; }
@@ -34,7 +53,7 @@ onMounted(async () => {
     }
   } catch (causa) { error.value = mensajeError(causa); }
 });
-onUnmounted(() => { desmontada = true; clasificador.liberar(); operaciones.detener(); window.removeEventListener('online', estadoRed); window.removeEventListener('offline', estadoRed); });
+onUnmounted(() => { desmontada = true; cancelarPreparacionProgramada(); clasificador.liberar(); operaciones.detener(); window.removeEventListener('online', estadoRed); window.removeEventListener('offline', estadoRed); });
 </script>
 <template>
   <section class="agro-panel agro-campo">
@@ -42,12 +61,15 @@ onUnmounted(() => { desmontada = true; clasificador.liberar(); operaciones.deten
       <p v-if="referencias.fecha">{{ red ? 'Datos actualizados:' : 'Sin conexión · datos del' }} {{ fechaLocal(referencias.fecha) }}</p>
       <p v-else>{{ red ? 'Prepare el dispositivo antes de salir al campo' : 'Sin conexión' }}</p>
       <p>{{ referencias.modelo ? `Clasificador ${referencias.modelo.versionModelo}` : 'Clasificador no disponible' }}</p>
+      <p v-if="preparando" role="status">Preparando el clasificador…</p>
+      <p v-else-if="referencias.modelo && versionPreparada === referencias.modelo.versionModelo" role="status">Clasificador listo</p>
       <p v-if="!conSesion">{{ operaciones.identidad?.nombre ? `Trabajando en este dispositivo como ${operaciones.identidad.nombre}. ` : '' }}<span v-if="red">Inicie sesión para sincronizar</span><span v-else>Los registros se guardan en este dispositivo</span></p>
       <button v-if="red && !conSesion" @click="entrar">Iniciar sesión</button>
       <button v-if="red && conSesion" :disabled="referencias.actualizando" @click="referencias.actualizar">{{ referencias.actualizando ? 'Actualizando…' : 'Actualizar datos' }}</button>
     </header>
     <p v-if="error" class="agro-error" role="alert">{{ error }}</p>
     <p v-if="referencias.errorModelo" class="agro-error" role="alert">{{ referencias.errorModelo }}</p>
+    <p v-if="errorPreparacion" class="agro-error" role="alert">No se pudo preparar el clasificador: {{ errorPreparacion }}</p>
     <p v-for="(mensaje, clave) in referencias.errores" :key="clave" class="agro-error" role="alert">No se actualizó {{ clave }}: {{ mensaje }}</p>
     <p v-if="aviso" role="status">{{ aviso }}</p>
     <nav class="campo-pestanas" aria-label="Vistas de Campo">
