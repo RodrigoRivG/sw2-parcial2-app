@@ -1,6 +1,6 @@
 # Verificación FE-007 — Clasificación en Campo
 
-Fecha: 2026-11-07, America/La_Paz. Windows, Campo servido desde `dist/` en `http://localhost:9000`, gateway `http://localhost:8080`, Keycloak `http://localhost:8180`, realm `agro`, client `agro-web`. Backend con IA levantado por el usuario y clasificador publicado previamente por él. La implementación incluye el calentamiento de RQ-CLA-12; la aceptación sigue pendiente por el bloqueo del hilo principal durante ese calentamiento y por dos discrepancias de categoría en maíz. Las secciones iniciales conservan la evidencia anterior al calentamiento; la revisión con los criterios nuevos se registra al final.
+Fecha: 2026-11-07, America/La_Paz. Windows, Campo servido desde `dist/` en `http://localhost:9000`, gateway `http://localhost:8080`, Keycloak `http://localhost:8180`, realm `agro`, client `agro-web`. Backend con IA levantado por el usuario y clasificador publicado previamente por él. La implementación incluye el calentamiento de RQ-CLA-12. **FE-007 se cerró el 2026-11-07 con dos limitaciones conocidas** (L-01: bloqueo del hilo principal en el primer calentamiento; L-02: dos discrepancias de categoría en maíz), documentadas en la sección 4 de la spec; ver "Cierre" al final. Las secciones iniciales conservan la evidencia anterior al calentamiento; la revisión con los criterios nuevos se registra al final.
 
 Se usaron Chrome y Edge con `tecnico.prueba`, y Administración con `admin.prueba`, mediante DevTools. Las credenciales se utilizaron únicamente en memoria. No se entrenó ni publicó otra versión, no se modificó código del backend y no se agregó una suite E2E. Los registros de prueba llevan `FE-007` en la descripción.
 
@@ -54,15 +54,15 @@ Las pruebas nuevas cubren interpretación, umbral, alternativas, cuatro campos e
 
 `npm.cmd run build`: TypeScript y Vite aprobados. El build con calentamiento pesa **1122237 bytes** en `campo.js`, y figura en las **11 entradas** del precaché generado por Workbox. Se configuró el margen de 10 MiB previsto; en este build el archivo está por debajo incluso del límite predeterminado de 2 MiB. Permanece el aviso informativo de Vite para bundles mayores de 500 kB.
 
-## Estado de aceptación
+## Estado de aceptación al cierre
 
 - **T01, T02 y T03:** completadas.
-- **T04:** calentamiento implementado y fotos posteriores en menos de 5 s; pendiente la estrategia para evitar el bloqueo del hilo principal superior a 1 s.
-- **T05:** comparación de seis fotos ejecutada con el criterio revisado; cuatro cumplen y dos de maíz fallan por categoría distinta. Pendiente revisar la equivalencia de los modelos.
+- **T04:** calentamiento implementado y fotos posteriores en menos de 5 s; cerrada con L-01 aceptada. Persiste el bloqueo del hilo principal superior a 1 s; su corrección se difiere.
+- **T05:** comparación de seis fotos ejecutada con el criterio revisado; cuatro cumplen y dos de maíz fallan por categoría distinta. Cerrada con L-02 aceptada; la revisión completa de equivalencia se difiere.
 - **T06 / CE-CLA-03:** completados con video real y resultado adjuntado y sincronizado.
-- **T07:** verificación parcial; el bloqueo y las discrepancias de maíz impiden el cierre conjunto.
+- **T07:** cerrada por aceptación de L-01 y L-02, conservando las comprobaciones fallidas; no se declara conformidad técnica completa.
 - **CE-CLA-05:** cumplido localmente.
-- **T08 / CE-CLA-06:** el usuario confirmó en verde el pipeline anterior el 2026-11-07. Se requiere un nuevo pipeline para los cambios de calentamiento; T08 queda pendiente de esa revalidación. No se desplegó en AWS.
+- **T08 / CE-CLA-06:** cumplidos; el usuario confirmó el 2026-11-07 que el pipeline con los cambios de calentamiento está en verde. T04, T05 y T07 están cerradas por aceptación de las limitaciones, no por haber corregido los hallazgos. No se desplegó en AWS.
 
 ## Revisión de RQ-CLA-12 y CE-CLA-02 (2026-11-07)
 
@@ -79,7 +79,7 @@ Se usó otro perfil limpio de Chrome, con directorio propio y puerto de DevTools
 
 La acción del formulario se programó para 200 ms después de observar el inicio; los tiempos de su columna incluyen esa espera nominal y la demora de ejecución. Al ejecutarse, la pestaña Incidencia abrió y el campo recibió el texto esperado. La traza, independientemente de los temporizadores de una ventana oculta, confirma las tareas largas indicadas: el trabajo sigue ocupando el hilo principal.
 
-**T04 permanece abierta:** el calentamiento reduce el tiempo posterior de la foto y funciona sin red, pero incumple el límite de respuesta de la interfaz de 1 s definido por RQ-CLA-12. Se informó al usuario durante el trabajo, antes de cerrar la tarea. Hace falta decidir otra estrategia; no se cambió a CPU por defecto ni se alteró la arquitectura del frontend. No se entrenó ni publicó otra versión para simular un cambio de modelo.
+**Resultado técnico de T04, cerrada con L-01 aceptada:** el calentamiento reduce el tiempo posterior de la foto y funciona sin red, pero incumple el límite de respuesta de la interfaz de 1 s definido por RQ-CLA-12. Se informó al usuario durante el trabajo, antes de cerrar la tarea. La evaluación de otra estrategia se difiere según D-FE7-10; no se cambió a CPU por defecto ni se alteró la arquitectura del frontend. No se entrenó ni publicó otra versión para simular un cambio de modelo.
 
 Las trazas y medidas de esta ronda están en el directorio local ignorado `.verificacion-herramientas/`: `fe007-traza-inicial.json`, `fe007-traza-offline.json`, `fe007-medicion-inicial.json` y `fe007-medicion-offline.json`. Las URL de las trazas se guardaron sin consultas y se retiraron campos de autenticación o cabeceras antes de escribirlas. La red se restauró después de la prueba offline.
 
@@ -100,4 +100,21 @@ Las confianzas listadas corresponden a la categoría principal de cada modo. Si 
 
 Para las dos fotos de maíz que fallaron, se calculó también el tensor de Pillow dentro del contenedor de IA y se comparó con el navegador: en cada foto, **máximo 0 y media 0 en los 150528 valores**. Por ello, la discrepancia observada no procede del preprocesamiento. Queda por revisar la equivalencia del modelo servido y su variante TF.js; no se modificó el backend ni se eligieron otras fotos para sustituir las que fallaron.
 
-**T05 y T07 permanecen abiertas.** La foto de roya de soya ya cumple la tolerancia nueva, pero CE-CLA-02 en conjunto no se cumple (4/6). Se mantienen las 24 pruebas aprobadas y el 98,98 % de cobertura de líneas, y el build con calentamiento está aprobado localmente. Estos cambios todavía no se han publicado con commit/push ni ejecutado en el pipeline remoto.
+**T05 y T07 quedan cerradas con las limitaciones aceptadas (D-FE7-10).** La foto de roya de soya ya cumple la tolerancia nueva, pero CE-CLA-02 en conjunto no se cumple (4/6). Se mantienen las 24 pruebas aprobadas y el 98,98 % de cobertura de líneas, y el build con calentamiento está aprobado localmente. El usuario confirmó el 2026-11-07 que el pipeline remoto con estos cambios está en verde; T08 y CE-CLA-06 quedan cumplidos.
+
+## Cierre (2026-11-07)
+
+El usuario decidió cerrar FE-007 con las dos limitaciones documentadas en la sección 4 de `spec-campo-clasificacion.md` (D-FE7-10), y confirmó el pipeline de `mf-campo` en verde con los cambios de calentamiento. T04, T05 y T07 quedan cerradas con L-01 y L-02; T08 y CE-CLA-06, cumplidos.
+
+**Experimento sobre L-02 comunicado por el usuario (desde `sw2-parcial2`, sin modificar el backend).** Dentro del contenedor de `servicio-ia` se cargó el `modelo.keras` de la versión vigente (`modelos/clasificador/a073d33f-a783-4280-be5a-3ca2678b12d4/`), se clasificaron las seis fotos de CE-CLA-02 con `preparar_imagen` y se repitió tras cuantizar a uint8 (mínimo y máximo por tensor, 256 niveles) los 63 kernels de convolución y de la capa densa:
+
+| Foto | Servidor `float32` | Kernels uint8 emulados | Dispositivo (TF.js) |
+|---|---|---|---|
+| `MAIZ_ROYA_COMUN/PlantVillage_image__1016_.jpg` | `MAIZ_ROYA_COMUN` 0.9810 | `MAIZ_ROYA_COMUN` 0.9631 | `MAIZ_ROYA_COMUN` 0.9997 |
+| `MAIZ_MANCHA_GRIS/PlantVillage_image__105_.jpg` | `MAIZ_TIZON_NORTENO` 0.5350 | `MAIZ_MANCHA_GRIS` 0.4774 | `MAIZ_MANCHA_GRIS` 0.7534 |
+| `MAIZ_TIZON_NORTENO/PlantVillage_image__106_.jpg` | `MAIZ_TIZON_NORTENO` 0.8163 | `MAIZ_TIZON_NORTENO` 0.6969 | `MAIZ_MANCHA_GRIS` 0.6448 |
+| `SOYA_ROYA/ASDID_soybean_rust_1041.jpg` | `SOYA_ROYA` 0.8968 | `SOYA_ROYA` 0.9335 | `SOYA_ROYA` 0.8321 |
+| `SOYA_MANCHA_OJO_RANA/ASDID_frogeye_103.jpg` | `SOYA_MANCHA_OJO_RANA` 0.8840 | `SOYA_MANCHA_OJO_RANA` 0.7591 | `SOYA_MANCHA_OJO_RANA` 0.9834 |
+| `SOYA_SANA/ASDID_healthy_1029.jpg` | `SOYA_SANA` 0.9687 | `SOYA_SANA` 0.9681 | `SOYA_SANA` 0.9858 |
+
+La columna del servidor reproduce los valores medidos por la API. La emulación cambia la categoría de la foto de mancha gris como el dispositivo, pero no la del tizón del norte. Es aproximada: TF.js pliega BatchNorm en las convoluciones antes de cuantizar, y eso no se emuló. Una primera emulación que cuantizaba también los parámetros de BatchNorm dejó todas las fotos en `MAIZ_SANO` y se descartó por no representar la conversión de TF.js. Conclusión: la cuantización uint8 alcanza para cambiar la categoría en fotos dudosas entre esas dos clases, sin que se haya aislado su contribución exacta. La propuesta de evaluar TF.js en float16 está en L-02; su eficacia aún no se ha comprobado. El experimento reproduce el cambio de categoría de mancha gris, pero no demuestra la causa completa de las dos discrepancias.

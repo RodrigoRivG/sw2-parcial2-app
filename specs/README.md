@@ -22,8 +22,8 @@ El backend vive en el repositorio `sw2-parcial2` y está implementado: los cuatr
 | 4 | FE-004 | [spec-admin-operaciones.md](spec-admin-operaciones.md) **(implementada y verificada)** | Programar labores; consultar labores, incidencias y Sagas; resolver labores `PENDIENTE_REVISION` | `mf-admin` | CU-10, CU-11, CU-12 | RF-11, RF-12, RF-13 |
 | 5 | FE-005 | [spec-admin-usuarios.md](spec-admin-usuarios.md) **(implementada y verificada)** | Usuarios con la API de administración de Keycloak y publicación de versiones de modelos de IA | `mf-admin` | CU-23 | RF-28, RF-32 |
 | 6 | FE-006 | [spec-campo-registro.md](spec-campo-registro.md) **(implementada y verificada)** | Labores e incidencias con foto, sin conexión, y sincronización por lotes | `mf-campo` | CU-10, CU-11, CU-13 | RF-11, RF-12, RF-14 a RF-17 |
-| 7 | FE-007 | [spec-campo-clasificacion.md](spec-campo-clasificacion.md) **(calentamiento implementado; aceptación parcial y nuevo pipeline pendiente)** | Clasificación de imágenes con TensorFlow.js (sin conexión), en el servidor y por video | `mf-campo` | CU-16 | RF-20, RF-21, RF-22 |
-| 8 | FE-008 | `spec-analisis-consultas.md` *(por redactar)* | Paneles de indicadores, inventario, labores e incidencias por GraphQL, con Recharts | `mf-analisis` | CU-05, CU-24 | RF-06, RF-27, RF-33 |
+| 7 | FE-007 | [spec-campo-clasificacion.md](spec-campo-clasificacion.md) **(cerrada con dos limitaciones aceptadas: sección 4 de la spec)** | Clasificación de imágenes con TensorFlow.js (sin conexión), en el servidor y por video | `mf-campo` | CU-16 | RF-20, RF-21, RF-22 |
+| 8 | FE-008 | [spec-analisis-consultas.md](spec-analisis-consultas.md) *(borrador, pendiente de implementación)* | Paneles de indicadores, inventario, labores e incidencias por GraphQL, con Recharts | `mf-analisis` | CU-05, CU-24 | RF-06, RF-27, RF-33 |
 | 9 | FE-009 | `spec-analisis-ia.md` *(por redactar)* | Predicción, análisis de patrones, agente y reportes por texto o voz | `mf-analisis` | CU-14, CU-15, CU-17, CU-18 | RF-18, RF-19, RF-23 a RF-25 |
 
 - FE-001 está completada: T01 a T10 verificadas, incluidas las ejecuciones de los cinco pipelines en GitHub. Evidencias y resultados en [verificacion-base.md](verificacion-base.md).
@@ -49,6 +49,7 @@ El backend vive en el repositorio `sw2-parcial2` y está implementado: los cuatr
 | RF-11 a RF-13, RN-06, RN-08, RNF-14, RNF-22 | Programar y consultar labores, Sagas e incidencias; resolver labores en revisión | admin-operaciones |
 | RF-26, RNF-07 | single-spa con carga solo del microfrontend activo | base |
 | RF-27 | React consulta por GraphQL | base, analisis-consultas |
+| RF-06, RF-33, RNF-08 | Paneles de indicadores, comparación e inventario con datos parciales ante fallos | analisis-consultas |
 | RF-28 | Keycloak con SSO y tres roles | base |
 | RF-14 a RF-17, RNF-09, RNF-14 | Registro sin conexión, sincronización y estado por operación | campo-registro |
 | RF-20 a RF-22, RNF-06 | Clasificación en el navegador, en el servidor y por video | campo-clasificacion |
@@ -73,3 +74,4 @@ Se completa con cada spec.
 - Desarrollo sobre la carpeta `dist/` servida en `localhost:9000`, sin servidores de desarrollo por microfrontend ni *proxies*. Así el service worker de `/campo/` funciona en local igual que en la nube.
 - Sin dependencias compartidas entre frameworks; solo `@agro/compartido` (sesión, HTTP y errores) y `estilos.css`.
 - Tras FE-001: versiones fijadas en Angular 21 y Vite 7, y despliegue con `configurar-despliegue.mjs` (constitución 1.1.0).
+- FE-007 cerrada con dos limitaciones conocidas (2026-11-07): el primer calentamiento de TF.js bloquea la interfaz unos 11 s (L-01) y dos fotos de maíz difieren de categoría entre TF.js y Keras (L-02). La emulación uint8 reproduce una de las discrepancias, sin aislar la causa completa. Web Worker y TF.js en float16 son propuestas pendientes de validar; esta última requiere cambios en `servicio-ia` y publicar otra versión. Evidencias y pasos para retomarlas: sección 4 de [spec-campo-clasificacion.md](spec-campo-clasificacion.md).

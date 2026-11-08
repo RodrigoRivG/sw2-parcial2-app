@@ -4,7 +4,7 @@
 |---|---|
 | ID | FE-007 |
 | Archivo | `specs/spec-campo-clasificacion.md` |
-| Estado | Calentamiento implementado; aceptación parcial (T04, T05 y T07); pipeline de esta revisión pendiente (2026-11-07) |
+| Estado | Cerrada por decisión del usuario con dos limitaciones aceptadas documentadas en la sección 4; pipeline en verde (2026-11-07) |
 | Constitución | Microfrontends v1.1.0 |
 | Trazabilidad | CU-16 · RF-20, RF-21, RF-22 · RN-13 · RNF-06, RNF-09, RNF-15 |
 | Depende de | FE-006: formulario de incidencia, Dexie y sincronización; `servicio-ia` (`spec-vision.md`, `spec-trabajos.md`, implementados) con una versión **vigente** de `clasificador` |
@@ -15,6 +15,7 @@ Contenido:
 1. [Spec](#1-spec): qué debe hacer la funcionalidad.
 2. [Plan](#2-plan): cómo se construye.
 3. [Tareas](#3-tareas): en qué orden se implementa.
+4. [Limitaciones conocidas](#4-limitaciones-conocidas-y-cómo-retomarlas): lo que quedó pendiente al cerrar y cómo retomarlo.
 
 ---
 
@@ -118,7 +119,7 @@ Como técnico con conexión, quiero analizar un video corto del cultivo (RF-22).
 ## 1.3 Criterios de éxito
 
 - **CE-CLA-01:** con `tecnico.prueba` en Chrome: abrir Campo con conexión (se descarga el modelo), activar **Offline**, recargar, esperar a que termine el calentamiento (RQ-CLA-12; se registra cuánto tardó), elegir una foto de hoja de soya o maíz (por ejemplo, de las de prueba de `servicio-ia`) y ver su clasificación en menos de 5 s; guardar la incidencia, sincronizar al volver la red y ver en `mf-admin` (FE-004) la clasificación con origen **Dispositivo**.
-- **CE-CLA-02:** con al menos seis fotos públicas de los fixtures de `servicio-ia` (soya y maíz, incluida una sana y la de roya de soya `ASDID_soybean_rust_1041.jpg` ya medida), dispositivo y servidor eligen la **misma categoría** en todas. La diferencia de confianza se registra, y se acepta hasta 0.10 como criterio de esta spec. El modelo TF.js tiene los pesos cuantizados a uint8 (`app/ml/exportar.py`) y el del servidor es Keras en `float32`, así que no se espera que las confianzas coincidan en general, aunque alguna puede coincidir. El criterio anterior, de 0.05, se reemplaza porque no tenía en cuenta la cuantización.
+- **CE-CLA-02:** con al menos seis fotos públicas de los fixtures de `servicio-ia` (soya y maíz, incluida una sana y la de roya de soya `ASDID_soybean_rust_1041.jpg` ya medida), dispositivo y servidor eligen la **misma categoría** en todas. La diferencia de confianza se registra, y se acepta hasta 0.10 como criterio de esta spec. El modelo TF.js tiene los pesos cuantizados a uint8 (`app/ml/exportar.py`) y el del servidor es Keras en `float32`, así que no se espera que las confianzas coincidan en general, aunque alguna puede coincidir. El criterio anterior, de 0.05, se reemplaza porque no tenía en cuenta la cuantización. **Resultado al cerrar (2026-11-07):** 4 de 6 fotos coinciden. Las dos de maíz que no coinciden se aceptan como la limitación L-02 (sección 4).
 - **CE-CLA-03:** un video corto se analiza y su clasificación se adjunta a una incidencia.
 - **CE-CLA-04:** lo mismo que CE-CLA-01 en Edge, al menos la clasificación en el dispositivo y en el servidor.
 - **CE-CLA-05:** `npm test` de `mf-campo` en verde con cobertura de líneas ≥ 80 % sobre `src/servicios/` y `src/stores/`.
@@ -132,6 +133,7 @@ Como técnico con conexión, quiero analizar un video corto del cultivo (RF-22).
 
 ## 1.5 Fuera de alcance
 
+- Ejecutar TF.js en un Web Worker y exportar el TF.js en float16: son las mejoras de las limitaciones L-01 y L-02, que quedan documentadas para retomarlas (sección 4).
 - Clasificar video sin conexión (no hay modelo de video; RF-22 es del servidor).
 - Guardar videos o resultados de clasificación fuera de la incidencia.
 - Clasificar fotos ya sincronizadas o cambiar la clasificación de una incidencia enviada (el backend no permite editarlas).
@@ -188,10 +190,11 @@ Documentos a mano: `Constitucion.md` v1.1.0 (§8), `specs/README.md`, `spec-camp
 |---|---|---|
 | D-FE7-01 | Archivos del modelo descargados a mano, verificados y guardados en Dexie; carga con `tf.io.fromMemory` | El manifiesto da SHA-256 por archivo; un solo almacenamiento (Dexie) para todo lo de Campo; los archivos se descargan con el token sin configurar `fetch` de TF.js |
 | D-FE7-02 | Paquetes modulares de TF.js empaquetados en `campo.js`, inicializados en el calentamiento (RQ-CLA-12) | Solo hace falta el *converter* y dos *backends*. Separarlos en otro *chunk* cambiaría la salida SystemJS de FE-001; sin conexión, TF.js tiene que estar en el precaché de todos modos |
-| D-FE7-03 | Reducción tipo Pillow en código propio, comprobada contra una referencia del servidor | La interpolación del canvas difiere de la de Pillow; con la misma entrada, el modelo da el mismo resultado en el dispositivo y en el servidor (CE-CLA-02, AC-03 de visión) |
+| D-FE7-03 | Reducción tipo Pillow en código propio, comprobada contra una referencia del servidor | La interpolación del canvas difiere de la de Pillow; se aíslan las diferencias de entrada, sin garantizar la equivalencia entre Keras y el TF.js cuantizado (CE-CLA-02, AC-03 de visión) |
 | D-FE7-07 | Intervalo fijo de 2 s para el video | El gateway no expone `Retry-After` por CORS; IA envía 2 s |
-| D-FE7-08 | Calentamiento del clasificador al montar Campo y después de descargar un modelo (RQ-CLA-12), conservando WebGL con alternativa `cpu` | Reduce el tiempo de la foto después de preparar el modelo. Implementado y medido: calentamiento inicial de 10,91 s y primera foto posterior de 1,01 s; en la recarga offline, 1,52 s y 0,33 s. La traza registra una tarea de 10,90 s en el hilo principal, por lo que sigue pendiente decidir otra estrategia antes de cerrar T04 según RQ-CLA-12 |
+| D-FE7-08 | Calentamiento del clasificador al montar Campo y después de descargar un modelo (RQ-CLA-12), conservando WebGL con alternativa `cpu` | Reduce el tiempo de la foto después de preparar el modelo. Implementado y medido: calentamiento inicial de 10,91 s y primera foto posterior de 1,01 s; en la recarga offline, 1,52 s y 0,33 s. La traza registra una tarea de 10,90 s en el hilo principal, limitación aceptada al cerrar T04 mediante D-FE7-10; la corrección se difiere como L-01 |
 | D-FE7-09 | CE-CLA-02 por coincidencia de categoría; diferencia de confianza de hasta 0.10, registrada | Con la misma foto, el preprocesamiento dio diferencia 0 en los 150.528 valores, y el TF.js dio la misma confianza en `webgl` y en `cpu`: eso descarta el preprocesamiento y el *backend*. Queda la cuantización uint8 de los pesos del TF.js (confirmada en `app/ml/exportar.py`) frente al `float32` del servidor. Es una explicación razonable de la diferencia de 0.0647 en la foto de roya, pero no se aisló que la explique entera |
+| D-FE7-10 | Cerrar FE-007 con las limitaciones L-01 y L-02 en lugar de corregirlas | Decisión del usuario (2026-11-07). La funcionalidad de RF-20 a RF-22 está completa; se difieren las propuestas de Web Worker y exportación TF.js en float16 para un proyecto efímero. Requieren cambios y validación; no se han demostrado como soluciones. El cierre no implica conformidad técnica completa de RQ-CLA-12 y CE-CLA-02. Evidencias y propuestas en la sección 4 |
 | D-FE7-04 | Clasificación automática en el dispositivo y a pedido en el servidor | El dispositivo funciona siempre; el servidor consume red y solo tiene sentido con conexión |
 | D-FE7-05 | Video solo con conexión y como apoyo a la incidencia | RF-22 es del servidor; la incidencia sigue exigiendo foto |
 | D-FE7-06 | `clasificador.ts` sin prueba unitaria | Ejecutar TF.js en Vitest exige un *backend* y un modelo real; se verifica en el navegador |
@@ -203,10 +206,58 @@ Documentos a mano: `Constitucion.md` v1.1.0 (§8), `specs/README.md`, `spec-camp
 - [x] **T01** — `modelos.ts` (RQ-CLA-11), `resultado.ts`, `preprocesamiento.ts` y `clasificacion-servidor.ts` con sus pruebas; copiar la referencia de Pillow ya generada (2.3). *Hecho cuando:* `npm test` en verde, incluida la equivalencia de RQ-CLA-04b.
 - [x] **T02** — Tabla `modelo`, `modelo-dispositivo.ts` con su prueba y llamada desde `stores/referencias.ts`. *Hecho cuando:* cobertura ≥ 80 %.
 - [x] **T03** — Requisito previo: `clasificador` entrenado y publicado en el backend local (con autorización del usuario). *Hecho cuando:* `GET /api/ia/v1/modelos/clasificador/dispositivo` responde `200` con `tecnico.prueba`.
-- [ ] **T04** — Dependencias de TF.js, `maximumFileSizeToCacheInBytes`, `clasificador.ts` y clasificación en el formulario. *Hecho cuando:* historias 1 y 2, y `campo.js` figura en el precaché de `sw.js` (Campo sigue abriendo sin conexión). Calentamiento implementado y medido en sus dos disparos, en un perfil nuevo y después de recargar offline. Las fotos posteriores tardan menos de 5 s. **Pendiente:** decidir otra estrategia por el bloqueo del hilo principal de 10,90 s durante el primer calentamiento (RQ-CLA-12).
-- [ ] **T05** [P] — Clasificación en el servidor. *Hecho cuando:* historia 3 y CE-CLA-02. Comparación repetida con seis fotos y tolerancia 0,10: cuatro cumplen, pero dos de maíz devuelven categorías distintas y diferencias de 0,2184 y 0,1715 entre sus confianzas principales. Se repitió en otro perfil con el mismo resultado y se confirmó diferencia 0 entre sus tensores de entrada y Pillow. **Pendiente:** revisar la equivalencia del modelo servido y su exportación TF.js.
+- [x] **T04** — Dependencias de TF.js, `maximumFileSizeToCacheInBytes`, `clasificador.ts`, calentamiento y clasificación en el formulario. Cerrada el 2026-11-07 con la limitación **L-01**: el primer calentamiento en un perfil nuevo ocupa el hilo principal unos 10,9 s (1,5 s tras recargar); la primera foto posterior medida tarda 1,013 s y, en la recarga offline, 0,334 s y Campo abre sin conexión con `campo.js` en el precaché.
+- [x] **T05** [P] — Clasificación en el servidor. Cerrada el 2026-11-07 con la limitación **L-02**: CE-CLA-02 da 4 de 6; dos fotos de maíz difieren de categoría entre dispositivo y servidor. La emulación uint8 reproduce una discrepancia, pero no explica por completo la otra.
 - [x] **T06** [P] — Video. *Hecho cuando:* historia 4.
-- [ ] **T07** — Verificación manual: CE-CLA-01 a CE-CLA-04. Antes de empezar, en cada navegador, activar el service worker nuevo de `/campo/`. Los perfiles pueden conservar una versión anterior y el nuevo queda en espera mientras haya pestañas de Campo abiertas. Se activa con DevTools → **Application** → **Service workers** → **skipWaiting** y una recarga, y se comprueba que `campo.js` servido sea el nuevo. Resultados de ambas rondas en `specs/verificacion-campo-clasificacion.md`; sigue parcial por T04 y T05.
-- [ ] **T08** — Pipeline de `mf-campo` en verde. *Hecho cuando:* CE-CLA-05 y CE-CLA-06. El usuario confirmó en verde el pipeline anterior el 2026-11-07. **Revalidación pendiente:** ejecutar el pipeline con los nuevos cambios de calentamiento.
+- [x] **T07** — Verificación manual: CE-CLA-01 a CE-CLA-04, en dos rondas, con el service worker nuevo activado. Cerrada con las limitaciones L-01 y L-02. Resultados en `specs/verificacion-campo-clasificacion.md`.
+- [x] **T08** — Pipeline de `mf-campo` en verde. *Hecho cuando:* CE-CLA-05 y CE-CLA-06. El usuario confirmó el 2026-11-07 que también está en verde el pipeline con los cambios de calentamiento.
 
-Resultados en [verificacion-campo-clasificacion.md](verificacion-campo-clasificacion.md). El calentamiento ya está implementado y la comparación de seis fotos está ejecutada con el criterio revisado. T04 sigue abierta por el bloqueo de la interfaz y T05 por dos discrepancias de categoría en maíz; T07 continúa parcial. La foto de roya de soya sí cumple la tolerancia nueva. CE-CLA-05 se mantiene aprobado: 24 pruebas en 10 archivos y 98,98 % de líneas en servicios y stores, con la exclusión de TF.js prevista en 2.3. El pipeline anterior fue confirmado en verde por el usuario el 2026-11-07; T08 se reabre para validar esta revisión antes de cerrarla.
+Resultados en [verificacion-campo-clasificacion.md](verificacion-campo-clasificacion.md). FE-007 queda **cerrada** el 2026-11-07 (D-FE7-10): T01 a T08 cerradas (T04, T05 y T07 por aceptación explícita de limitaciones), CE-CLA-03, CE-CLA-05 y CE-CLA-06 cumplidos, y CE-CLA-01, CE-CLA-02 y CE-CLA-04 cumplidos salvo por las limitaciones L-01 y L-02 de la sección 4. Pruebas: 24 en 10 archivos, 98,98 % de líneas en servicios y stores. Pipeline de `mf-campo` en verde, confirmado por el usuario.
+
+---
+
+# 4. Limitaciones conocidas y cómo retomarlas
+
+Las dos se aceptaron al cerrar FE-007 (D-FE7-10). Ninguna impide registrar ni sincronizar incidencias, ni clasificar sin conexión.
+
+## L-01 — El primer calentamiento bloquea la interfaz
+
+**Qué pasa.** La primera inferencia WebGL compila los *shaders* del modelo en el hilo principal. Medido en un perfil nuevo de Chrome (verificación, "Revisión de RQ-CLA-12"):
+
+| Caso | Calentamiento | Tarea larga del hilo principal | Primera foto después |
+|---|---:|---:|---:|
+| Perfil nuevo, tras la primera descarga | 10.909 ms | 10.902 ms | 1.013 ms |
+| Recarga sin conexión, con la caché gráfica del navegador | 1.521 ms | 1.513 ms | 334 ms |
+
+Incumple el límite de 1 s de respuesta de RQ-CLA-12. `requestIdleCallback` solo pospone el trabajo.
+
+**Propuesta para retomarlo: TF.js en un Web Worker con `OffscreenCanvas`.** No se ha implementado ni validado en este proyecto. Comprobar primero WebGL en el worker en los navegadores objetivo y la compatibilidad con la salida SystemJS y el precaché offline.
+
+1. Crear `servicios/clasificador.worker.ts` con la lógica actual de `clasificador.ts`: selección de *backend* (`webgl`, o `cpu` si falla), carga del modelo desde los `ArrayBuffer` guardados (`tf.io.fromMemory`), calentamiento e inferencia. Mensajes: `cargar { versionModelo, archivos }`, `calentar`, `clasificar { rgba, ancho, alto }` → `{ probabilidades }`, `liberar`, y errores como `{ error: mensaje }`.
+2. Dejar `clasificador.ts` como fachada con la misma interfaz pública (`cargar`, `calentar`, `clasificar`, `liberar`), que crea el *worker* con `new Worker(new URL('./clasificador.worker.ts', import.meta.url), { type: 'module' })` y le transfiere los `ArrayBuffer` (`postMessage(..., [buffers])`). La promesa compartida de calentamiento y la serialización se mantienen en la fachada.
+3. `prepararImagen` puede correr en el hilo principal (ya es rápida) o en el *worker*; los píxeles se transfieren.
+4. Vite: comprobar que el *worker* se emite como archivo propio en `dist/campo/` (por ejemplo, con `worker: { format: 'es' }` en `vite.config.ts`) y que entra en el precaché de Workbox. TF.js sale de `campo.js`.
+5. Verificar en un perfil nuevo: la tarea larga del hilo principal desaparece durante el calentamiento (pestaña **Performance**), las pestañas responden, y las seis fotos de CE-CLA-02 dan los mismos resultados que antes.
+
+Alternativa más chica, no probada: la compilación paralela de TF.js (`tf.env().set('ENGINE_COMPILE_ONLY', true)`, una inferencia, `await backend.checkCompileCompletionAsync()`, `backend.getUniformLocations()`), que usa `KHR_parallel_shader_compile` si la GPU lo admite. Reduce el bloqueo, pero no garantiza quitarlo.
+
+## L-02 — Dos fotos de maíz cambian de categoría entre dispositivo y servidor
+
+**Qué pasa.** En CE-CLA-02, 4 de 6 fotos coinciden. Las dos de maíz que no coinciden son de las clases que el modelo confunde entre sí:
+
+| Foto (`servicio-ia/tests/fixtures/imagenes/`) | Servidor (Keras `float32`) | Dispositivo (TF.js uint8) |
+|---|---|---|
+| `MAIZ_MANCHA_GRIS/PlantVillage_image__105_.jpg` | `MAIZ_TIZON_NORTENO` 0.5350 | `MAIZ_MANCHA_GRIS` 0.7534 |
+| `MAIZ_TIZON_NORTENO/PlantVillage_image__106_.jpg` | `MAIZ_TIZON_NORTENO` 0.8163 | `MAIZ_MANCHA_GRIS` 0.6448 |
+
+**Evidencia y alcance de la explicación.** El preprocesamiento es idéntico (diferencia 0 en los 150.528 valores de cada una de estas dos fotos). La igualdad entre `webgl` y `cpu` se comprobó para la foto de roya de soya; no se extrapola esa comprobación a las dos fotos de maíz. El TF.js se exporta con los pesos cuantizados a uint8 (`servicio-ia/app/ml/exportar.py`, `quantization_dtype_map={"uint8": "*"}`). Emular esa cuantización en los kernels del modelo del servidor reproduce el cambio de la primera foto (`MAIZ_MANCHA_GRIS` 0.4774) pero no el de la segunda (verificación, "Cierre"). La emulación es aproximada: TF.js además pliega BatchNorm antes de cuantizar. Conclusión: la cuantización basta para cambiar la categoría en fotos dudosas; no se aisló su contribución exacta.
+
+**Propuesta para retomarlo: evaluar la exportación TF.js en float16.** No se ha comprobado que resuelva las dos discrepancias. Es trabajo en `sw2-parcial2`, no realizado en este repositorio:
+
+1. En `servicios/servicio-ia/app/ml/exportar.py`, cambiar `quantization_dtype_map={"uint8": "*"}` por `{"float16": "*"}`. Comparar primero las exportaciones sin cuantizar, uint8 y float16 con los mismos pesos Keras y las mismas seis fotos, considerando el plegado de BatchNorm. Medir equivalencia, tamaño y rendimiento: unos 6 MB son una estimación, no un resultado verificado aquí.
+2. Actualizar `servicios/servicio-ia/docs/modelos.md` (tabla de archivos) y la nota de exportación de `servicios/servicio-ia/specs/spec-vision.md` (2.4 y la "Combinación verificada").
+3. Preferir reexportar los mismos pesos Keras para aislar la conversión. Revisar el procedimiento de `docs/modelos.md` para publicar otra versión; si fuera necesario reentrenar, no asumir que la misma semilla garantiza pesos idénticos.
+4. Publicar la versión 2 desde `/admin/modelos` (FE-005). Campo la descarga sola en la siguiente actualización con conexión (historia 1).
+5. Repetir CE-CLA-02 completo con las mismas seis fotos: misma categoría y diferencia de confianza de hasta 0.10 en todas. Retirar L-02 solo si se cumple y verificar descarga, hashes y clasificación offline de la nueva versión.
+
+Recordatorio: el emulador de Firestore no persiste. Si se reinicia, hay que volver a entrenar y publicar las versiones de los modelos.
