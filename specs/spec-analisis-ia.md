@@ -4,7 +4,7 @@
 |---|---|
 | ID | FE-009 |
 | Archivo | `specs/spec-analisis-ia.md` |
-| Estado | Implementada y verificada localmente (2026-11-08); pipeline pendiente |
+| Estado | Implementada y verificada (2026-11-08); pipeline en verde confirmado por el usuario |
 | Constitución | Microfrontends v1.1.0 |
 | Trazabilidad | CU-14, CU-15, CU-17, CU-18 · RF-18, RF-19, RF-23, RF-24, RF-25 · RN-13, RN-14, RN-15, RN-16 · RNF-05, RNF-08, RNF-15 |
 | Depende de | FE-008: pestañas, cliente Apollo, errores por sección y detalle de campaña de `mf-analisis`. `servicio-ia` implementado (`spec-prediccion.md`, `spec-agentes.md`, `spec-reportes.md`, `spec-trabajos.md`) con `rendimiento` y `patrones` **vigentes**, Ollama y Whisper disponibles |
@@ -214,8 +214,8 @@ Documentos a mano: `Constitucion.md` v1.1.0, `specs/README.md`, `spec-analisis-c
 - [x] **T06** — **Reportes** por texto, descarga y reenvío. *Hecho cuando:* historia 4.
 - [x] **T07** — Grabación y reporte por voz. CE-IA-02 confirmado por el usuario tras una grabación real en Chrome: transcripción y reporte correctos. Límites y liberación del micrófono cubiertos en pruebas.
 - [x] **T08** — Verificación manual: CE-IA-01 a CE-IA-03 en Chrome y Edge (voz real en Chrome confirmada por el usuario). Salud de IA verificada con los cuatro componentes en `UP`. Evidencias y límites de los datos en `specs/verificacion-analisis-ia.md`.
-- [ ] **T09** — Pipeline de `mf-analisis` en verde. *Hecho cuando:* CE-IA-04 y CE-IA-05.
+- [x] **T09** — Pipeline de `mf-analisis` en verde. *Hecho cuando:* CE-IA-04 y CE-IA-05.
 
 ## Resultado local (2026-11-08)
 
-T01 a T08 completadas. Los cuatro paneles de IA y la sección de predicciones del detalle están implementados sin dependencias nuevas. Las 21 pruebas de `mf-analisis` pasan con 98,5 % de líneas sobre la lógica exigida; el build compila. Predicciones, patrones, asistente, reportes, descargas y reenvío de plan se comprobaron con el backend real. La prueba de voz real corresponde a la confirmación explícita del usuario. Queda pendiente T09: ejecutar el workflow sobre estos cambios y registrar su resultado. Evidencias en [verificacion-analisis-ia.md](verificacion-analisis-ia.md).
+T01 a T09 completadas. Los cuatro paneles de IA y la sección de predicciones del detalle están implementados sin dependencias nuevas. Las 21 pruebas de `mf-analisis` pasan con 98,5 % de líneas sobre la lógica exigida; el build compila. Predicciones, patrones, asistente, reportes, descargas y reenvío de plan se comprobaron con el backend real. La prueba de voz real corresponde a la confirmación explícita del usuario. T09 completada: el usuario confirmó el pipeline de este cambio en verde el 2026-11-08. No se proporcionó el enlace de la ejecución; no se verificó de forma independiente. Evidencias en [verificacion-analisis-ia.md](verificacion-analisis-ia.md).

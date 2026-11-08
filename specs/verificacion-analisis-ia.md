@@ -1,6 +1,6 @@
 # Verificación FE-009 — Inteligencia artificial en Análisis
 
-Fecha: 2026-11-08, hora de Bolivia (UTC−04:00). T01 a T08 completadas localmente; T09 pendiente de pipeline remoto.
+Fecha: 2026-11-08, hora de Bolivia (UTC−04:00). T01 a T09 completadas; pipeline en verde según confirmación del usuario el 2026-11-08. No se proporcionó el enlace de la ejecución ni se verificó de forma independiente.
 
 ## Entorno y contratos
 
@@ -95,7 +95,7 @@ En el Chrome headless separado se denegó explícitamente el permiso `microphone
 - `npm.cmd test` en `mf-analisis`: **21 pruebas en siete archivos**, todas en verde. Cobertura: **98,5 % de líneas**, 97 % de sentencias, 92,5 % de ramas; incluye `src/servicios/` y `src/apollo.ts`.
 - `npm.cmd run build`: TypeScript estricto y Vite en verde. SystemJS en `dist/analisis/analisis.js`, aproximadamente 909 kB / 269 kB gzip. Se mantiene la advertencia de tamaño de entrada única, como en FE-008.
 - No se agregaron dependencias. Se reutilizan Apollo, Recharts, el módulo compartido y las variables CSS existentes.
-- CE-IA-01 y CE-IA-03 comprobados localmente; CE-IA-02 confirmado por el usuario; CE-IA-04 satisfecho por las pruebas. **CE-IA-05 y T09 pendientes** de ejecutar el workflow de `mf-analisis` sobre estos cambios en GitHub.
-- No se repitió el pipeline de FE-008 como evidencia de FE-009 ni se ejecutó `workflow_dispatch`, que también desplegaría archivos a AWS. No se hicieron commit ni push.
+- CE-IA-01 y CE-IA-03 comprobados localmente; CE-IA-02 confirmado por el usuario; CE-IA-04 satisfecho por las pruebas. **CE-IA-05 y T09 completadas** según confirmación explícita del usuario del pipeline de FE-009 en verde el 2026-11-08.
+- No se repitió el pipeline de FE-008 como evidencia de FE-009 ni se ejecutó `workflow_dispatch`, que también desplegaría archivos a AWS. El agente no realizó commit ni push durante la implementación.
 
 Límites de datos: no había diez predicciones o análisis anteriores para recorrer páginas adicionales, ni mil campañas para verificar truncamiento. Las rutas y los parámetros de paginación se cubren en pruebas; el caso `422 DATOS_INSUFICIENTES` de predicción y los fallos de todos los proveedores de IA no se provocaron alterando datos o deteniendo servicios. Los trabajos `FALLIDO`, la cancelación y la espera máxima se comprobaron con respuestas simuladas y temporizadores.
