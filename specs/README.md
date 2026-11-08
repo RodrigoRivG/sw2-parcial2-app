@@ -76,3 +76,5 @@ Se completa con cada spec.
 - Sin dependencias compartidas entre frameworks; solo `@agro/compartido` (sesión, HTTP y errores) y `estilos.css`.
 - Tras FE-001: versiones fijadas en Angular 21 y Vite 7, y despliegue con `configurar-despliegue.mjs` (constitución 1.1.0).
 - FE-007 cerrada con dos limitaciones conocidas (2026-11-07): el primer calentamiento de TF.js bloquea la interfaz unos 11 s (L-01) y dos fotos de maíz difieren de categoría entre TF.js y Keras (L-02). La emulación uint8 reproduce una de las discrepancias, sin aislar la causa completa. Web Worker y TF.js en float16 son propuestas pendientes de validar; esta última requiere cambios en `servicio-ia` y publicar otra versión. Evidencias y pasos para retomarlas: sección 4 de [spec-campo-clasificacion.md](spec-campo-clasificacion.md).
+
+- (2026-11-08) Actualizada FE-008 para registrar como corregido el defecto de `Labor.fechaReferencia`: `graphql-server` usa `FechaOFechaHora!`. Se conservan la evidencia histórica y la elección de campos del frontend (D-FE8-07 y D-FE8-11); la verificación distingue la revisión de código de las pruebas y consultas en vivo reportadas por el usuario.

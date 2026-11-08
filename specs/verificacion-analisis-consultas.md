@@ -42,7 +42,7 @@ En Chrome y Edge se abrió el detalle de `121256de-3e2d-4771-a244-4e04b0fccb82` 
 
 Esta prueba descubrió que Apollo 4 usa `errorPolicy: 'none'` por defecto en `fetchMore`. Se corrigió con `errorPolicy: 'all'` explícito y se conservaron los errores asociados a cada página hasta recargar la sección. La prueba se repitió satisfactoriamente en ambos navegadores.
 
-## Diferencia del contrato de fechas
+## Diferencia del contrato de fechas (evidencia anterior a la corrección)
 
 Pedir `Labor.fechaReferencia` en la campaña con labores programadas produjo:
 
@@ -50,7 +50,17 @@ Pedir `Labor.fechaReferencia` en la campaña con labores programadas produjo:
 {"data":{"labores":null},"errors":[{"path":["labores","items",0,"fechaReferencia"],"extensions":{"codigo":"ERROR_INTERNO","idCorrelacion":"969c55ba-f61e-4006-b075-3f249bd04472"}}]}
 ```
 
-Se consultan los campos existentes `fechaEjecucion` y `fechaProgramada`, mostrando la ejecución cuando existe y, en su defecto, la fecha programada. La lista recuperó sus 33 registros. No se cambió el backend.
+Se consultan los campos existentes `fechaEjecucion` y `fechaProgramada`, mostrando la ejecución cuando existe y, en su defecto, la fecha programada. La lista recuperó sus 33 registros. En esa verificación no se cambió el backend; la corrección posterior se documenta a continuación.
+
+## Corrección posterior de `fechaReferencia` (2026-11-08)
+
+El defecto quedó corregido en `graphql-server`: `Labor.fechaReferencia` usa ahora `FechaOFechaHora!`, registrado en los resolvers. Acepta `AAAA-MM-DD` o fecha con hora ISO 8601 y devuelve el texto del servicio sin cambios. Verifica el formato textual, como los demás escalares de fechas; no valida el calendario.
+
+La revisión del código confirmó el contrato de operaciones (RQ-LAB-15), la aceptación de ambas formas y la prueba de integración que consulta `fechaReferencia` en una lista con una labor confirmada y otra programada. La prueba unitaria también rechaza `2026-11-16 12:00`.
+
+Según la verificación reportada por el usuario, pasaron lint, las 38 pruebas con cobertura y el build. Tras reiniciar `graphql-server`, las consultas en vivo devolvieron `"2026-11-08"` para labores programadas y `"2026-11-07T23:34:00Z"` para realizadas, sin errores. La revisión posterior fue de código: no volvió a ejecutar esas comprobaciones.
+
+El frontend conserva la consulta de `fechaProgramada` y `fechaEjecucion` (D-FE8-07). El error y la correlación anteriores se mantienen como evidencia histórica, no como defecto pendiente.
 
 ## Mediciones (CE-ANA-03)
 
@@ -99,7 +109,7 @@ Revisión hecha desde `sw2-parcial2`, sin modificar el backend:
 
 - **Primera carga.** En los registros de `graphql-server`, las dos primeras consultas del día (13:28:54 UTC) fueron `Cultivos` con 4.538 ms y 1 error, y `Campanias` con 4.553 ms, 29 llamadas y 33 errores de campo. Coinciden con el plazo total de 4,5 s de GraphQL (`spec-consultas.md`, historia 7): los servicios no respondieron a tiempo en su primer uso tras el arranque del backend. Las mismas consultas, a las 13:29:14, tardaron 79 y 582 ms sin errores. Durante el resto de la verificación, la consulta más lenta sin servicios caídos fue `Campanias`, con 2.311 ms. Se trata de un arranque en frío del backend; la spec ajusta CE-ANA-03 (D-FE8-09).
 - **Foto ausente.** El volumen `localstack-data` ocupa 76 KB y no contiene objetos de S3: LocalStack se configura sin persistencia (`SERVICES: s3`, bucket creado por `docker/localstack/init` al arrancar). Al apagar el equipo se perdieron las fotos, mientras las incidencias siguieron en DynamoDB. La spec pasa a verificar la foto con una incidencia nueva registrada desde Campo (D-FE8-10).
-- **`fechaReferencia`.** `esquema.graphql` declara `Labor.fechaReferencia: FechaHora!`, y operaciones devuelve `AAAA-MM-DD` para las labores programadas (RQ-LAB-15). Es un defecto de `graphql-server`, registrado en D-FE8-11; el frontend no usa el campo (D-FE8-07).
+- **`fechaReferencia` (diagnóstico histórico; corregido).** El esquema declaraba `Labor.fechaReferencia: FechaHora!`, pero operaciones devuelve `AAAA-MM-DD` para las labores programadas (RQ-LAB-15). Se corrigió con `FechaOFechaHora!` el 2026-11-08 (D-FE8-11), según la sección de corrección posterior. El frontend mantiene D-FE8-07.
 
 ## Cierre manual de T04 y T08 (2026-11-08)
 
