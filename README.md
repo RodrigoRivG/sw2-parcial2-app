@@ -38,6 +38,8 @@ FE-009 agrega **Predicción**, **Patrones**, **Asistente** y **Reportes** en `/a
 
 ## Versiones y decisiones verificadas
 
+La app Android del técnico (FE-010) está implementada en `app-movil/`: Flutter, SQLite, sesión `agro-movil`, clasificación TFLite o en el servidor y avisos FCM. No forma parte de `npm run construir`. Preparación de Firebase, teléfono por USB y compilación en [app-movil/README.md](app-movil/README.md). Las 22 pruebas locales pasan y el usuario confirmó sus pruebas tras instalar manualmente. Las notificaciones se verificarán después; siguen pendientes los criterios de integración completos y el pipeline, según [specs/verificacion-app-movil.md](specs/verificacion-app-movil.md).
+
 - Angular 21.2.26 y `single-spa-angular` 21.0.2: Angular 22 fue probado primero, pero el helper webpack de `single-spa-angular` 22.0.1 falla por publicar CommonJS dentro de un paquete ESM. La spec permite bajar una versión mayor al fallar T02. La configuración se hizo manualmente porque `ng add` no ejecutó acciones con la publicación 22.
 - Vite 7.3.7: Vite 8 eliminó la salida `system`; se usa la última versión estable de la rama compatible con SystemJS. El plugin de inyección de CSS se fija a 4.0.1 por la misma compatibilidad.
 - Angular usa TypeScript 5.9.3 y el runner de Angular con Vitest 4.1.12. Los demás proyectos usan TypeScript 6.0.2 y Vitest 5.1.0.

@@ -2,7 +2,7 @@
 
 Un archivo por funcionalidad, cada uno con tres partes: **Spec** (qué hace), **Plan** (cómo se construye) y **Tareas** (en qué orden se implementa).
 
-- Constitución de referencia: Microfrontends v1.1.0 (2026-11-07). Si un archivo la contradice, prevalece la constitución.
+- Constitución de referencia: Microfrontends y app móvil v1.2.0 (2026-11-08). Si un archivo la contradice, prevalece la constitución.
 - Documento de requisitos: `SW2_Parcial_2.pdf`.
 - Criterio: lo mínimo que cumpla el documento de requisitos y consuma lo que el backend **ya implementa**. El sistema se despliega para la evaluación y se apaga horas después: nada de complejidad para producción.
 
@@ -25,6 +25,7 @@ El backend vive en el repositorio `sw2-parcial2` y está implementado: los cuatr
 | 7 | FE-007 | [spec-campo-clasificacion.md](spec-campo-clasificacion.md) **(cerrada con dos limitaciones aceptadas: sección 4 de la spec)** | Clasificación de imágenes con TensorFlow.js (sin conexión), en el servidor y por video | `mf-campo` | CU-16 | RF-20, RF-21, RF-22 |
 | 8 | FE-008 | [spec-analisis-consultas.md](spec-analisis-consultas.md) **(implementada y verificada; CI en verde: [evidencias](verificacion-analisis-consultas.md))** | Paneles de indicadores, inventario, labores e incidencias por GraphQL, con Recharts | `mf-analisis` | CU-05, CU-24 | RF-06, RF-27, RF-33 |
 | 9 | FE-009 | [spec-analisis-ia.md](spec-analisis-ia.md) **(implementada y verificada; CI en verde: [evidencias](verificacion-analisis-ia.md))** | Predicción, análisis de patrones, agente y reportes por texto o voz | `mf-analisis` | CU-14, CU-15, CU-17, CU-18 | RF-18, RF-19, RF-23 a RF-25 |
+| 10 | FE-010 | [spec-app-movil.md](spec-app-movil.md) *(implementación local; pendientes teléfono y CI: [evidencias](verificacion-app-movil.md))* | App Flutter (Android) del técnico: labores e incidencias sin conexión, sincronización, clasificación con TFLite y en el servidor, historial y notificaciones push | `app-movil` | CU-10, CU-11, CU-13, CU-16, CU-21, CU-22 | RF-11, RF-12, RF-14 a RF-17, RF-20, RF-21, RF-28, RF-30, RF-31 |
 
 - FE-001 está completada: T01 a T10 verificadas, incluidas las ejecuciones de los cinco pipelines en GitHub. Evidencias y resultados en [verificacion-base.md](verificacion-base.md).
 - Las funcionalidades FE-002 a FE-009 quedan desbloqueadas por FE-001. Los tres microfrontends son independientes entre sí, respetando las dependencias particulares de cada spec.
@@ -64,6 +65,7 @@ El backend vive en el repositorio `sw2-parcial2` y está implementado: los cuatr
 | RNF-15 | Chrome y Edge | todas |
 | RNF-16 | Service worker con *scope* `/campo/` | base, campo-registro |
 | RNF-20 | Un pipeline por proyecto | base |
+| Módulo 7, RF-30, RF-31 (push) | App móvil Flutter y notificaciones de n8n en el teléfono | app-movil |
 
 Se completa con cada spec.
 

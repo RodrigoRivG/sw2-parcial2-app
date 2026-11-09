@@ -1,9 +1,9 @@
-# Constitución — Microfrontends
+# Constitución — Microfrontends y app móvil
 
 | Campo | Valor |
 |---|---|
-| Versión | 1.1.0 (2026-11-07) |
-| Alcance | Aplicación contenedora de single-spa, módulo compartido y los tres microfrontends web (Angular, React y Vue.js). Flutter no está incluida |
+| Versión | 1.2.0 (2026-11-08) |
+| Alcance | Aplicación contenedora de single-spa, módulo compartido, los tres microfrontends web (Angular, React y Vue.js) y la app móvil Flutter del técnico de campo (Android) |
 | Documento de requisitos | `SW2_Parcial_2.pdf` (Módulos 5, 6 y 7; RF-15 a RF-17, RF-21, RF-26 a RF-28, RF-32; RNF-07, RNF-12 a RNF-16, RNF-20) |
 | Repositorio | Propio, separado del backend (`sw2-parcial2`). Las rutas de este documento son relativas a ese repositorio |
 
@@ -20,6 +20,7 @@ Los microfrontends son la cara web del sistema. Cada uno atiende a un rol y solo
 | `mf-admin` | `/admin/` | Angular | `administrador` | Parcelas, cultivos, campañas (estado, costos manuales, producción, indicadores), insumos, movimientos y estado del inventario, consulta de labores, incidencias y Sagas, programación de labores, resolución de labores `PENDIENTE_REVISION` y gestión de usuarios con la API de administración de Keycloak (CU-01 a CU-07, CU-23, CU-24) |
 | `mf-analisis` | `/analisis/` | React | `gerencia` | Indicadores, inventario, labores, incidencias y análisis por GraphQL; predicción de rendimiento, análisis de patrones, consultas al agente y reportes por texto o voz por REST a `servicio-ia` (CU-05, CU-14, CU-15, CU-17, CU-18, CU-24) |
 | `mf-campo` | `/campo/` | Vue.js (PWA) | `tecnico_campo` | Labores e incidencias con foto, también sin conexión, sincronización por lotes y clasificación de imágenes en el navegador con TensorFlow.js (CU-10, CU-11, CU-13, CU-16) |
+| `app-movil` | App Android | Flutter | `tecnico_campo` | Lo mismo que `mf-campo` salvo el video, con SQLite y TensorFlow Lite, más las notificaciones push de n8n por FCM (Módulo 7; CU-10, CU-11, CU-13, CU-16, CU-21, CU-22) |
 
 **Principio rector: simplicidad.** El sistema se despliega para la evaluación y se apaga horas después. Se construye lo mínimo que cumpla el documento de requisitos y el contrato del backend. No hay internacionalización, temas, accesibilidad avanzada, telemetría, *feature flags*, SSR, microfrontends anidados ni dependencias compartidas entre frameworks.
 
@@ -34,6 +35,7 @@ Los microfrontends son la cara web del sistema. Cada uno atiende a un rol y solo
 | `mf-admin` | Angular con Angular Material y `single-spa-angular`, con zone.js | `@angular-builders/custom-webpack` (lo instala `ng add single-spa-angular`) |
 | `mf-analisis` | React con `single-spa-react`, Apollo Client, Recharts y MediaRecorder API | Vite, salida `system` |
 | `mf-campo` | Vue 3 con `single-spa-vue`, Pinia, Axios, Dexie.js, `vite-plugin-pwa` y TensorFlow.js | Vite, salida `system` |
+| `app-movil` | Flutter (Dart) para Android, con `flutter_appauth`, `sqflite`, `tflite_flutter` y `firebase_messaging` (lista completa en su spec) | `flutter build apk` |
 
 - Node.js LTS en Windows, sin Docker ni WSL en desarrollo. Cada proyecto tiene su propio `package.json` y su `package-lock.json`, y se instala con `npm ci`.
 - **Versiones:** se fija la última versión estable de cada librería al crear el proyecto. **Excepción:** Angular se fija a la última versión mayor que tenga `single-spa-angular` **publicada en npm** (el paquete sigue la versión de Angular).
@@ -44,6 +46,7 @@ Los microfrontends son la cara web del sistema. Cada uno atiende a un rol y solo
 - Cada microfrontend empaqueta su propio framework. **No** se comparten Angular, React ni Vue por el import map: así se evitan choques de versiones entre frameworks.
 - Lo único que se comparte en tiempo de ejecución es `@agro/compartido` (sección 5).
 - Navegadores: Chrome y Edge actualizados (RNF-15).
+- **`app-movil`:** Flutter estable en Windows con el SDK de Android (Android Studio). Se fijan la versión de Flutter (`.fvmrc` o una nota en su README) y las de los paquetes en `pubspec.yaml`/`pubspec.lock`. Solo Android: iOS necesita una Mac para compilar. No comparte código con los proyectos web: replica en Dart las reglas que ya fijaron sus specs.
 
 ## 3. Estructura del repositorio
 
@@ -60,6 +63,7 @@ Los microfrontends son la cara web del sistema. Cada uno atiende a un rol y solo
 ├── mf-admin/
 ├── mf-analisis/
 ├── mf-campo/
+├── app-movil/                 # app Flutter (Android); no entra en dist/ ni en `npm run construir`
 └── dist/                      # salida de los builds (no se versiona)
 ```
 
@@ -111,6 +115,7 @@ Ningún microfrontend crea su propia instancia de Keycloak, lee el token por otr
 - **Todo pasa por el API Gateway** (`gatewayUrl`), en `/api/<servicio>/v1/...` o `/api/graphql`. **Única excepción:** `mf-admin` llama directamente a la API de administración de Keycloak (`{keycloakUrl}/admin/realms/{realm}/users…`) para gestionar usuarios (RF-32). El realm solo le da esos permisos a la cuenta de administrador.
 - **Ocultar no es autorizar:** cada microfrontend oculta lo que el rol no puede hacer, pero siempre muestra el `403 SIN_PERMISO` del servidor si llega (RN-16).
 - Sin secretos en el repositorio: `config.json` solo tiene URL públicas.
+- **`app-movil`:** usa su propio client, `agro-movil` (público, Authorization Code con PKCE `S256`, redirección `com.agrosystem.campo:/oauthredirect`), con `flutter_appauth` y el navegador del sistema. No comparte sesión con la web. Los tokens viven solo en memoria, como en la web: tras cerrar la app, sincronizar exige iniciar sesión de nuevo (RN-12). Sin conexión, la app abre con los datos guardados y la última identidad conocida, sin tokens.
 
 ## 7. Contrato con el backend
 
@@ -125,13 +130,14 @@ Lo fijan las constituciones y specs del backend; los microfrontends lo respetan 
 - **Trabajos asíncronos de IA** (agente, reportes, video): `202` + trabajo, y después *polling* de `GET /api/ia/v1/trabajos/{id}` cada 2 s hasta que termine (RF-24).
 - Antes de implementar una pantalla se revisa el contrato real del servicio (su `specs/` y su OpenAPI en `sw2-parcial2`), no se supone.
 
-## 8. Sin conexión (solo `mf-campo`)
+## 8. Sin conexión (`mf-campo` y `app-movil`)
 
 - **Service worker** generado por `vite-plugin-pwa` (Workbox), servido en `/campo/sw.js` con *scope* `/campo/` (RNF-16).
 - Además de los archivos de `/campo/`, el service worker guarda en caché los archivos fijos de la raíz necesarios para arrancar sin red: `index.html`, `root-config.js`, `importmap.json`, `config.json`, `estilos.css`, `system.min.js` y `compartido/compartido.js`. Las navegaciones dentro de `/campo/` responden con el `index.html` guardado.
 - Las operaciones pendientes y los datos de referencia (parcelas, campañas no finalizadas, insumos sin datos económicos) se guardan en IndexedDB con Dexie.js. No se pierden al cerrar la pestaña, reiniciar el equipo o vencer la sesión (RNF-09).
 - Se sincroniza en orden cronológico con `POST /api/operaciones/v1/sincronizacion`. Cada operación queda `PENDIENTE`, `SINCRONIZADA` o `CON_ERROR`, y se muestra su motivo. Las rechazadas no se borran (RF-16, RF-17, RN-11, RNF-14).
 - El modelo de TensorFlow.js se descarga una vez desde `servicio-ia` y se guarda en el navegador para clasificar sin conexión (RF-21).
+- **`app-movil`:** aplica las mismas reglas con SQLite (`sqflite`) en lugar de IndexedDB, el modelo TensorFlow Lite del mismo manifiesto en lugar del TF.js, y los mismos estados (`PENDIENTE`, `SINCRONIZADA`, `CON_ERROR`). No necesita service worker: la app ya está instalada en el teléfono.
 
 ## 9. Pruebas
 
@@ -141,8 +147,8 @@ Lo fijan las constituciones y specs del backend; los microfrontends lo respetan 
   - en `mf-campo`, la cola offline, el armado del lote y la interpretación de su respuesta;
   - en cada microfrontend, los servicios que transforman datos.
 - Sin pruebas de extremo a extremo automatizadas. La integración se verifica a mano con el backend real, siguiendo los pasos de cada spec.
-- Herramientas: Vitest en `compartido`, `root-config`, `mf-analisis` y `mf-campo`; el *runner* que trae Angular en `mf-admin` (`ng test`, que usa Vitest 4).
-- **Cobertura:** 80 % de líneas en los archivos de lógica (carpetas `servicios/` y `stores/`, y todo `compartido`). Los componentes no cuentan.
+- Herramientas: Vitest en `compartido`, `root-config`, `mf-analisis` y `mf-campo`; el *runner* que trae Angular en `mf-admin` (`ng test`, que usa Vitest 4); `flutter test` en `app-movil`.
+- **Cobertura:** 80 % de líneas en los archivos de lógica (carpetas `servicios/` y `stores/`, y todo `compartido`; en `app-movil`, `lib/servicios/`). Los componentes y las pantallas no cuentan.
 
 ## 10. Construcción, CI y despliegue
 
@@ -150,6 +156,7 @@ Lo fijan las constituciones y specs del backend; los microfrontends lo respetan 
 - **Desarrollo:** `npm run servir` en una terminal y, en otra, el *watch* del proyecto que se esté editando (`npm run dev`: `vite build --watch` o `ng build --watch`), que escribe en su carpeta de `dist/`. Se recarga el navegador para ver los cambios. Así se desarrolla igual que en producción, sin *proxies* ni servidores por microfrontend.
 - `localhost:9000` es el origen que ya aceptan el client `agro-web` y el CORS del gateway. El backend corre en Docker (WSL) y se alcanza desde Windows en `localhost:8080` (gateway) y `localhost:8180` (Keycloak).
 - **Un pipeline por proyecto** en `.github/workflows/<proyecto>.yml`, filtrado por su carpeta: `npm ci`, pruebas, build (RNF-20). El despliegue a S3 es un job manual (`workflow_dispatch`) que sube la carpeta del proyecto al bucket, sin `--delete`. Los pipelines que consumen `compartido` también lo instalan, para que TypeScript resuelva los tipos de `keycloak-js`. El pipeline de `mf-campo` además construye el contenedor y `compartido`, porque Workbox calcula las revisiones del precaché con los archivos comunes reales.
+- **`app-movil`:** su pipeline (`.github/workflows/app-movil.yml`) corre `flutter test` con cobertura y `flutter build apk`, y guarda el APK como artefacto de la ejecución. No se publica en ninguna tienda: el APK se instala en el teléfono de la demostración. Las URL del gateway y de Keycloak entran al compilar con `--dart-define`.
 - **Nube:** S3 + CloudFront en AWS (sección 1.8.5 del documento). En el despliegue manual, `scripts/configurar-despliegue.mjs` reescribe `root-config/public/config.json` antes de construir. Toma los valores de las variables del repositorio en GitHub: `GATEWAY_URL` y `KEYCLOAK_URL` del gateway y del Keycloak de Azure, más `KEYCLOAK_REALM` y `KEYCLOAK_CLIENT_ID`, que son opcionales. Los secrets de AWS (`AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_BUCKET`) van como secrets de GitHub. La URL de CloudFront se agrega a las redirecciones de `agro-web` y a `CORS_ORIGENES_PERMITIDOS` del gateway al desplegar.
 
 ## 11. Convenciones
@@ -170,6 +177,8 @@ Las mismas del backend (constitución común, Convenciones), adaptadas al fronte
 | RNF-19: todos los componentes en contenedores Docker | Los microfrontends no usan Docker: se sirven como archivos estáticos (local: `serve`; nube: S3 + CloudFront) | Son archivos estáticos, el documento ya los publica en S3 y CloudFront (§1.8.5), y el desarrollo es nativo en Windows |
 | Angular, React y Vue.js en `/admin`, `/analisis` y `/campo` | `/admin/`, `/analisis/` y `/campo/`, con barra final | El *scope* `/campo/` del service worker (RNF-16) no incluye `/campo` |
 | RF-32 vía "API de administración de Keycloak" | Llamada directa desde Angular a Keycloak, no por el gateway | El gateway solo enruta a los microservicios (constitución del gateway) |
+| Flutter como aplicación móvil (Módulo 7), sin plataforma fijada | Solo Android; la app vive en este repositorio, junto a los microfrontends | Se compila y prueba en Windows (iOS exige una Mac); comparte contrato y criterios con `mf-campo` |
+| Video para clasificar (RF-22) | La app no graba video; lo cubre `mf-campo` | Decisión del usuario (2026-11-08): mismo alcance que `mf-campo` sin video |
 
 ## Historial
 
@@ -177,3 +186,4 @@ Las mismas del backend (constitución común, Convenciones), adaptadas al fronte
 |---|---|---|
 | 1.0.0 | 2026-11-07 | Primera versión |
 | 1.1.0 | 2026-11-07 | Tras implementar FE-001: versiones fijadas (Angular 21, Vite 7), `ng test` con Vitest, `obtenerToken(true)`, `configurar-despliegue.mjs` y detalles de los pipelines |
+| 1.2.0 | 2026-11-08 | Se agrega la app Flutter `app-movil` (Android, client `agro-movil`, SQLite, TensorFlow Lite y push por FCM), en este repositorio |
