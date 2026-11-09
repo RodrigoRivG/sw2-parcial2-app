@@ -67,16 +67,10 @@ export function PanelInventario() {
       />
       {datos && (
         <>
-          <dl className="ana-indicadores">
-            <div>
-              <dt>Total de insumos</dt>
-              <dd>{datos.resumen.totalInsumos}</dd>
-            </div>
-            <div>
-              <dt>Con stock bajo</dt>
-              <dd>{datos.resumen.totalStockBajo}</dd>
-            </div>
-          </dl>
+          <p>
+            Total de insumos: <strong>{datos.resumen.totalInsumos}</strong> · Con stock bajo:{' '}
+            <strong>{datos.resumen.totalStockBajo}</strong>
+          </p>
           {items.length === 0 ? (
             <p>No hay resultados con estos filtros</p>
           ) : (
@@ -101,13 +95,13 @@ export function PanelInventario() {
                   </thead>
                   <tbody>
                     {items.map((i) => (
-                      <tr key={i.idInsumo} className={i.stockBajo ? 'ana-stock-bajo' : ''}>
+                      <tr key={i.idInsumo}>
                         <td>{i.nombre}</td>
                         <td>{etiqueta(i.categoria)}</td>
                         <td>{etiqueta(i.unidad)}</td>
                         <td>{unidad(i.stock, etiqueta(i.unidad))}</td>
                         <td>{unidad(i.nivelMinimo, etiqueta(i.unidad))}</td>
-                        <td>{i.stockBajo ? 'Stock bajo' : 'Normal'}</td>
+                        <td><span className="ana-estado" data-estado={i.stockBajo ? 'STOCK_BAJO' : 'DISPONIBLE'}>{i.stockBajo ? 'Stock bajo' : 'Disponible'}</span></td>
                         <td>{fecha(i.fechaUltimaAlerta)}</td>
                       </tr>
                     ))}

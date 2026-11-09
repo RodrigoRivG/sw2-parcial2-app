@@ -61,20 +61,7 @@ export function PanelPrediccion({ inicial }: { inicial: string | null }) {
   return (
     <>
       <h2>Predicción</h2>
-      <label>
-        Campaña
-        <select value={id} disabled={cargando} onChange={(e) => seleccionar(e.target.value)}>
-          <option value="">Seleccione campaña</option>
-          {id && !consulta.data?.campanias?.items.some((c) => c.id === id) && (
-            <option value={id}>Campaña seleccionada desde el detalle</option>
-          )}
-          {consulta.data?.campanias?.items.map((c) => (
-            <option key={c.id} value={c.id}>
-              {c.nombre}
-            </option>
-          ))}
-        </select>
-      </label>
+      <p>Selecciona una campaña para estimar su rendimiento o consultar sus predicciones anteriores.</p>
       {consulta.loading && <p role="status">Consultando campañas…</p>}
       <ErrorSeccion
         error={consulta.error}
@@ -82,14 +69,56 @@ export function PanelPrediccion({ inicial }: { inicial: string | null }) {
         reintentar={() => consulta.refetch()}
       />
       {consulta.data?.campanias && (
-        <Paginador
+        <>
+          {consulta.data.campanias.items.length ? (
+            <div className="ana-tabla">
+              <table aria-label="Campañas disponibles para predicción">
+                <thead>
+                  <tr>
+                    <th scope="col">Campaña</th>
+                    <th scope="col">Cultivo</th>
+                    <th scope="col">Parcela</th>
+                    <th scope="col">Estado</th>
+                    <th scope="col">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {consulta.data.campanias.items.map((c) => (
+                    <tr key={c.id}>
+                      <td>{c.nombre}</td>
+                      <td>{c.cultivo?.nombre ?? 'No disponible'}</td>
+                      <td>{c.parcela?.nombre ?? 'No disponible'}</td>
+                      <td><span className="ana-estado" data-estado={c.estado}>{etiqueta(c.estado)}</span></td>
+                      <td>
+                        <button
+                          className="ana-enlace"
+                          aria-pressed={id === c.id}
+                          disabled={cargando}
+                          onClick={() => seleccionar(c.id)}
+                        >
+                          {id === c.id ? 'Seleccionada' : 'Seleccionar'}
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : <p>No hay campañas disponibles.</p>}
+          <Paginador
           pagina={pagina}
           tamanio={20}
           total={consulta.data.campanias.total}
           cambiar={cambiarPagina}
           cargando={consulta.loading}
-        />
+          />
+        </>
       )}
+      <p role="status">
+        {id
+          ? `Campaña seleccionada: ${consulta.data?.campanias?.items.find((c) => c.id === id)?.nombre ?? 'seleccionada desde el detalle u otra página'}`
+          : 'Selecciona una campaña de la tabla para continuar.'}
+      </p>
       <label className="ana-casilla">
         <input
           type="checkbox"
@@ -110,16 +139,22 @@ export function PanelPrediccion({ inicial }: { inicial: string | null }) {
                   inputMode="decimal"
                   value={costos[c]}
                   disabled={cargando}
-                  pattern="\d+(\.\d{1,2})?"
+                  pattern="\d+([.,]\d{1,2})?"
+                  aria-invalid={costos[c] !== '' && !montoValido(costos[c])}
                   onChange={(e) => cambiarCostos({ ...costos, [c]: e.target.value })}
                 />
               </label>
             ))}
           </div>
-          <p>Ingrese los cuatro montos, no negativos y con hasta dos decimales.</p>
+          <p>Ingrese los cuatro montos, no negativos y con hasta dos decimales. Puede usar coma o punto, sin separadores de miles.</p>
         </fieldset>
       )}
-      <button disabled={!valido || cargando} onClick={() => void calcular()}>
+      {!valido && (
+        <p id="ana-validacion-estimar" role="status">
+          {!id ? 'Selecciona una campaña para estimar.' : 'Completa los cuatro costos con montos válidos; puedes ingresar 0.'}
+        </p>
+      )}
+      <button aria-describedby={!valido ? 'ana-validacion-estimar' : undefined} disabled={!valido || cargando} onClick={() => void calcular()}>
         {cargando ? 'Estimando…' : 'Estimar'}
       </button>
       <ErrorSolicitud error={error} reintentar={() => void calcular()} />

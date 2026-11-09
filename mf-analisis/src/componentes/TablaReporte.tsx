@@ -1,4 +1,5 @@
 import type { TablaDeReporte } from '../modelos-ia';
+import { formatoCeldaReporte } from '../servicios/formato-reporte';
 export function TablaReporte({ tabla }: { tabla: TablaDeReporte }) {
   const filas = tabla.filas.slice(0, 50);
   return (
@@ -22,11 +23,7 @@ export function TablaReporte({ tabla }: { tabla: TablaDeReporte }) {
               <tr key={i}>
                 {tabla.columnas.map((c, j) => (
                   <td key={c.campo}>
-                    {fila[j] == null
-                      ? '—'
-                      : typeof fila[j] === 'object'
-                        ? JSON.stringify(fila[j])
-                        : String(fila[j])}
+                    {formatoCeldaReporte(c.campo, fila[j])}
                   </td>
                 ))}
               </tr>

@@ -14,6 +14,14 @@ const etiquetas: Record<string, string> = {
 };
 export function etiqueta(codigo: string) { return etiquetas[codigo] ?? codigo; }
 export function fechaLocal(fecha: string) {
-  return new Date(fecha.length === 10 ? fecha + 'T12:00:00' : fecha).toLocaleString('es-BO',
-    fecha.length === 10 ? { dateStyle: 'medium' } : { dateStyle: 'medium', timeStyle: 'short' });
+  if (!fecha) return 'Sin fecha';
+  if (/^\d{4}-\d{2}-\d{2}$/.test(fecha)) return fecha.split('-').reverse().join('/');
+  const instante = new Date(fecha);
+  return Number.isNaN(instante.getTime()) ? fecha : instante.toLocaleString('es-BO',
+    { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+}
+const formatoDecimal = new Intl.NumberFormat('es-BO', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+export function decimalLocal(valor: string | number) {
+  const numero = Number(valor);
+  return String(valor).trim() && Number.isFinite(numero) ? formatoDecimal.format(numero) : String(valor);
 }

@@ -12,7 +12,7 @@ import type {
 } from '../modelos-ia';
 const raiz = '/api/ia/v1';
 export const categoriasCosto = ['INSUMO', 'MANO_DE_OBRA', 'MAQUINARIA', 'OTRO'] as const;
-export const montoValido = (valor: string) => /^\d+(\.\d{1,2})?$/.test(valor);
+export const montoValido = (valor: string) => /^\d+([.,]\d{1,2})?$/.test(valor.trim());
 const post = <T>(ruta: string, cuerpo: unknown, signal?: AbortSignal) =>
   http<T>(raiz + ruta, { method: 'POST', body: JSON.stringify(cuerpo), signal });
 export function estimar(
@@ -24,7 +24,14 @@ export function estimar(
     throw new Error('Los cuatro costos deben ser decimales no negativos con hasta dos decimales');
   return post<Prediccion>(
     '/predicciones',
-    { idCampania, ...(costosPorHectarea ? { costosPorHectarea } : {}) },
+    {
+      idCampania,
+      ...(costosPorHectarea ? {
+        costosPorHectarea: Object.fromEntries(
+          categoriasCosto.map((c) => [c, costosPorHectarea[c].trim().replace(',', '.')]),
+        ),
+      } : {}),
+    },
     signal,
   );
 }

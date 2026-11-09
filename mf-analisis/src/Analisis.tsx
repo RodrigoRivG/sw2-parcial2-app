@@ -30,9 +30,7 @@ export function Analisis() {
     pagina: 0,
   });
   return (
-    <section className="agro-panel agro-analisis">
-      <p className="agro-etiqueta">GERENCIA</p>
-      <h1>Análisis</h1>
+    <section className="agro-analisis" aria-label="Análisis de gerencia">
       <nav className="ana-pestanias" aria-label="Paneles de análisis">
         {[
           'Campañas',

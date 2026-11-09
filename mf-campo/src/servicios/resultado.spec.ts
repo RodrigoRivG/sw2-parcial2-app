@@ -13,7 +13,7 @@ it('interpreta top 3, umbral y empates en orden de índice sin alterar probabili
   expect(() => interpretar([0.1], etiquetas, '0.5', 'v')).toThrow('etiquetas');
   expect(() => interpretar([NaN, 0, 1], etiquetas, '0.5', 'v')).toThrow('inválidas');
   expect([confianzaTexto(1), confianzaTexto(0), confianzaTexto(0.87312)]).toEqual(['1.0000', '0.0000', '0.8731']);
-  expect(porcentaje('0.8731')).toBe('87.31 %');
+  expect(porcentaje('0.8731')).toBe('87,31 %');
   expect(Object.keys(clasificacionAdjunta(claro))).toEqual(['categoria', 'confianza', 'versionModelo', 'origen']);
   const video = resultadoDeVideo({ categoriaPredominante: 'C1', nombre: 'Clase 1', confianza: '0.8', clasificacion: claro.clasificacion, aviso: 'Aviso', orientativo: true } as ResultadoVideo);
   expect(video.categoria).toBe('C1'); expect(video.alternativas).toEqual([]);

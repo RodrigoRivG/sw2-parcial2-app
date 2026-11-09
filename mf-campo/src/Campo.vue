@@ -56,25 +56,29 @@ onMounted(async () => {
 onUnmounted(() => { desmontada = true; cancelarPreparacionProgramada(); clasificador.liberar(); operaciones.detener(); window.removeEventListener('online', estadoRed); window.removeEventListener('offline', estadoRed); });
 </script>
 <template>
-  <section class="agro-panel agro-campo">
-    <header><p class="campo-ceja">TÉCNICO DE CAMPO</p><h1>Campo</h1>
+  <section class="agro-campo" aria-label="Trabajo de campo">
+    <nav class="campo-pestanas" aria-label="Vistas de Campo">
+      <button v-for="nombre in ['Labores', 'Incidencia', 'Pendientes', 'Historial']" :key="nombre" :aria-current="pestania === nombre ? 'page' : undefined" @click="pestania = nombre; aviso = ''">{{ nombre }}{{ nombre === 'Pendientes' ? ` (${operaciones.pendientes})` : '' }}</button>
+    </nav>
+    <header class="campo-resumen">
+      <div>
       <p v-if="referencias.fecha">{{ red ? 'Datos actualizados:' : 'Sin conexión · datos del' }} {{ fechaLocal(referencias.fecha) }}</p>
       <p v-else>{{ red ? 'Prepare el dispositivo antes de salir al campo' : 'Sin conexión' }}</p>
-      <p>{{ referencias.modelo ? `Clasificador ${referencias.modelo.versionModelo}` : 'Clasificador no disponible' }}</p>
-      <p v-if="preparando" role="status">Preparando el clasificador…</p>
-      <p v-else-if="referencias.modelo && versionPreparada === referencias.modelo.versionModelo" role="status">Clasificador listo</p>
+      <p class="campo-ayuda">{{ referencias.modelo ? `Modelo: ${referencias.modelo.versionModelo}` : 'Clasificador no disponible' }}</p>
+      <p v-if="preparando" role="status"><span class="campo-estado" data-estado="PENDIENTE">Preparando clasificador</span></p>
+      <p v-else-if="referencias.modelo && versionPreparada === referencias.modelo.versionModelo" role="status"><span class="campo-estado" data-estado="CONFIRMADA">Clasificador listo</span></p>
       <p v-if="!conSesion">{{ operaciones.identidad?.nombre ? `Trabajando en este dispositivo como ${operaciones.identidad.nombre}. ` : '' }}<span v-if="red">Inicie sesión para sincronizar</span><span v-else>Los registros se guardan en este dispositivo</span></p>
+      </div>
+      <div class="campo-acciones">
       <button v-if="red && !conSesion" @click="entrar">Iniciar sesión</button>
       <button v-if="red && conSesion" :disabled="referencias.actualizando" @click="referencias.actualizar">{{ referencias.actualizando ? 'Actualizando…' : 'Actualizar datos' }}</button>
+      </div>
     </header>
     <p v-if="error" class="agro-error" role="alert">{{ error }}</p>
     <p v-if="referencias.errorModelo" class="agro-error" role="alert">{{ referencias.errorModelo }}</p>
     <p v-if="errorPreparacion" class="agro-error" role="alert">No se pudo preparar el clasificador: {{ errorPreparacion }}</p>
     <p v-for="(mensaje, clave) in referencias.errores" :key="clave" class="agro-error" role="alert">No se actualizó {{ clave }}: {{ mensaje }}</p>
-    <p v-if="aviso" role="status">{{ aviso }}</p>
-    <nav class="campo-pestanas" aria-label="Vistas de Campo">
-      <button v-for="nombre in ['Labores', 'Incidencia', 'Pendientes', 'Historial']" :key="nombre" :aria-current="pestania === nombre ? 'page' : undefined" @click="pestania = nombre; aviso = ''">{{ nombre }}{{ nombre === 'Pendientes' ? ` (${operaciones.pendientes})` : '' }}</button>
-    </nav>
+    <p v-if="aviso" class="campo-aviso" role="status">{{ aviso }}</p>
     <p v-if="!lista && !error" role="status">Preparando Campo…</p>
     <template v-else-if="lista">
       <VistaPendientes v-if="pestania === 'Pendientes'" :red="red" :con-sesion="conSesion" @entrar="entrar" />
@@ -85,23 +89,4 @@ onUnmounted(() => { desmontada = true; cancelarPreparacionProgramada(); clasific
     </template>
   </section>
 </template>
-<style>
-.agro-campo { max-width: 48rem; margin: auto; }
-.agro-campo h1, .agro-campo h2 { color: var(--agro-color-primario); }
-.campo-ceja { letter-spacing: .12em; font-size: .8rem; }
-.campo-pestanas { display: flex; flex-wrap: wrap; gap: .5rem; margin: 1.5rem 0; }
-.agro-campo button { min-height: 48px; }
-.agro-campo button[aria-current=page], .agro-campo button[type=submit] { background: var(--agro-color-primario); color: white; }
-.agro-campo button:disabled { opacity: .55; cursor: default; }
-.agro-campo form, .campo-lista { display: grid; gap: var(--agro-espaciado); }
-.campo-lista { margin-top: var(--agro-espaciado); }
-.agro-campo label { display: grid; gap: .4rem; }
-.agro-campo input, .agro-campo select, .agro-campo textarea { width: 100%; min-width: 0; min-height: 48px; padding: .65rem; font: inherit; color: inherit; border: 1px solid var(--agro-color-borde); border-radius: .4rem; background: var(--agro-color-superficie); }
-.agro-campo textarea { min-height: 100px; }
-.campo-tarjeta { padding: var(--agro-espaciado); border: 1px solid var(--agro-color-borde); border-radius: var(--agro-radio); overflow-wrap: anywhere; }
-.campo-tarjeta h3 { margin-top: 0; }
-.campo-acciones { display: flex; flex-wrap: wrap; gap: .5rem; }
-.campo-ayuda { font-size: .9rem; }
-.agro-campo fieldset { min-width: 0; border: 1px solid var(--agro-color-borde); border-radius: var(--agro-radio); }
-.agro-campo img { display: block; max-width: 100%; max-height: 300px; object-fit: contain; }
-</style>
+<style src="./estilos.css"></style>

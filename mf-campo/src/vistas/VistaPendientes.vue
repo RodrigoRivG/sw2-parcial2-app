@@ -19,7 +19,7 @@ async function limpiar() { try { await operaciones.limpiarSincronizadas(); } cat
     <p v-if="!operaciones.operaciones.length">No hay registros guardados.</p>
     <div class="campo-lista"><article v-for="op in operaciones.operaciones" :key="op.idOperacion" class="campo-tarjeta">
       <h3>{{ etiqueta(op.tipo) }}</h3><p>{{ op.resumen }}</p><p>{{ fechaLocal(op.fechaCreacion) }}</p>
-      <p><strong>{{ etiqueta(op.estado) }}</strong>{{ operaciones.enviando.has(op.idOperacion) ? ' · Enviando…' : '' }}</p>
+      <p><span class="campo-estado" :data-estado="op.estado">{{ etiqueta(op.estado) }}</span>{{ operaciones.enviando.has(op.idOperacion) ? ' · Enviando…' : '' }}</p>
       <p v-if="op.resultado?.estado">Estado en el servidor: {{ etiqueta(op.resultado.estado) }}</p>
       <p v-if="op.resultado?.mensaje" :class="{ 'agro-error': op.estado === 'CON_ERROR' }">{{ op.resultado.codigo ? `${op.resultado.codigo}: ` : '' }}{{ op.resultado.mensaje }}</p>
       <p v-if="op.estado === 'PENDIENTE' && op.resultado && !operaciones.enviando.has(op.idOperacion)">Se reintentará</p>

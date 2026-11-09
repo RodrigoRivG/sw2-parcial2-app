@@ -13,6 +13,7 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
+import { EtiquetaGrafico, numeroEje, textoGrafico } from './presentacion-graficos';
 type Punto = {
   etiqueta: string;
   valor: number;
@@ -23,6 +24,8 @@ type Punto = {
 };
 const primario = 'var(--agro-color-primario)';
 const borde = 'var(--agro-color-borde)';
+const azul = '#3979a8';
+const paleta = ['#276444', '#3979a8', '#b28136', '#81719c'];
 function ContenidoTooltip({
   active,
   payload,
@@ -34,7 +37,9 @@ function ContenidoTooltip({
   return active && punto ? (
     <div className="ana-tooltip">
       <strong>{punto.etiqueta}</strong>
-      <p>{punto.texto}</p>
+      {punto.texto.split(/ · | \/ mínimo /).map((texto, i) => (
+        <p key={i}>{punto.costo != null ? (i === 0 ? 'Rendimiento: ' : 'Costo: ') : punto.minimo != null ? (i === 0 ? 'Stock: ' : 'Nivel mínimo: ') : ''}{textoGrafico(texto)}</p>
+      ))}
     </div>
   ) : null;
 }
@@ -59,46 +64,51 @@ export function Grafico({
         }[tipo]
       }
     >
-      <ResponsiveContainer width="100%" height={320}>
+      <div className="ana-grafico-desplazable">
+      <div style={{ minWidth: tipo === 'indicadores' || tipo === 'inventario' ? Math.max(640, datos.length * 155) : 0 }}>
+      <ResponsiveContainer width="100%" height={380}>
         {tipo === 'costos' ? (
           <PieChart>
             <Pie
               data={datos}
               dataKey="valor"
               nameKey="etiqueta"
-              outerRadius={105}
-              label
+              innerRadius={65}
+              outerRadius={115}
+              paddingAngle={2}
               isAnimationActive={false}
             >
               {datos.map((d, i) => (
-                <Cell key={d.etiqueta} fill={primario} fillOpacity={1 - i * 0.18} />
+                <Cell key={d.etiqueta} fill={paleta[i % paleta.length]} />
               ))}
             </Pie>
             <Tooltip content={<ContenidoTooltip />} />
-            <Legend />
+            <Legend iconType="circle" iconSize={10} />
           </PieChart>
         ) : tipo === 'comparar' ? (
-          <ScatterChart margin={{ top: 20, right: 35, bottom: 35, left: 25 }}>
-            <CartesianGrid stroke={borde} />
-            <XAxis type="number" dataKey="costo" name="Costo" unit=" Bs/ha" />
-            <YAxis type="number" dataKey="valor" name="Rendimiento" unit=" kg/ha" />
-            <Tooltip content={<ContenidoTooltip />} />
+          <ScatterChart margin={{ top: 30, right: 30, bottom: 35, left: 30 }}>
+            <CartesianGrid stroke={borde} strokeDasharray="3 5" />
+            <XAxis type="number" dataKey="costo" name="Costo" tickFormatter={numeroEje} tickLine={false} label={{ value: 'Costo (Bs/ha)', position: 'bottom', offset: 12 }} />
+            <YAxis type="number" dataKey="valor" name="Rendimiento" tickFormatter={numeroEje} tickLine={false} width={75} label={{ value: 'kg/ha', position: 'top', offset: 12 }} />
+            <Tooltip content={<ContenidoTooltip />} cursor={{ stroke: '#cdd8ce', strokeDasharray: '3 5' }} />
             <Scatter data={datos} fill={primario} isAnimationActive={false} />
           </ScatterChart>
         ) : (
-          <BarChart data={datos} margin={{ top: 15, right: 20, bottom: 45, left: 20 }}>
-            <CartesianGrid stroke={borde} />
-            <XAxis dataKey="etiqueta" angle={-15} textAnchor="end" height={65} />
-            <YAxis yAxisId="valor" />
-            <YAxis yAxisId="otro" orientation="right" hide={tipo === 'inventario'} />
-            <Tooltip content={<ContenidoTooltip />} />
-            <Legend />
+          <BarChart data={datos} margin={{ top: 24, right: 20, bottom: 8, left: 8 }} barGap={6} barCategoryGap="24%">
+            <CartesianGrid stroke={borde} strokeDasharray="3 5" vertical={false} />
+            <XAxis dataKey="etiqueta" interval={0} tick={<EtiquetaGrafico />} tickLine={false} height={80} axisLine={{ stroke: borde }} />
+            <YAxis yAxisId="valor" tickFormatter={numeroEje} tickLine={false} axisLine={false} width={75} label={tipo === 'inventario' ? undefined : { value: 'kg/ha', position: 'top', offset: 10, fill: primario }} />
+            <YAxis yAxisId="otro" orientation="right" hide={tipo === 'inventario'} tickFormatter={numeroEje} tickLine={false} axisLine={false} width={75} label={{ value: 'Bs/ha', position: 'top', offset: 10, fill: azul }} />
+            <Tooltip content={<ContenidoTooltip />} cursor={{ fill: '#276444', fillOpacity: 0.05 }} />
+            <Legend verticalAlign="top" height={42} iconType="circle" iconSize={10} />
             <Bar
               isAnimationActive={false}
               yAxisId="valor"
               dataKey="valor"
               name={tipo === 'inventario' ? 'Stock' : 'Rendimiento kg/ha'}
               fill={primario}
+              maxBarSize={44}
+              radius={[5, 5, 0, 0]}
             >
               {datos.map((d, i) => (
                 <Cell key={i} fill={d.bajo ? 'var(--agro-color-error)' : primario} />
@@ -109,12 +119,15 @@ export function Grafico({
               yAxisId={tipo === 'inventario' ? 'valor' : 'otro'}
               dataKey={tipo === 'inventario' ? 'minimo' : 'costo'}
               name={tipo === 'inventario' ? 'Nivel mínimo' : 'Costo Bs/ha'}
-              fill={primario}
-              fillOpacity={0.45}
+              fill={azul}
+              maxBarSize={44}
+              radius={[5, 5, 0, 0]}
             />
           </BarChart>
         )}
       </ResponsiveContainer>
+      </div>
+      </div>
     </div>
   );
 }

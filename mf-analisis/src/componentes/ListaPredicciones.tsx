@@ -5,7 +5,7 @@ import type { Prediccion } from '../modelos-ia';
 import { Paginador } from './Paginador';
 import { ErrorSolicitud } from './ErrorSolicitud';
 import { ResultadoPrediccion } from './ResultadoPrediccion';
-import { fecha } from '../servicios/formato';
+import { fecha, unidad } from '../servicios/formato';
 export function ListaPredicciones({
   idCampania,
   revision = 0,
@@ -46,7 +46,7 @@ export function ListaPredicciones({
           {datos.items.map((p) => (
             <details key={p.id}>
               <summary>
-                {fecha(p.fecha)} · {p.rendimientoEstimado} {p.unidad}
+                {fecha(p.fecha)} · {unidad(p.rendimientoEstimado, p.unidad)}
               </summary>
               <ResultadoPrediccion datos={p} />
             </details>

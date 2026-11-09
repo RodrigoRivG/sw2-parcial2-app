@@ -3,7 +3,7 @@ import { computed, ref } from 'vue';
 import { usarReferencias } from '../stores/referencias';
 import { usarOperaciones } from '../stores/operaciones';
 import { tiposLabor, type Labor, type TipoLabor, type Consumo } from '../modelos';
-import { etiqueta } from '../servicios/etiquetas';
+import { etiqueta, decimalLocal } from '../servicios/etiquetas';
 import { ahoraLocal, aUtc, insumosValidos, noFutura } from '../servicios/validacion';
 import { mensajeError } from '../servicios/errores';
 const props = defineProps<{ labor?: Labor }>();
@@ -40,7 +40,7 @@ async function guardar() {
     <label>Observaciones (opcional)<textarea v-model="observaciones" maxlength="500" :disabled="guardando" /></label>
     <fieldset :disabled="guardando"><legend>Insumos usados (opcional)</legend>
       <div v-for="(fila, indice) in insumos" :key="indice" class="campo-tarjeta">
-        <label>Insumo<select v-model="fila.idInsumo" required><option value="" disabled>Seleccione insumo</option><option v-for="i in referencias.datos.insumos" :key="i.id" :value="i.id" :disabled="insumos.some((f, n) => n !== indice && f.idInsumo === i.id)">{{ i.nombre }} · {{ etiqueta(i.unidad) }} · stock {{ i.stock }}</option></select></label>
+        <label>Insumo<select v-model="fila.idInsumo" required><option value="" disabled>Seleccione insumo</option><option v-for="i in referencias.datos.insumos" :key="i.id" :value="i.id" :disabled="insumos.some((f, n) => n !== indice && f.idInsumo === i.id)">{{ i.nombre }} · {{ etiqueta(i.unidad) }} · stock {{ decimalLocal(i.stock) }}</option></select></label>
         <label>Cantidad {{ etiqueta(referencias.datos.insumos.find(i => i.id === fila.idInsumo)?.unidad ?? '') }}<input v-model="fila.cantidad" type="text" inputmode="decimal" required maxlength="16"></label>
         <button type="button" @click="insumos.splice(indice, 1)">Quitar insumo</button>
       </div>

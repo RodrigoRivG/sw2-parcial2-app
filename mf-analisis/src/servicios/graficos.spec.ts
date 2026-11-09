@@ -9,6 +9,12 @@ import {
   barrasGrupos,
 } from './graficos';
 import type { Prediccion, AnalisisPatrones } from '../modelos-ia';
+import { textoGrafico } from '../componentes/presentacion-graficos';
+it('presenta las cifras del tooltip con coma decimal y dos decimales', () => {
+  expect(textoGrafico('2400.00 kg/ha')).toBe('2.400,00 kg/ha');
+  expect(textoGrafico('5.2000 Bs')).toBe('5,20 Bs');
+  expect(textoGrafico('0 kg')).toBe('0,00 kg');
+});
 it('muestra el intervalo y el rendimiento real sin alterar los decimales, y las cantidades de grupos', () => {
   const prediccion = {
     intervalo: { minimo: '2810.00', maximo: '3390.75' },

@@ -1,15 +1,10 @@
-.agro-analisis h1 {
-  color: var(--agro-color-primario);
-}
-.agro-analisis .agro-etiqueta {
-  letter-spacing: 0.12em;
-  font-size: 0.8rem;
-}
 .agro-analisis {
   min-width: 0;
 }
+.agro-analisis .agro-error { overflow-wrap: anywhere; }
 .agro-analisis h2 {
-  margin-top: 1.8rem;
+  margin: 2rem 0 1.5rem;
+  font-size: 2rem;
 }
 .agro-analisis h3,
 .agro-analisis h4 {
@@ -28,10 +23,34 @@
   align-items: center;
   margin: 1.5rem 0;
 }
-.ana-pestanias button[aria-current] {
-  color: var(--agro-color-superficie);
-  background: var(--agro-color-primario);
+.ana-pestanias {
+  flex-wrap: nowrap;
+  gap: 0;
+  overflow-x: auto;
+  margin: 0 0 2rem;
 }
+.ana-pestanias button {
+  flex: 1 0 auto;
+  min-height: 48px;
+  padding: 12px 24px;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+  background: transparent;
+  color: var(--agro-color-texto);
+  white-space: nowrap;
+}
+.ana-pestanias button:hover { background: #e8efe5; border-color: transparent; }
+.ana-pestanias button[aria-current] {
+  color: var(--agro-color-primario);
+  border-bottom-color: var(--agro-color-primario);
+  font-weight: 600;
+}
+.ana-filtros { align-items: flex-start; }
+.ana-filtros > label:not(.ana-casilla),
+.ana-filtros > div:has(> label) { flex: 0 1 240px; min-width: 0; }
+.ana-filtros > .ana-casilla { min-height: 72px; }
+.ana-filtros > div:has(> label) label { width: 100%; }
 .ana-filtros label {
   display: flex;
   flex-direction: column;
@@ -53,27 +72,86 @@
 .ana-tabla {
   overflow-x: auto;
   max-width: 100%;
+  border: 1px solid var(--agro-color-borde);
+  border-radius: var(--agro-radio);
+  background: var(--agro-color-superficie);
 }
 .agro-analisis table {
   width: 100%;
-  border-collapse: collapse;
-  font-size: 0.9rem;
+  min-width: 640px;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 14px;
+  background: var(--agro-color-superficie);
 }
 .agro-analisis th,
 .agro-analisis td {
-  text-align: left;
-  padding: 0.8rem;
-  border-bottom: 1px solid var(--agro-color-borde);
-  vertical-align: top;
+  text-align: center;
+  padding: 12px 20px;
+  border-bottom: 1px solid #e5ebe4;
+  vertical-align: middle;
+  line-height: 22px;
+  font-variant-numeric: tabular-nums;
 }
 .agro-analisis th {
-  background: var(--agro-color-fondo);
+  background: #e8efe5;
+  color: #354b3c;
+  padding: 14px 20px;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 20px;
+  white-space: nowrap;
 }
+.agro-analisis tbody tr:last-child td { border-bottom: 0; }
 .ana-enlace {
   border: 0;
   padding: 0;
-  text-decoration: underline;
-  text-align: left;
+  background: transparent;
+  font-weight: 600;
+  text-align: inherit;
+  text-underline-offset: 3px;
+}
+.ana-enlace:hover { text-decoration: underline; }
+.ana-estado {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  width: 150px;
+  height: 30px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  background: #eef0f2;
+  color: #4b5563;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.ana-estado[data-estado='EN_CURSO'] { background: #e5effb; color: #24558a; }
+.ana-estado:is([data-estado='FINALIZADA'], [data-estado='DISPONIBLE']) { background: #e4f2e8; color: #24633d; }
+.ana-estado:is([data-estado='PLANIFICADA'], [data-estado='STOCK_BAJO']) { background: #fff1d7; color: #80530b; }
+.ana-paginador {
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 12px;
+  margin: 8px 0 24px;
+  border: 1px solid var(--agro-color-borde);
+  border-radius: var(--agro-radio);
+  background: var(--agro-color-superficie);
+  font-size: 13px;
+}
+.ana-tabla:has(+ .ana-paginador) { border-radius: var(--agro-radio) var(--agro-radio) 0 0; }
+.ana-tabla + .ana-paginador { margin-top: 0; border-top: 0; border-radius: 0 0 var(--agro-radio) var(--agro-radio); }
+.ana-paginador > span { margin-right: 16px; }
+.ana-paginador button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border-radius: 0;
+  font-size: 22px;
+  line-height: 1;
 }
 .ana-indicadores {
   display: flex;
@@ -111,12 +189,21 @@
   min-width: 0;
   margin: 1rem 0;
 }
+.ana-grafico-desplazable { overflow-x: auto; max-width: 100%; }
+.ana-grafico .recharts-legend-item { padding: 0 12px; font-size: 13px; }
+.ana-grafico .recharts-cartesian-axis-tick { font-size: 12px; }
 .ana-tooltip {
   padding: 0.7rem;
   background: var(--agro-color-superficie);
   border: 1px solid var(--agro-color-borde);
   border-radius: var(--agro-radio);
+  max-width: 340px;
+  box-shadow: 0 4px 16px #23352b14;
+  font-size: 14px;
+  overflow-wrap: anywhere;
 }
+.ana-tooltip strong { display: block; margin-bottom: 10px; }
+.ana-tooltip p { margin: 6px 0 0; font-variant-numeric: tabular-nums; }
 .ana-stock-bajo {
   color: var(--agro-color-error);
   font-weight: 600;
@@ -158,6 +245,25 @@
   padding: 0.65rem;
   max-width: 100%;
 }
+.agro-analisis input:not([type='checkbox']),
+.agro-analisis select { height: 48px; }
+.agro-analisis input:not([type='checkbox'], [type='date'], [type='radio'], [type='range']),
+.agro-analisis select { width: 300px; }
+.ana-filtros select { width: 100%; }
+.ana-filtros :is(select, input[type='date']) {
+  border: 0;
+  border-bottom: 1px solid var(--agro-color-texto);
+  border-radius: 0;
+  background: transparent;
+}
+.agro-analisis select option { background: var(--agro-color-superficie); color: var(--agro-color-texto); }
+.agro-analisis :is(input, select, textarea):hover { border-color: var(--agro-color-primario); }
+.agro-analisis :is(input, select, textarea, button, a):focus-visible {
+  outline: 2px solid var(--agro-color-primario);
+  outline-offset: 2px;
+}
+.agro-analisis button:not(.ana-enlace, .ana-pestanias button, .ana-paginador button) { min-height: 48px; }
+.agro-analisis input[type='checkbox'] { accent-color: var(--agro-color-primario); }
 .agro-analisis textarea {
   min-height: 6rem;
   width: 100%;
@@ -204,4 +310,11 @@
   display: block;
   max-width: 100%;
   margin: 1rem 0;
+}
+@media (max-width: 600px) {
+  .ana-pestanias button { padding-inline: 20px; }
+  .agro-analisis :is(th, td) { padding: 12px; }
+  .ana-filtros > label:not(.ana-casilla),
+  .ana-filtros > div:has(> label) { flex-basis: 100%; }
+  .ana-filtros > .ana-casilla { min-height: 48px; }
 }

@@ -1,7 +1,8 @@
 import type { Clasificacion, EtiquetaModelo, ResultadoClasificacion, ResultadoVideo } from '../modelos';
+import { decimalLocal } from './etiquetas';
 export const avisoOrientativo = 'Clasificación orientativa. No sustituye una evaluación técnica agrícola.';
 export function confianzaTexto(probabilidad: number) { return Math.max(0, Math.min(1, probabilidad)).toFixed(4); }
-export function porcentaje(texto: string) { return (Number(texto) * 100).toFixed(2) + ' %'; }
+export function porcentaje(texto: string) { return decimalLocal(Number(texto) * 100) + ' %'; }
 export function interpretar(probabilidades: ArrayLike<number>, etiquetas: EtiquetaModelo[], umbral: string, versionModelo: string): ResultadoClasificacion {
   if (probabilidades.length !== etiquetas.length || !etiquetas.length) throw new Error('La salida del clasificador no coincide con sus etiquetas');
   const ordenadas = etiquetas.map(e => ({ ...e, probabilidad: probabilidades[e.indice]! }))

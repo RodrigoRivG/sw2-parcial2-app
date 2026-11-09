@@ -1,0 +1,62 @@
+.agro-campo { min-width: 0; }
+.agro-campo h2 { margin: 2rem 0 1rem; font-size: 2rem; }
+.agro-campo h3 { color: var(--agro-color-primario); }
+.campo-ceja { letter-spacing: .1em; font-size: .8rem; color: #53685a; }
+.campo-pestanas { display: flex; overflow-x: auto; margin-bottom: 1.5rem; }
+.agro-campo button { min-height: 48px; }
+.campo-pestanas button {
+  flex: 1 0 auto;
+  padding: 12px 24px;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+  background: transparent;
+  color: var(--agro-color-texto);
+  white-space: nowrap;
+}
+.campo-pestanas button:hover { background: #e8efe5; border-color: transparent; }
+.campo-pestanas button[aria-current='page'] { color: var(--agro-color-primario); font-weight: 600; border-bottom-color: var(--agro-color-primario); }
+.agro-campo button:disabled { opacity: .55; cursor: default; }
+.agro-campo :is(button, input, select, textarea):focus-visible { outline: 2px solid var(--agro-color-primario); outline-offset: 2px; }
+.campo-resumen { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1rem; padding-bottom: 1rem; border-bottom: 1px solid var(--agro-color-borde); }
+.campo-resumen p { margin: 6px 0; }
+.campo-aviso { padding: 12px 16px; border-left: 3px solid #ad812f; background: #fff4df; color: #70511d; line-height: 1.5; }
+.agro-campo form { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--agro-espaciado); max-width: 1100px; }
+.agro-campo form > :not(label), .agro-campo form > label:has(textarea) { grid-column: 1 / -1; }
+.agro-campo label { display: grid; gap: 8px; align-content: start; }
+.agro-campo :is(input, select, textarea) {
+  width: 100%; min-width: 0; min-height: 48px; padding: .65rem 1rem;
+  font: inherit; color: inherit; border: 1px solid var(--agro-color-borde);
+  border-radius: var(--agro-radio); background: var(--agro-color-superficie);
+}
+.agro-campo :is(input, select, textarea):hover { border-color: var(--agro-color-primario); }
+.agro-campo select option { background: var(--agro-color-superficie); }
+.agro-campo textarea { min-height: 120px; resize: vertical; }
+.agro-campo input[type='file'] { padding: 10px; }
+.agro-campo input[type='file']::file-selector-button { padding: 6px 10px; border: 1px solid var(--agro-color-borde); border-radius: 6px; background: white; color: var(--agro-color-primario); margin-right: 12px; font: inherit; cursor: pointer; }
+.campo-lista { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr)); gap: var(--agro-espaciado); margin: 1.5rem 0; }
+.campo-tarjeta { padding: 20px; border: 1px solid var(--agro-color-borde); border-radius: var(--agro-radio); overflow-wrap: anywhere; background: var(--agro-color-superficie); min-width: 0; }
+.campo-tarjeta h3 { margin: 0 0 14px; font-size: 18px; }
+.campo-tarjeta p { line-height: 1.5; margin: 12px 0; }
+.campo-tarjeta button { margin-top: 4px; }
+.agro-campo fieldset .campo-tarjeta { display: grid; gap: 1rem; margin: 12px 0; }
+.campo-acciones { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+.campo-ayuda { color: #53685a; font-size: .9rem; line-height: 1.5; }
+.agro-campo fieldset { min-width: 0; border: 1px solid var(--agro-color-borde); border-radius: var(--agro-radio); padding: 20px; }
+.agro-campo legend { padding: 0 8px; font-weight: 600; }
+.agro-campo img { display: block; max-width: 100%; max-height: 300px; object-fit: contain; border-radius: var(--agro-radio); }
+.agro-campo .agro-error { overflow-wrap: anywhere; }
+.campo-estado { display: inline-flex; align-items: center; justify-content: center; min-width: 150px; min-height: 30px; padding: 4px 10px; border-radius: 6px; background: #eef0f2; color: #4b5563; font-size: 12px; font-weight: 600; }
+.campo-estado:is([data-estado='CONFIRMADA'], [data-estado='SINCRONIZADA']) { background: #e4f2e8; color: #24633d; }
+.campo-estado:is([data-estado='PENDIENTE'], [data-estado='PROGRAMADA'], [data-estado='PENDIENTE_REVISION']) { background: #fff1d7; color: #80530b; }
+.campo-estado:is([data-estado='RECHAZADA'], [data-estado='CON_ERROR']) { background: #fce7e5; color: #9b302c; }
+.campo-filtro-historial { display: flex; align-items: end; flex-wrap: wrap; gap: 1rem; margin: 1.5rem 0; }
+.campo-filtro-historial label { width: 240px; max-width: 100%; }
+.campo-filtro-historial select { border: 0; border-bottom: 1px solid var(--agro-color-texto); border-radius: 0; background: transparent; }
+@media (max-width: 700px) {
+  .agro-campo form { grid-template-columns: minmax(0, 1fr); }
+  .agro-campo h2 { font-size: 1.6rem; }
+  .campo-resumen { align-items: start; }
+  .campo-tarjeta { padding: 16px; }
+  .campo-pestanas button { padding-inline: 20px; }
+}

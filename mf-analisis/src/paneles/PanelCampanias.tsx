@@ -106,7 +106,7 @@ export function PanelCampanias({
                         </td>
                         <td>{c.cultivo?.nombre ?? 'No disponible'}</td>
                         <td>{c.parcela?.nombre ?? 'No disponible'}</td>
-                        <td>{etiqueta(c.estado)}</td>
+                        <td><span className="ana-estado" data-estado={c.estado}>{etiqueta(c.estado)}</span></td>
                         <td>{unidad(c.superficieHectareas, 'ha')}</td>
                         <td>{unidad(c.indicadores?.produccion, 'kg')}</td>
                         <td>{unidad(c.indicadores?.costoTotal, 'Bs')}</td>

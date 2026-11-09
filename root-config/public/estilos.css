@@ -20,7 +20,7 @@ a[aria-current=page] { font-weight: bold; text-decoration-thickness: .15rem; }
 button { font: inherit; cursor: pointer; padding: .65rem 1rem; border-radius: var(--agro-radio); color: var(--agro-color-primario); background: var(--agro-color-superficie); border: 1px solid var(--agro-color-borde); }
 button:hover { border-color: var(--agro-color-primario); }
 #agro-contenido { max-width: 76rem; margin: auto; padding: 2rem; }
-#agro-contenido:has(#agro-admin app-root) { max-width: none; }
+#agro-contenido:has(#agro-admin app-root, #agro-analisis .agro-analisis, #agro-campo .agro-campo) { max-width: none; }
 .agro-panel { padding: 2rem; border: 1px solid var(--agro-color-borde); border-radius: var(--agro-radio); background: var(--agro-color-superficie); }
 .agro-error { color: var(--agro-color-error); white-space: pre-line; }
 @media (max-width: 600px) { #agro-barra, #agro-contenido, .agro-panel { padding: var(--agro-espaciado); } }

@@ -10,6 +10,8 @@ export const etiquetas: Record<string, string> = {
   FALLIDO: 'Fallido',
   PDF: 'PDF',
   XLSX: 'Excel',
+  MANUAL: 'Manual',
+  SAGA: 'Saga',
   FUERA_DE_RANGO: 'Fuera de rango',
   CALCULO_NO_PERMITIDO: 'Cálculo no permitido',
   RESUMEN_NO_DISPONIBLE: 'Resumen no disponible',

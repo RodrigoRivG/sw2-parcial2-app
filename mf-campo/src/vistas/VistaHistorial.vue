@@ -37,12 +37,14 @@ onUnmounted(() => { generacion++; controlador?.abort(); });
   <div><h2>Mis registros enviados</h2>
     <p v-if="!red">Necesita conexión para consultar el historial</p><p v-else-if="!conSesion">Inicie sesión para consultar el historial</p>
     <template v-else>
+      <div class="campo-filtro-historial">
       <label>Mostrar<select v-model="vista"><option value="labores">Mis labores</option><option value="incidencias">Mis incidencias</option></select></label>
       <button :disabled="cargando" @click="cargar(true)">Actualizar historial</button>
+      </div>
       <p v-if="error" class="agro-error" role="alert">{{ error }}</p><p v-if="cargando" role="status">Consultando…</p>
       <div v-if="vista === 'labores'" class="campo-lista"><article v-for="l in labores" :key="l.id" class="campo-tarjeta">
         <h3>{{ etiqueta(l.tipoLabor) }}</h3><p>{{ referencias.nombre('campanias', l.idCampania) }} · {{ referencias.nombre('parcelas', l.idParcela) }}</p>
-        <p>{{ fechaLocal(l.fechaEjecucion ?? l.fechaProgramada ?? '') }}</p><p><strong>{{ etiqueta(l.estado) }}</strong>{{ l.motivo ? ` · ${etiqueta(l.motivo.codigo)}` : '' }}</p><p v-if="l.motivo">{{ l.motivo.mensaje }}</p>
+        <p>{{ fechaLocal(l.fechaEjecucion ?? l.fechaProgramada ?? '') }}</p><p><span class="campo-estado" :data-estado="l.estado">{{ etiqueta(l.estado) }}</span>{{ l.motivo ? ` · ${etiqueta(l.motivo.codigo)}` : '' }}</p><p v-if="l.motivo">{{ l.motivo.mensaje }}</p>
       </article></div>
       <div v-else class="campo-lista"><article v-for="i in incidencias" :key="i.id" class="campo-tarjeta"><h3>{{ etiqueta(i.tipo) }}</h3><p>{{ referencias.nombre('parcelas', i.idParcela) }} · {{ fechaLocal(i.fechaObservacion) }}</p><p>{{ i.descripcion }}</p></article></div>
       <p v-if="!cargando && !error && !(vista === 'labores' ? labores.length : incidencias.length)">No hay registros.</p>

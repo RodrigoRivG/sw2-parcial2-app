@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import { http, sesion } from '@agro/compartido';
 import {
+  montoValido,
   analizar,
   descargarArchivo,
   estimar,
@@ -68,6 +69,18 @@ it('respeta rutas y cuerpos REST, conserva decimales y omite vacíos', async () 
   expect(() => estimar('id', { ...costos, OTRO: '1.001' })).toThrow('dos decimales');
   expect(() => preguntar('  a ')).toThrow('3 y 1.000');
   expect(() => pedirReporte('a'.repeat(1001))).toThrow('3 y 1.000');
+});
+it('acepta coma o punto decimal y envía texto con punto sin modificar los costos originales', async () => {
+  const costos = { INSUMO: '1000,00', MANO_DE_OBRA: ' 1200,00 ', MAQUINARIA: '300.00', OTRO: '0' };
+  await estimar('campania', costos);
+  const opciones = vi.mocked(http).mock.calls[0][1];
+  expect(JSON.parse(opciones?.body as string)).toEqual({
+    idCampania: 'campania',
+    costosPorHectarea: { INSUMO: '1000.00', MANO_DE_OBRA: '1200.00', MAQUINARIA: '300.00', OTRO: '0' },
+  });
+  expect(costos.INSUMO).toBe('1000,00');
+  for (const valor of ['', '-1', '1,234', '1.000,00', '1e3']) expect(montoValido(valor)).toBe(false);
+  expect(() => estimar('campania', { ...costos, OTRO: '1,234' })).toThrow('dos decimales');
 });
 it('envía voz autenticada con un campo por formato y valida el tamaño', async () => {
   const enviar = vi
