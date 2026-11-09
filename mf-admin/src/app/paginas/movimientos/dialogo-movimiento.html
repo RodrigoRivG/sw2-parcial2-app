@@ -2,7 +2,7 @@
 <mat-dialog-content>
   <agro-mensaje-error [error]="error()" />
   <form id="formulario-movimiento" [formGroup]="formulario" (ngSubmit)="guardar()">
-    <mat-form-field
+    <mat-form-field appearance="outline"
       ><mat-label>Insumo</mat-label
       ><mat-select formControlName="idInsumo">
         @for (i of catalogo; track i.id) {
@@ -15,10 +15,10 @@
     }
     @if (elegido(); as insumo) {
       <p>
-        Stock actual: <strong>{{ insumo.stock }} {{ etiquetas[insumo.unidad] }}</strong>
+        Stock actual: <strong>{{ insumo.stock | number: '1.2-2' }} {{ etiquetas[insumo.unidad] }}</strong>
       </p>
     }
-    <mat-form-field
+    <mat-form-field appearance="outline"
       ><mat-label>Tipo</mat-label
       ><mat-select formControlName="tipo"
         ><mat-option value="ENTRADA">Entrada</mat-option

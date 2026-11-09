@@ -13,7 +13,7 @@ import { material } from '../../componentes/material';
     <mat-dialog-content
       ><agro-mensaje-error [error]="error()" />
       <form id="formulario-costo" [formGroup]="formulario" (ngSubmit)="guardar()">
-        <mat-form-field
+        <mat-form-field appearance="outline"
           ><mat-label>Categoría</mat-label
           ><mat-select formControlName="categoria">
             @for (c of categorias; track c) {
@@ -25,7 +25,7 @@ import { material } from '../../componentes/material';
           ><input matInput inputmode="decimal" formControlName="monto" /><mat-error
             >Use un decimal con hasta 2 cifras decimales</mat-error
           ></mat-form-field
-        ><mat-form-field
+        ><mat-form-field appearance="fill"
           ><mat-label>Fecha</mat-label
           ><input matInput type="date" formControlName="fecha" [max]="hoy" /><mat-error
             >Fecha obligatoria</mat-error

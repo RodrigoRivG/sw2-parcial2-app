@@ -35,20 +35,20 @@ import { IndicadoresCampania } from './indicadores-campania';
       <mat-card
         ><mat-card-content
           ><h1>{{ c.nombre }}</h1>
-          <p>{{ etiquetas[c.estado] }} · {{ c.superficieHectareas }} ha</p>
+          <p>{{ etiquetas[c.estado] }} · {{ c.superficieHectareas | number: '1.2-2' }} ha</p>
           <p>
             Parcela: {{ nombre(parcelas(), c.idParcela) }} · Cultivo:
             {{ nombre(cultivos(), c.idCultivo) }}
           </p>
-          <p>Fechas planificadas: {{ c.fechaInicio }} al {{ c.fechaFin }}</p>
+          <p>Fechas planificadas: {{ c.fechaInicio | date: 'dd/MM/yyyy' }} al {{ c.fechaFin | date: 'dd/MM/yyyy' }}</p>
           <p>
             Inicio de ejecución: {{ (c.fechaInicioEjecucion | date: 'medium') ?? 'Sin iniciar' }} ·
             Finalización: {{ (c.fechaFinalizacion | date: 'medium') ?? 'Sin finalizar' }}
           </p>
           <p>
-            Costo total: {{ c.resumen?.costoTotal }} Bs · Cantidad de costos:
+            Costo total: {{ c.resumen?.costoTotal | number: '1.2-2' }} Bs · Cantidad de costos:
             {{ c.resumen?.cantidadCostos }} · Producción:
-            {{ c.resumen?.produccion ?? 'Sin registrar' }}
+            {{ (c.resumen?.produccion | number: '1.2-2') ?? 'Sin registrar' }}
             @if (c.resumen?.produccion != null) {
               kg
             }

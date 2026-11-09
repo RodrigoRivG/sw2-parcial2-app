@@ -16,7 +16,7 @@ import { PaginaConsulta } from '../../componentes/pagina';
     }
     @if (produccion(); as p) {
       <p>
-        Producción: <strong>{{ p.cantidad }} kg</strong> · Cosecha: {{ p.fechaCosecha }}
+        Producción: <strong>{{ p.cantidad | number: '1.2-2' }} kg</strong> · Cosecha: {{ p.fechaCosecha | date: 'dd/MM/yyyy' }}
       </p>
       <p>{{ p.observaciones }}</p>
     } @else {
@@ -29,7 +29,7 @@ import { PaginaConsulta } from '../../componentes/pagina';
           ><input matInput inputmode="decimal" formControlName="cantidad" /><mat-error
             >Use un decimal con hasta 2 cifras decimales</mat-error
           ></mat-form-field
-        ><mat-form-field
+        ><mat-form-field appearance="fill"
           ><mat-label>Fecha de cosecha</mat-label
           ><input matInput type="date" formControlName="fechaCosecha" [max]="hoy" /><mat-error
             >Fecha obligatoria</mat-error

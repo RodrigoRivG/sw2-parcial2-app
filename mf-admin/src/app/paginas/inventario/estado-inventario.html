@@ -1,6 +1,6 @@
 <h1>Inventario</h1>
 <form class="agro-herramientas" [formGroup]="filtros">
-  <mat-form-field
+  <mat-form-field appearance="fill"
     ><mat-label>Categoría</mat-label
     ><mat-select formControlName="categoria" (selectionChange)="filtrar()"
       ><mat-option value="">Todas</mat-option>
@@ -15,14 +15,10 @@
   <p role="status">Cargando inventario…</p>
 }
 @if (datos(); as d) {
-  <mat-card
-    ><mat-card-content
-      ><p>
-        Total de insumos: <strong>{{ d.resumen.totalInsumos }}</strong> · Con stock bajo:
-        <strong>{{ d.resumen.totalStockBajo }}</strong>
-      </p></mat-card-content
-    ></mat-card
-  >
+  <p>
+    Total de insumos: <strong>{{ d.resumen.totalInsumos }}</strong> · Con stock bajo:
+    <strong>{{ d.resumen.totalStockBajo }}</strong>
+  </p>
   <div class="agro-tabla">
     <table mat-table [dataSource]="d.items">
       <ng-container matColumnDef="nombre"
@@ -39,17 +35,15 @@
       >
       <ng-container matColumnDef="stock"
         ><th mat-header-cell *matHeaderCellDef>Stock</th>
-        <td mat-cell *matCellDef="let i">{{ i.stock }}</td></ng-container
+        <td mat-cell *matCellDef="let i">{{ i.stock | number: '1.2-2' }}</td></ng-container
       >
       <ng-container matColumnDef="nivelMinimo"
         ><th mat-header-cell *matHeaderCellDef>Nivel mínimo</th>
-        <td mat-cell *matCellDef="let i">{{ i.nivelMinimo }}</td></ng-container
+        <td mat-cell *matCellDef="let i">{{ i.nivelMinimo | number: '1.2-2' }}</td></ng-container
       >
       <ng-container matColumnDef="estado"
         ><th mat-header-cell *matHeaderCellDef>Estado</th>
-        <td mat-cell *matCellDef="let i">
-          <strong>{{ i.stockBajo ? 'Stock bajo' : 'Disponible' }}</strong>
-        </td></ng-container
+        <td mat-cell *matCellDef="let i"><span class="agro-estado" [attr.data-estado]="i.stockBajo ? 'STOCK_BAJO' : 'DISPONIBLE'"><strong>{{ i.stockBajo ? 'Stock bajo' : 'Disponible' }}</strong></span></td></ng-container
       >
       <ng-container matColumnDef="alerta"
         ><th mat-header-cell *matHeaderCellDef>Última alerta</th>

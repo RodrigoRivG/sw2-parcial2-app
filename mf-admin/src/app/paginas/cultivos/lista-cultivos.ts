@@ -9,8 +9,8 @@ import { PaginaConsulta } from '../../componentes/pagina';
 @Component({
   imports: material,
   template: `<h1>Cultivos</h1>
-    <div class="agro-herramientas">
-      <mat-form-field
+    <div class="agro-herramientas agro-busqueda">
+      <mat-form-field subscriptSizing="dynamic"
         ><mat-label>Buscar por nombre</mat-label
         ><input
           matInput

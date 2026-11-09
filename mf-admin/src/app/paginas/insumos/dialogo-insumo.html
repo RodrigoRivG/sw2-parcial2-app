@@ -8,7 +8,7 @@
         >Nombre obligatorio, máximo 100 caracteres</mat-error
       ></mat-form-field
     >
-    <mat-form-field
+    <mat-form-field appearance="outline"
       ><mat-label>Categoría</mat-label
       ><mat-select formControlName="categoria">
         @for (c of categorias; track c) {
@@ -16,7 +16,7 @@
         }
       </mat-select></mat-form-field
     >
-    <mat-form-field
+    <mat-form-field appearance="outline"
       ><mat-label>Unidad</mat-label
       ><mat-select formControlName="unidad">
         @for (u of unidades; track u) {

@@ -1,6 +1,6 @@
 <h1>Labores</h1>
 <form class="agro-herramientas" [formGroup]="filtros" (ngSubmit)="filtrar()">
-  <mat-form-field
+  <mat-form-field appearance="fill"
     ><mat-label>Estado</mat-label
     ><mat-select formControlName="estado" (selectionChange)="filtrar()"
       ><mat-option value="">Todos</mat-option>
@@ -9,7 +9,7 @@
       }
     </mat-select></mat-form-field
   >
-  <mat-form-field
+  <mat-form-field appearance="fill"
     ><mat-label>Campaña</mat-label
     ><mat-select formControlName="idCampania" (selectionChange)="filtrar()"
       ><mat-option value="">Todas</mat-option>
@@ -18,18 +18,18 @@
       }
     </mat-select></mat-form-field
   >
-  <mat-form-field
+  <mat-form-field appearance="fill"
     ><mat-label>Desde</mat-label
     ><input
       matInput
       type="date"
       formControlName="fechaDesde"
       (change)="filtrar()" /></mat-form-field
-  ><mat-form-field
+  ><mat-form-field appearance="fill"
     ><mat-label>Hasta</mat-label
     ><input matInput type="date" formControlName="fechaHasta" (change)="filtrar()"
   /></mat-form-field>
-  <mat-form-field
+  <mat-form-field appearance="fill"
     ><mat-label>Orden</mat-label
     ><mat-select formControlName="orden" (selectionChange)="filtrar()"
       ><mat-option value="DESC">Más recientes primero</mat-option
@@ -52,7 +52,7 @@
     <ng-container matColumnDef="fecha"
       ><th mat-header-cell *matHeaderCellDef>Fecha de referencia</th>
       <td mat-cell *matCellDef="let l">
-        {{ l.fechaProgramada ?? (l.fechaReferencia | date: 'medium') }}
+        {{ (l.fechaProgramada | date: 'dd/MM/yyyy') ?? (l.fechaReferencia | date: 'medium') }}
       </td></ng-container
     >
     <ng-container matColumnDef="tipo"
@@ -75,7 +75,7 @@
     >
     <ng-container matColumnDef="estado"
       ><th mat-header-cell *matHeaderCellDef>Estado</th>
-      <td mat-cell *matCellDef="let l">{{ etiqueta(l.estado) }}</td></ng-container
+      <td mat-cell *matCellDef="let l"><span class="agro-estado" [attr.data-estado]="l.estado">{{ etiqueta(l.estado) }}</span></td></ng-container
     >
     <tr mat-header-row *matHeaderRowDef="columnas"></tr>
     <tr mat-row *matRowDef="let l; columns: columnas" (click)="abrir(l.id)"></tr>

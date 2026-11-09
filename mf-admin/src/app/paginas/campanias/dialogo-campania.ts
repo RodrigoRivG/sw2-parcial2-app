@@ -17,26 +17,26 @@ import { material } from '../../componentes/material';
           ><input matInput formControlName="nombre" maxlength="150" /><mat-error
             >Nombre obligatorio, máximo 150 caracteres</mat-error
           ></mat-form-field
-        ><mat-form-field
+        ><mat-form-field appearance="outline"
           ><mat-label>Parcela</mat-label
           ><mat-select formControlName="idParcela">
             @for (p of datos.parcelas; track p.id) {
               <mat-option [value]="p.id">{{ p.nombre }}</mat-option>
             }</mat-select
           ><mat-error>Seleccione una parcela</mat-error></mat-form-field
-        ><mat-form-field
+        ><mat-form-field appearance="outline"
           ><mat-label>Cultivo</mat-label
           ><mat-select formControlName="idCultivo">
             @for (c of datos.cultivos; track c.id) {
               <mat-option [value]="c.id">{{ c.nombre }} · {{ c.variedad }}</mat-option>
             }</mat-select
           ><mat-error>Seleccione un cultivo</mat-error></mat-form-field
-        ><mat-form-field
+        ><mat-form-field appearance="fill"
           ><mat-label>Fecha de inicio</mat-label
           ><input matInput type="date" formControlName="fechaInicio" /><mat-error
             >Fecha obligatoria</mat-error
           ></mat-form-field
-        ><mat-form-field
+        ><mat-form-field appearance="fill"
           ><mat-label>Fecha de fin</mat-label
           ><input matInput type="date" formControlName="fechaFin" /><mat-error
             >Fecha obligatoria</mat-error

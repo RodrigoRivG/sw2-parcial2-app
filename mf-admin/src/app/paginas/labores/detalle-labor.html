@@ -16,7 +16,7 @@
         {{ nombre(parcelas(), l.idParcela) }}
       </p>
       <p>
-        Fecha programada: {{ l.fechaProgramada ?? 'Sin programar' }} · Ejecución:
+        Fecha programada: {{ (l.fechaProgramada | date: 'dd/MM/yyyy') ?? 'Sin programar' }} · Ejecución:
         {{ (l.fechaEjecucion | date: 'medium') ?? 'Sin ejecutar' }}
       </p>
       <p>
@@ -44,7 +44,7 @@
       <h2>Insumos consumidos</h2>
       @for (i of l.insumos; track i.idInsumo) {
         <p>
-          {{ insumo(i.idInsumo)?.nombre ?? i.idInsumo.slice(0, 8) }}: {{ i.cantidad }}
+          {{ insumo(i.idInsumo)?.nombre ?? i.idInsumo.slice(0, 8) }}: {{ i.cantidad | number: '1.2-2' }}
           {{ unidades[insumo(i.idInsumo)?.unidad ?? ''] }}
         </p>
       } @empty {
@@ -69,7 +69,7 @@
         <h2>Resolver</h2>
         <form [formGroup]="formulario" (ngSubmit)="resolver()">
           <div class="agro-herramientas">
-            <mat-form-field
+            <mat-form-field appearance="outline"
               ><mat-label>Decisión</mat-label
               ><mat-select formControlName="decision">
                 @for (d of decisiones(); track d) {

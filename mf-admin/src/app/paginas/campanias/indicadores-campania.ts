@@ -13,19 +13,19 @@ import { PaginaConsulta } from '../../componentes/pagina';
     }
     @if (datos(); as d) {
       <h3>Indicadores {{ d.definitivo ? 'definitivos' : 'provisionales' }}</h3>
-      <p>Superficie: {{ d.superficieHectareas }} ha</p>
+      <p>Superficie: {{ d.superficieHectareas | number: '1.2-2' }} ha</p>
       <p>
-        Producción: {{ d.produccion ?? 'Sin registrar' }}
+        Producción: {{ (d.produccion | number: '1.2-2') ?? 'Sin registrar' }}
         @if (d.produccion !== null) {
           kg
         }
       </p>
-      <p>Costo total: {{ d.costoTotal }} Bs</p>
+      <p>Costo total: {{ d.costoTotal | number: '1.2-2' }} Bs</p>
       @if (d.rendimientoPorHectarea !== null) {
-        <p>Rendimiento: {{ d.rendimientoPorHectarea }} kg/ha</p>
+        <p>Rendimiento: {{ d.rendimientoPorHectarea | number: '1.2-2' }} kg/ha</p>
       }
       @if (d.costoPorHectarea !== null) {
-        <p>Costo por hectárea: {{ d.costoPorHectarea }} Bs/ha</p>
+        <p>Costo por hectárea: {{ d.costoPorHectarea | number: '1.2-2' }} Bs/ha</p>
       }
       @for (m of d.motivosNoDisponible; track m) {
         <p>{{ etiquetas[m] }}</p>

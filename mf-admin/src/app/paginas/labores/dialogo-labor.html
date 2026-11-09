@@ -8,7 +8,7 @@
     <p role="status">Reintente el envío para consultar el resultado de esta misma operación.</p>
   }
   <form id="formulario-labor" [formGroup]="formulario" (ngSubmit)="guardar()">
-    <mat-form-field
+    <mat-form-field appearance="outline"
       ><mat-label>Campaña</mat-label
       ><mat-select formControlName="idCampania">
         @for (c of campanias(); track c.id) {
@@ -17,7 +17,7 @@
       ><mat-error>Seleccione una campaña</mat-error></mat-form-field
     >
     <p>Parcela: {{ nombreParcela() }}</p>
-    <mat-form-field
+    <mat-form-field appearance="outline"
       ><mat-label>Tipo de labor</mat-label
       ><mat-select formControlName="tipoLabor">
         @for (t of tipos; track t) {
@@ -25,7 +25,7 @@
         }
       </mat-select></mat-form-field
     >
-    <mat-form-field
+    <mat-form-field appearance="fill"
       ><mat-label>Fecha programada</mat-label
       ><input matInput type="date" formControlName="fechaProgramada" [min]="hoy" /><mat-error
         >Elija una fecha desde hoy (UTC)</mat-error

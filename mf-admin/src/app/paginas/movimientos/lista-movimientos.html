@@ -6,7 +6,7 @@
   </p>
 }
 <form class="agro-herramientas" [formGroup]="filtros" (ngSubmit)="filtrar()">
-  <mat-form-field
+  <mat-form-field appearance="fill"
     ><mat-label>Insumo</mat-label
     ><mat-select formControlName="idInsumo" (selectionChange)="filtrar()"
       ><mat-option value="">Todos</mat-option>
@@ -15,17 +15,17 @@
       }
     </mat-select></mat-form-field
   >
-  <mat-form-field
+  <mat-form-field appearance="fill"
     ><mat-label>Tipo</mat-label
     ><mat-select formControlName="tipo" (selectionChange)="filtrar()"
       ><mat-option value="">Todos</mat-option><mat-option value="ENTRADA">Entrada</mat-option
       ><mat-option value="SALIDA">Salida</mat-option></mat-select
     ></mat-form-field
   >
-  <mat-form-field
+  <mat-form-field appearance="fill"
     ><mat-label>Desde</mat-label
     ><input matInput type="date" formControlName="desde" (change)="filtrar()" /></mat-form-field
-  ><mat-form-field
+  ><mat-form-field appearance="fill"
     ><mat-label>Hasta</mat-label
     ><input matInput type="date" formControlName="hasta" (change)="filtrar()" /></mat-form-field
   ><button mat-button type="submit">Buscar</button
@@ -59,16 +59,16 @@
     <ng-container matColumnDef="cantidad"
       ><th mat-header-cell *matHeaderCellDef>Cantidad</th>
       <td mat-cell *matCellDef="let m">
-        {{ m.cantidad }} {{ etiquetas[insumo(m.idInsumo)?.unidad ?? ''] }}
+        {{ m.cantidad | number: '1.2-2' }} {{ etiquetas[insumo(m.idInsumo)?.unidad ?? ''] }}
       </td></ng-container
     >
     <ng-container matColumnDef="stockResultante"
       ><th mat-header-cell *matHeaderCellDef>Stock resultante</th>
-      <td mat-cell *matCellDef="let m">{{ m.stockResultante }}</td></ng-container
+      <td mat-cell *matCellDef="let m">{{ m.stockResultante | number: '1.2-2' }}</td></ng-container
     >
     <ng-container matColumnDef="costoUnitario"
       ><th mat-header-cell *matHeaderCellDef>Costo unitario</th>
-      <td mat-cell *matCellDef="let m">{{ m.costoUnitario }} Bs</td></ng-container
+      <td mat-cell *matCellDef="let m">{{ m.costoUnitario | number: '1.2-2' }} Bs</td></ng-container
     >
     <ng-container matColumnDef="motivo"
       ><th mat-header-cell *matHeaderCellDef>Motivo</th>

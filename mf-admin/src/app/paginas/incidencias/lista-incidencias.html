@@ -1,6 +1,6 @@
 <h1>Incidencias</h1>
 <form class="agro-herramientas" [formGroup]="filtros" (ngSubmit)="filtrar()">
-  <mat-form-field
+  <mat-form-field appearance="fill"
     ><mat-label>Parcela</mat-label
     ><mat-select formControlName="idParcela" (selectionChange)="filtrar()"
       ><mat-option value="">Todas</mat-option>
@@ -9,7 +9,7 @@
       }
     </mat-select></mat-form-field
   >
-  <mat-form-field
+  <mat-form-field appearance="fill"
     ><mat-label>Campaña</mat-label
     ><mat-select formControlName="idCampania" (selectionChange)="filtrar()"
       ><mat-option value="">Todas</mat-option>
@@ -18,7 +18,7 @@
       }
     </mat-select></mat-form-field
   >
-  <mat-form-field
+  <mat-form-field appearance="fill"
     ><mat-label>Tipo</mat-label
     ><mat-select formControlName="tipo" (selectionChange)="filtrar()"
       ><mat-option value="">Todos</mat-option>
@@ -27,14 +27,14 @@
       }
     </mat-select></mat-form-field
   >
-  <mat-form-field
+  <mat-form-field appearance="fill"
     ><mat-label>Desde</mat-label
     ><input
       matInput
       type="date"
       formControlName="fechaDesde"
       (change)="filtrar()" /></mat-form-field
-  ><mat-form-field
+  ><mat-form-field appearance="fill"
     ><mat-label>Hasta</mat-label
     ><input
       matInput

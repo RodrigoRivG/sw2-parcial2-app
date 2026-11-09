@@ -13,7 +13,7 @@ import { DialogoCosto } from './dialogo-costo';
   selector: 'agro-costos-campania',
   imports: material,
   template: `<form class="agro-herramientas" [formGroup]="filtros">
-      <mat-form-field
+      <mat-form-field appearance="fill"
         ><mat-label>Categoría</mat-label
         ><mat-select formControlName="categoria" (selectionChange)="filtrar()"
           ><mat-option value="">Todas</mat-option>
@@ -21,7 +21,7 @@ import { DialogoCosto } from './dialogo-costo';
             <mat-option [value]="c">{{ etiquetas[c] }}</mat-option>
           }
         </mat-select></mat-form-field
-      ><mat-form-field
+      ><mat-form-field appearance="fill"
         ><mat-label>Origen</mat-label
         ><mat-select formControlName="origen" (selectionChange)="filtrar()"
           ><mat-option value="">Todos</mat-option><mat-option value="MANUAL">Manual</mat-option
@@ -38,7 +38,7 @@ import { DialogoCosto } from './dialogo-costo';
     }
     @if (datos(); as d) {
       <p>
-        <strong>Costo total: {{ d.costoTotal }} Bs</strong>
+        <strong>Costo total: {{ d.costoTotal | number: '1.2-2' }} Bs</strong>
       </p>
       <div class="agro-herramientas">
         @for (c of categorias; track c) {
@@ -49,7 +49,7 @@ import { DialogoCosto } from './dialogo-costo';
         <table mat-table [dataSource]="d.items">
           <ng-container matColumnDef="fecha"
             ><th mat-header-cell *matHeaderCellDef>Fecha</th>
-            <td mat-cell *matCellDef="let c">{{ c.fecha }}</td></ng-container
+            <td mat-cell *matCellDef="let c">{{ c.fecha | date: 'dd/MM/yyyy' }}</td></ng-container
           ><ng-container matColumnDef="categoria"
             ><th mat-header-cell *matHeaderCellDef>Categoría</th>
             <td mat-cell *matCellDef="let c">{{ etiquetas[c.categoria] }}</td></ng-container
@@ -58,7 +58,7 @@ import { DialogoCosto } from './dialogo-costo';
             <td mat-cell *matCellDef="let c">{{ c.descripcion }}</td></ng-container
           ><ng-container matColumnDef="monto"
             ><th mat-header-cell *matHeaderCellDef>Monto</th>
-            <td mat-cell *matCellDef="let c">{{ c.monto }} Bs</td></ng-container
+            <td mat-cell *matCellDef="let c">{{ c.monto | number: '1.2-2' }} Bs</td></ng-container
           ><ng-container matColumnDef="origen"
             ><th mat-header-cell *matHeaderCellDef>Origen</th>
             <td mat-cell *matCellDef="let c">

@@ -8,10 +8,11 @@ export function crearLayout() {
   marca.textContent = 'Agro';
   const identidad = document.createElement('span');
   const usuario = sesion.usuario();
-  identidad.textContent = sesion.conectado() ? `${usuario.nombre} · ${usuario.roles.join(', ')}` : 'Sin conexión';
+  identidad.textContent = sesion.conectado() ? usuario.nombre : 'Sin conexión';
   const navegacion = document.createElement('nav');
   navegacion.setAttribute('aria-label', 'Microfrontends');
-  for (const aplicacion of enlacesVisibles(usuario.roles)) {
+  const enlaces = enlacesVisibles(usuario.roles);
+  for (const aplicacion of enlaces.length > 1 ? enlaces : []) {
     const enlace = document.createElement('a');
     enlace.href = aplicacion.prefijo;
     enlace.textContent = aplicacion.titulo;
@@ -27,7 +28,7 @@ export function crearLayout() {
     void (sesion.conectado() ? sesion.cerrarSesion() : sesion.iniciarSesion())
       .catch(() => mostrarPagina('No se pudo conectar con el servidor', true));
   };
-  barra.replaceChildren(marca, identidad, navegacion, boton);
+  barra.replaceChildren(marca, identidad, ...(enlaces.length > 1 ? [navegacion] : []), boton);
   window.addEventListener('single-spa:routing-event', actualizarPagina);
   actualizarPagina();
 }

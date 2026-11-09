@@ -4,8 +4,8 @@
     Su cuenta no tiene permiso para administrar usuarios en Keycloak
   </p>
 } @else {
-  <div class="agro-herramientas">
-    <mat-form-field
+  <div class="agro-herramientas agro-busqueda">
+    <mat-form-field subscriptSizing="dynamic"
       ><mat-label>Buscar usuarios</mat-label
       ><input
         matInput
@@ -55,11 +55,12 @@
       >
       <ng-container matColumnDef="estado"
         ><th mat-header-cell *matHeaderCellDef>Estado</th>
-        <td mat-cell *matCellDef="let u">{{ u.enabled ? 'Activo' : 'Inactivo' }}</td></ng-container
+        <td mat-cell *matCellDef="let u"><span class="agro-estado" [attr.data-estado]="u.enabled ? 'ACTIVO' : 'INACTIVO'">{{ u.enabled ? 'Activo' : 'Inactivo' }}</span></td></ng-container
       >
       <ng-container matColumnDef="acciones"
         ><th mat-header-cell *matHeaderCellDef>Acciones</th>
         <td mat-cell *matCellDef="let u">
+          <div class="agro-acciones-usuarios">
           <button
             mat-button
             [disabled]="ocupada() || representaciones().length !== 3"
@@ -72,7 +73,8 @@
               {{ u.enabled ? 'Desactivar' : 'Activar' }}
             </button>
           }
-          <button mat-button (click)="contrasena(u)">Restablecer contraseña</button>
+          <button mat-button class="agro-accion-contrasena" (click)="contrasena(u)">Restablecer contraseña</button>
+          </div>
         </td></ng-container
       >
       <tr mat-header-row *matHeaderRowDef="columnas"></tr>

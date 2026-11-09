@@ -9,8 +9,8 @@ import { PaginaConsulta } from '../../componentes/pagina';
 @Component({
   imports: material,
   template: `<h1>Parcelas</h1>
-    <div class="agro-herramientas">
-      <mat-form-field
+    <div class="agro-herramientas agro-busqueda">
+      <mat-form-field subscriptSizing="dynamic"
         ><mat-label>Buscar por nombre</mat-label
         ><input
           matInput
@@ -29,7 +29,7 @@ import { PaginaConsulta } from '../../componentes/pagina';
           <td mat-cell *matCellDef="let fila">{{ fila.nombre }}</td></ng-container
         ><ng-container matColumnDef="superficieHectareas"
           ><th mat-header-cell *matHeaderCellDef>Superficie</th>
-          <td mat-cell *matCellDef="let fila">{{ fila.superficieHectareas }} ha</td></ng-container
+          <td mat-cell *matCellDef="let fila">{{ fila.superficieHectareas | number: '1.2-2' }} ha</td></ng-container
         ><ng-container matColumnDef="ubicacion"
           ><th mat-header-cell *matHeaderCellDef>Ubicación</th>
           <td mat-cell *matCellDef="let fila">{{ fila.ubicacion }}</td></ng-container

@@ -1,4 +1,142 @@
 /* Material toma sus colores y tipografía de las variables compartidas. */
+/* Sin estas opacidades la capa de interacción puede cubrir todo el campo. */
+app-root,
+.cdk-overlay-container {
+  --mat-form-field-hover-state-layer-opacity: 0;
+  --mat-select-panel-background-color: var(--agro-color-superficie);
+  --mat-form-field-focus-state-layer-opacity: 0;
+  --mat-form-field-outlined-container-shape: var(--agro-radio);
+  --mat-form-field-outlined-outline-width: 1px;
+  --mat-form-field-outlined-focus-outline-width: 2px;
+  --mat-form-field-outlined-outline-color: var(--agro-color-borde);
+  --mat-form-field-outlined-hover-outline-color: var(--agro-color-primario);
+  --mat-form-field-outlined-focus-outline-color: var(--agro-color-primario);
+  --mat-form-field-outlined-label-text-color: var(--agro-color-texto);
+  --mat-form-field-outlined-hover-label-text-color: var(--agro-color-texto);
+  --mat-form-field-outlined-focus-label-text-color: var(--agro-color-primario);
+  --mat-form-field-outlined-input-text-color: var(--agro-color-texto);
+  --mat-form-field-outlined-caret-color: var(--agro-color-primario);
+  --mat-form-field-outlined-label-text-size: 16px;
+  --mat-sys-error: var(--agro-color-error);
+  --mat-sys-hover-state-layer-opacity: 0;
+  --mat-sys-focus-state-layer-opacity: 0;
+  --mat-sys-pressed-state-layer-opacity: 0;
+  --mat-option-hover-state-layer-color: transparent;
+  --mat-option-focus-state-layer-color: transparent;
+  --mat-button-filled-container-color: var(--agro-color-superficie);
+  --mat-button-filled-label-text-color: var(--agro-color-primario);
+  --mat-button-filled-disabled-container-color: var(--agro-color-superficie);
+  --mat-button-filled-disabled-label-text-color: #727a74;
+  --mat-button-text-disabled-label-text-color: #727a74;
+  --mat-button-filled-hover-state-layer-opacity: 0;
+  --mat-button-filled-focus-state-layer-opacity: 0;
+  --mat-button-filled-pressed-state-layer-opacity: 0;
+  --mat-button-text-hover-state-layer-opacity: 0;
+  --mat-button-text-focus-state-layer-opacity: 0;
+  --mat-button-text-pressed-state-layer-opacity: 0;
+  --mat-button-filled-ripple-color: transparent;
+  --mat-button-text-ripple-color: transparent;
+}
+
+app-root .mat-mdc-form-field:not(:has(mat-select, input[type='date'])),
+.cdk-overlay-container .mat-mdc-form-field:not(:has(mat-select, input[type='date'])) {
+  --mat-form-field-container-text-size: 16px;
+  --mat-form-field-container-text-line-height: 24px;
+  --mat-form-field-container-height: 56px;
+  --mat-form-field-container-vertical-padding: 16px;
+  width: 300px;
+  max-width: 100%;
+}
+
+.cdk-overlay-container form .mat-mdc-form-field:not(:has(mat-select, input[type='date'])) {
+  width: 100%;
+}
+
+.cdk-overlay-container form .mat-mdc-form-field.mat-form-field-appearance-outline {
+  width: 100%;
+}
+
+app-root .agro-busqueda .mat-mdc-form-field:not(:has(mat-select, input[type='date'])) {
+  --mat-form-field-container-height: 48px;
+  --mat-form-field-container-vertical-padding: 12px;
+}
+
+app-root .agro-busqueda .mat-mdc-text-field-wrapper {
+  height: 48px;
+}
+
+app-root .agro-busqueda > button.mat-mdc-button-base {
+  height: 48px;
+}
+
+app-root .agro-busqueda {
+  margin-bottom: var(--agro-espaciado);
+}
+
+/* Material oculta el selector nativo; restauramos su botón de calendario. */
+app-root input[type='date']::-webkit-calendar-picker-indicator,
+.cdk-overlay-container input[type='date']::-webkit-calendar-picker-indicator {
+  display: block;
+  opacity: 1;
+  cursor: pointer;
+  width: 20px;
+  height: 20px;
+  padding: 4px;
+}
+
+app-root .mat-mdc-text-field-wrapper.mdc-text-field--outlined,
+.cdk-overlay-container .mat-mdc-text-field-wrapper.mdc-text-field--outlined {
+  background: var(--agro-color-superficie);
+  border-radius: var(--agro-radio);
+}
+
+/* Las pestañas principales conservan su resaltado de interacción. */
+app-root nav[mat-tab-nav-bar] {
+  --mat-tab-divider-height: 0;
+  --mat-sys-hover-state-layer-opacity: 0.04;
+  --mat-sys-focus-state-layer-opacity: 0.12;
+  --mat-sys-pressed-state-layer-opacity: 0.12;
+}
+
+app-root mat-tab-nav-panel,
+.cdk-overlay-container {
+  --mat-ripple-color: transparent;
+}
+
+.cdk-overlay-container .mat-mdc-option.mat-mdc-option-active {
+  outline: 2px solid var(--agro-color-primario);
+  outline-offset: -2px;
+}
+
+app-root :is(button, a).mat-mdc-button-base,
+.cdk-overlay-container :is(button, a).mat-mdc-button-base {
+  background: var(--agro-color-superficie);
+  border: 1px solid var(--agro-color-borde);
+  border-radius: var(--agro-radio);
+  padding: .65rem 1rem;
+  height: auto;
+  font: inherit;
+  box-shadow: none;
+  text-decoration: none;
+}
+
+app-root :is(button, a).mat-mdc-button-base:not(:disabled):not([aria-disabled='true']):hover,
+.cdk-overlay-container :is(button, a).mat-mdc-button-base:not(:disabled):not([aria-disabled='true']):hover {
+  border-color: var(--agro-color-primario);
+}
+
+app-root :is(button, a).mat-mdc-button-base:is(:disabled, [aria-disabled='true']),
+.cdk-overlay-container :is(button, a).mat-mdc-button-base:is(:disabled, [aria-disabled='true']) {
+  border-color: var(--agro-color-borde);
+  cursor: default;
+}
+
+app-root :is(button, a).mat-mdc-button-base:focus-visible,
+.cdk-overlay-container :is(button, a).mat-mdc-button-base:focus-visible {
+  outline: 2px solid var(--agro-color-primario);
+  outline-offset: 2px;
+}
+
 app-root {
   --mat-sys-primary: var(--agro-color-primario);
   --mat-sys-surface: var(--agro-color-superficie);
@@ -46,10 +184,178 @@ app-root agro-produccion-campania form {
 }
 .agro-tabla {
   overflow-x: auto;
+  border: 1px solid var(--agro-color-borde);
+  border-radius: var(--agro-radio);
+  background: var(--agro-color-superficie);
 }
 app-root table {
   width: 100%;
   background: var(--agro-color-superficie);
+}
+app-root .mat-mdc-table {
+  --mat-table-header-container-height: 48px;
+  --mat-table-row-item-container-height: 56px;
+  --mat-table-row-item-outline-color: #e5ebe4;
+  --mat-table-row-item-outline-width: 1px;
+  min-width: 640px;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-family: var(--agro-fuente);
+}
+app-root .mat-mdc-table .mat-mdc-header-row,
+app-root .mat-mdc-table .mat-mdc-header-cell {
+  background: #e8efe5;
+}
+app-root .mat-mdc-table .mat-mdc-header-cell {
+  padding: 14px 20px;
+  color: #354b3c;
+  font: 600 13px/20px var(--agro-fuente);
+  text-align: left;
+  white-space: nowrap;
+  border-bottom: 1px solid var(--agro-color-borde);
+}
+app-root .mat-mdc-cell {
+  padding: 12px 20px;
+  color: var(--agro-color-texto);
+  font: 400 14px/22px var(--agro-fuente);
+  vertical-align: middle;
+  overflow-wrap: anywhere;
+}
+app-root .mat-mdc-row:last-child .mat-mdc-cell { border-bottom: 0; }
+app-root .mat-mdc-cell a:not(.mat-mdc-button-base) {
+  font-weight: 600;
+  text-decoration: none;
+  text-underline-offset: 3px;
+}
+app-root .mat-mdc-cell a:not(.mat-mdc-button-base):hover { text-decoration: underline; }
+app-root .mat-mdc-cell a:focus-visible { outline: 2px solid var(--agro-color-primario); outline-offset: 3px; }
+app-root .mat-mdc-table :is(.mat-column-nombre, .mat-column-descripcion) { min-width: 200px; }
+app-root .mat-mdc-table :is(.mat-column-inicio, .mat-column-fin, .mat-column-fecha, .mat-column-estado) {
+  width: 1%;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+app-root .mat-mdc-table :is(.mat-column-superficieHectareas, .mat-column-stock, .mat-column-nivelMinimo, .mat-column-cantidad, .mat-column-stockResultante, .mat-column-costoUnitario, .mat-column-monto, .mat-column-intentos, .mat-column-filas, .mat-column-metrica) {
+  text-align: right;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+app-root .mat-mdc-table .mat-column-acciones { min-width: 120px; text-align: right; }
+app-root .mat-mdc-table th.mat-mdc-header-cell {
+  text-align: center;
+  font-weight: 700;
+}
+app-root .mat-mdc-table td.mat-mdc-cell {
+  text-align: center;
+}
+app-root .mat-mdc-cell.mat-column-acciones .mat-mdc-button-base {
+  border: 0;
+  background: transparent;
+  margin: 3px 0 3px 6px;
+  padding: 6px 12px;
+  font-size: 13px;
+  line-height: 20px;
+}
+app-root .agro-acciones-usuarios {
+  display: grid;
+  grid-template-columns: 72px 104px 184px;
+  align-items: center;
+  gap: 8px;
+  width: max-content;
+  margin-inline: auto;
+}
+app-root .mat-mdc-cell.mat-column-acciones .agro-acciones-usuarios .mat-mdc-button-base {
+  width: 100%;
+  height: 36px;
+  min-width: 0;
+  margin: 0;
+  padding: 6px 8px;
+  white-space: nowrap;
+}
+app-root .agro-acciones-usuarios .agro-accion-contrasena { grid-column: 3; }
+app-root .agro-estado {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 150px;
+  height: 30px;
+  padding: 4px 10px;
+  border: 0;
+  border-radius: 6px;
+  background: #eef0f2;
+  color: #4b5563;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 20px;
+}
+app-root .agro-estado:is([data-estado='EN_CURSO'], [data-estado='ENVIADO']) {
+  background: #e5effb;
+  color: #24558a;
+}
+app-root .agro-estado:is([data-estado='FINALIZADA'], [data-estado='COMPLETADA'], [data-estado='COMPLETADO'], [data-estado='CONFIRMADA'], [data-estado='ACTIVO'], [data-estado='VIGENTE'], [data-estado='DISPONIBLE']) {
+  background: #e4f2e8;
+  color: #24633d;
+}
+app-root .agro-estado:is([data-estado='PLANIFICADA'], [data-estado='PENDIENTE'], [data-estado='PROGRAMADA'], [data-estado='CANDIDATA'], [data-estado='PENDIENTE_REVISION'], [data-estado='COMPENSANDO'], [data-estado='STOCK_BAJO'], [data-estado='SIN_RESPUESTA']) {
+  background: #fff1d7;
+  color: #80530b;
+}
+app-root .agro-estado:is([data-estado='RECHAZADA'], [data-estado='RECHAZADO'], [data-estado='REQUIERE_INTERVENCION']) {
+  background: #fce7e5;
+  color: #9b302c;
+}
+app-root .agro-estado strong { font-weight: inherit; }
+app-root .mat-mdc-paginator {
+  --mat-paginator-container-background-color: var(--agro-color-superficie);
+  --mat-paginator-container-text-color: #4d6053;
+  --mat-paginator-enabled-icon-color: var(--agro-color-primario);
+  --mat-paginator-disabled-icon-color: #a8b4aa;
+  --mat-paginator-container-text-size: 13px;
+  --mat-paginator-container-text-line-height: 20px;
+  --mat-paginator-container-text-font: var(--agro-fuente);
+  display: block;
+  padding: 6px 12px;
+  border: 1px solid var(--agro-color-borde);
+  border-radius: var(--agro-radio);
+  margin-top: 8px;
+}
+app-root .agro-tabla:has(+ mat-paginator) { border-radius: var(--agro-radio) var(--agro-radio) 0 0; }
+app-root .agro-tabla + mat-paginator {
+  margin-top: 0;
+  border-top: 0;
+  border-radius: 0 0 var(--agro-radio) var(--agro-radio);
+}
+app-root .mat-mdc-paginator-range-label { margin: 0 16px; font-variant-numeric: tabular-nums; }
+app-root .mat-mdc-paginator-range-actions { gap: 8px; }
+app-root .mat-mdc-paginator button.mat-mdc-icon-button {
+  --mat-icon-button-container-shape: 0;
+  --mat-icon-button-state-layer-size: 32px;
+  --mat-icon-button-touch-target-size: 32px;
+  --mat-icon-button-hover-state-layer-opacity: 0;
+  --mat-icon-button-focus-state-layer-opacity: 0;
+  --mat-icon-button-pressed-state-layer-opacity: 0;
+  --mat-icon-button-ripple-color: transparent;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 32px;
+  width: 32px;
+  min-width: 32px;
+  height: 32px;
+  padding: 0;
+  border-radius: 0;
+  line-height: 1;
+}
+app-root .mat-mdc-paginator .mat-mdc-paginator-icon {
+  display: block;
+  width: 20px;
+  height: 20px;
+  margin: 0;
+}
+@media (max-width: 600px) {
+  app-root :is(.mat-mdc-cell, .mat-mdc-header-cell) { padding: 12px; }
+  app-root .mat-mdc-paginator { padding: 6px; }
+  app-root .mat-mdc-paginator-range-label { margin: 0 8px; }
 }
 app-root small {
   display: block;

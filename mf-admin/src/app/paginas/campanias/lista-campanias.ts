@@ -15,7 +15,7 @@ import { DialogoCampania } from './dialogo-campania';
   imports: [...material, RouterLink],
   template: `<h1>Campañas</h1>
     <form class="agro-herramientas" [formGroup]="filtros">
-      <mat-form-field
+      <mat-form-field appearance="fill"
         ><mat-label>Estado</mat-label
         ><mat-select formControlName="estado" (selectionChange)="filtrar()"
           ><mat-option value="">Todos</mat-option>
@@ -23,7 +23,7 @@ import { DialogoCampania } from './dialogo-campania';
             <mat-option [value]="e">{{ etiquetas[e] }}</mat-option>
           }
         </mat-select></mat-form-field
-      ><mat-form-field
+      ><mat-form-field appearance="fill"
         ><mat-label>Parcela</mat-label
         ><mat-select formControlName="idParcela" (selectionChange)="filtrar()"
           ><mat-option value="">Todas</mat-option>
@@ -31,7 +31,7 @@ import { DialogoCampania } from './dialogo-campania';
             <mat-option [value]="p.id">{{ p.nombre }}</mat-option>
           }
         </mat-select></mat-form-field
-      ><mat-form-field
+      ><mat-form-field appearance="fill"
         ><mat-label>Cultivo</mat-label
         ><mat-select formControlName="idCultivo" (selectionChange)="filtrar()"
           ><mat-option value="">Todos</mat-option>
@@ -62,13 +62,13 @@ import { DialogoCampania } from './dialogo-campania';
           <td mat-cell *matCellDef="let c">{{ nombre(cultivos(), c.idCultivo) }}</td></ng-container
         ><ng-container matColumnDef="inicio"
           ><th mat-header-cell *matHeaderCellDef>Inicio</th>
-          <td mat-cell *matCellDef="let c">{{ c.fechaInicio }}</td></ng-container
+          <td mat-cell *matCellDef="let c">{{ c.fechaInicio | date: 'dd/MM/yyyy' }}</td></ng-container
         ><ng-container matColumnDef="fin"
           ><th mat-header-cell *matHeaderCellDef>Fin</th>
-          <td mat-cell *matCellDef="let c">{{ c.fechaFin }}</td></ng-container
+          <td mat-cell *matCellDef="let c">{{ c.fechaFin | date: 'dd/MM/yyyy' }}</td></ng-container
         ><ng-container matColumnDef="estado"
           ><th mat-header-cell *matHeaderCellDef>Estado</th>
-          <td mat-cell *matCellDef="let c">{{ etiquetas[c.estado] }}</td></ng-container
+          <td mat-cell *matCellDef="let c"><span class="agro-estado" [attr.data-estado]="c.estado">{{ etiquetas[c.estado] }}</span></td></ng-container
         >
         <tr mat-header-row *matHeaderRowDef="columnas"></tr>
         <tr mat-row *matRowDef="let c; columns: columnas" (click)="abrir(c.id)"></tr>

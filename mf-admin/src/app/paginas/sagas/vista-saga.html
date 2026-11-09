@@ -4,7 +4,7 @@
   Estado: <strong>{{ etiqueta(s.estado) }}</strong> · Paso actual: {{ etiqueta(s.pasoActual) }}
 </p>
 <p>
-  Costo total: {{ s.costoTotal ?? 'Sin registrar' }}
+  Costo total: {{ (s.costoTotal | number: '1.2-2') ?? 'Sin registrar' }}
   @if (s.costoTotal !== null) {
     Bs
   }
@@ -20,7 +20,7 @@
     >
     <ng-container matColumnDef="estado"
       ><th mat-header-cell *matHeaderCellDef>Estado</th>
-      <td mat-cell *matCellDef="let p">{{ etiqueta(p.estado) }}</td></ng-container
+      <td mat-cell *matCellDef="let p"><span class="agro-estado" [attr.data-estado]="p.estado">{{ etiqueta(p.estado) }}</span></td></ng-container
     >
     <ng-container matColumnDef="intentos"
       ><th mat-header-cell *matHeaderCellDef>Intentos</th>
