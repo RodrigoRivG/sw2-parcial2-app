@@ -19,21 +19,40 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Set up Node.js version
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: '24.x'
 
-      - name: npm install, build, and test
+      - name: Install frontend dependencies
         run: |
-          npm install
-          npm run build --if-present
-          npm run test --if-present
+          for project in root-config compartido mf-admin mf-analisis mf-campo; do
+            npm ci --prefix "$project"
+          done
+
+      - name: Configure production URLs
+        env:
+          GATEWAY_URL: https://sw2-api-gateway.blackbush-a3013f34.brazilsouth.azurecontainerapps.io
+          KEYCLOAK_URL: https://sw2-keycloak.blackbush-a3013f34.brazilsouth.azurecontainerapps.io
+          KEYCLOAK_REALM: agro
+          KEYCLOAK_CLIENT_ID: agro-web
+        run: node scripts/configurar-despliegue.mjs
+
+      - name: Build all microfrontends
+        run: npm run construir
+
+      - name: Verify deployment contents
+        run: |
+          for file in index.html root-config.js compartido/compartido.js admin/main.js analisis/analisis.js campo/campo.js; do
+            test -f "dist/$file"
+          done
+          node -e "const c = require('./dist/config.json'); if (!c.gatewayUrl.startsWith('https://') || !c.keycloakUrl.startsWith('https://')) process.exit(1)"
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
           name: node-app
-          path: .
+          path: dist/
+          if-no-files-found: error
 
   deploy:
     runs-on: ubuntu-latest
@@ -47,7 +66,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: node-app
-      
+
       - name: Login to Azure
         uses: azure/login@v2
         with:
@@ -62,4 +81,3 @@ jobs:
           app-name: 'sw2-p2-app'
           slot-name: 'Production'
           package: .
-          
